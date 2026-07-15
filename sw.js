@@ -1,5 +1,5 @@
 /* 그로핏 PWA 서비스워커 | 버전 올리면 캐시 갱신·자동 새로고침 */
-var CACHE = 'grofit-v0.11.0';
+var CACHE = 'grofit-v0.11.1';
 var ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', function (e) {

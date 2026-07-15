@@ -1,5 +1,5 @@
-<!-- 코드명: 그로핏 PWA 학생앱 | index.html | @version pwa-0.2.0 -->
-<!-- 수정요약: [pwa-0.2.0] 유산소 '사진 분석하기' 버튼(자동→수동), 기록탭에 '내가 올린 운동 기록' 목록(getMyExercises). [pwa-0.1.0] PWA 이식 -->
+<!-- 코드명: 그로핏 PWA 학생앱 | index.html | @version pwa-0.2.1 -->
+<!-- 수정요약: [pwa-0.2.1] 기록탭에 로그아웃 버튼 추가(자동로그인 상태 전환). [pwa-0.2.0] 유산소 분석버튼+내 운동기록 목록. [pwa-0.1.0] PWA 이식 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -265,6 +265,7 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
       <h2>내가 올린 운동 기록</h2>
       <div id="my-records"></div>
     </div>
+    <button class="btn sec" onclick="logout()" style="margin-top:2px">로그아웃</button>
   </section>
 
   <!-- 공지사항 -->
