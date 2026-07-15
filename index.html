@@ -1,5 +1,5 @@
-<!-- 코드명: 그로핏 PWA 학생앱 | index.html | @version pwa-0.1.0 -->
-<!-- 수정요약: [pwa-0.1.0] GAS index.html을 PWA로 이식 — fetch API+토큰(localStorage)+manifest+서비스워커+자동로그인 -->
+<!-- 코드명: 그로핏 PWA 학생앱 | index.html | @version pwa-0.2.0 -->
+<!-- 수정요약: [pwa-0.2.0] 유산소 '사진 분석하기' 버튼(자동→수동), 기록탭에 '내가 올린 운동 기록' 목록(getMyExercises). [pwa-0.1.0] PWA 이식 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -164,6 +164,7 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
       <div class="drop" id="cardio-drop" onclick="pick('cardio-file')">📷 운동 앱 스크린샷 업로드<br><span class="cap">탭하여 사진 선택</span></div>
       <input type="file" id="cardio-file" accept="image/*" class="hidden" onchange="onCardioImg(this)">
       <img id="cardio-prev" class="hidden" style="width:100%;border-radius:12px;margin-top:12px">
+      <button class="btn hidden" id="cardio-analyze" onclick="analyzeCardioNow()" style="margin-top:12px">🔍 사진 분석하기</button>
     </div>
     <div class="card hidden" id="cardio-result">
       <h2>분석 결과 <span class="cap" id="cardio-ai"></span></h2>
@@ -259,6 +260,10 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
       <h2>점수 구성</h2>
       <div class="list-item"><span>운동 달성률</span><span id="sc-ex">—</span></div>
       <div class="list-item"><span>제출 정시성</span><span id="sc-sub">—</span></div>
+    </div>
+    <div class="card">
+      <h2>내가 올린 운동 기록</h2>
+      <div id="my-records"></div>
     </div>
   </section>
 
@@ -404,20 +409,26 @@ function selDay(prov,date,btn){ST[prov+'Date']=date;
 var cardioB64=null;
 function onCardioImg(inp){readImg(inp,function(b64){cardioB64=b64;
   var p=document.getElementById('cardio-prev');p.src=b64;p.classList.remove('hidden');
-  document.getElementById('cardio-ai').textContent='· AI 분석 중…';
+  document.getElementById('cardio-analyze').classList.remove('hidden');
   document.getElementById('cardio-result').classList.remove('hidden');
-  call('analyzeCardio',[b64],function(r){
+  document.getElementById('cardio-ai').textContent='· 분석 버튼을 누르거나 직접 입력하세요';
+});}
+function analyzeCardioNow(){
+  if(!cardioB64){toast('사진을 먼저 첨부하세요');return;}
+  document.getElementById('cardio-ai').textContent='· AI 분석 중…';
+  call('analyzeCardio',[cardioB64],function(r){
     if(r&&r.ok&&r.data){var d=r.data;
       if(d.distanceKm!=null)document.getElementById('c-dist').value=d.distanceKm;
       if(d.durationMin!=null)document.getElementById('c-dur').value=d.durationMin;
       if(d.paceMinPerKm)document.getElementById('c-pace').value=d.paceMinPerKm;
       if(d.kcal!=null)document.getElementById('c-kcal').value=d.kcal;
       document.getElementById('cardio-ai').textContent='· 자동 인식됨 (확인·수정)';
-    } else {document.getElementById('cardio-ai').textContent='· 직접 입력해주세요';}
+    } else {document.getElementById('cardio-ai').textContent='· 인식 실패 · 직접 입력';toast((r&&r.msg)||'분석 실패');}
   });
-});}
+}
 function resetCardio(){cardioB64=null;['c-dist','c-dur','c-pace','c-kcal'].forEach(function(id){document.getElementById(id).value=''});
-  document.getElementById('cardio-prev').classList.add('hidden');document.getElementById('cardio-result').classList.add('hidden');}
+  document.getElementById('cardio-prev').classList.add('hidden');document.getElementById('cardio-result').classList.add('hidden');
+  document.getElementById('cardio-analyze').classList.add('hidden');}
 function saveCardio(){
   call('submitCardio',[ST.student.학번,{imageBase64:cardioB64,date:ST.cardioDate,
     distanceKm:val('c-dist'),durationMin:val('c-dur'),summary:'페이스 '+val('c-pace')+' · '+val('c-kcal')+'kcal',source:'앱'}],
@@ -511,6 +522,21 @@ function loadScore(){
     document.getElementById('sc-weeks').innerHTML=html;
     document.getElementById('sc-ex').textContent=s.운동달성률+'%';
     document.getElementById('sc-sub').textContent=s.정시성+'%';
+  });
+  loadMyRecords();
+}
+function loadMyRecords(){
+  call('getMyExercises',[ST.student.학번],function(list){
+    var html='';(list||[]).forEach(function(r){
+      var chip=(r.종류==='유산소')?'<span class="chip cardio">유산소</span>':'<span class="chip strength">근력</span>';
+      var sub=(r.종류==='유산소' && (r.거리||r.시간))?((r.거리?r.거리+'km ':'')+(r.시간?r.시간+'분':'')):'';
+      html+='<div class="list-item" style="align-items:flex-start">'
+        +'<div style="flex:1"><div>'+r.날짜+' '+chip+'</div>'
+        +'<div class="cap" style="margin-top:3px">'+esc(sub||r.내용||'')+'</div></div>'
+        +(r.사진?'<a class="cap" style="background:var(--cardio-tint);color:var(--cardio);padding:4px 9px;border-radius:8px;text-decoration:none;white-space:nowrap" href="'+r.사진+'" target="_blank" rel="noopener">📷 사진</a>':'')
+        +'</div>';
+    });
+    document.getElementById('my-records').innerHTML=html||'<p class="muted" style="padding:6px 0">아직 인증한 기록이 없습니다.</p>';
   });
 }
 
