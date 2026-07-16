@@ -1,5 +1,5 @@
-<!-- 코드명: 그로핏 PWA 학생앱 | index.html | @version pwa-0.3.3 -->
-<!-- 수정요약: [pwa-0.3.3] 로그인 화면 버전+배포시각을 화면 하단 고정. [pwa-0.3.2] 설치배너 항상표시. [pwa-0.3.1] 로그인 설치버튼. [pwa-0.3.0] 설치배너 -->
+<!-- 코드명: 그로핏 PWA 학생앱 | index.html | @version pwa-0.3.4 -->
+<!-- 수정요약: [pwa-0.3.4] 버전/배포시각을 PWA 자체 버전+KST 빌드시각으로 표시(PWA_VER/PWA_BUILD, 배포마다 갱신). [pwa-0.3.3] 로그인 버전 하단고정 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -302,6 +302,10 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
+/* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
+var PWA_VER = '0.3.4';
+var PWA_BUILD = '2026.07.16 12:38';
+function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 var ST = { student:null, config:null, inbody:[], metric:'체중' };
 
 /* ---------- 설치 배너 ---------- */
@@ -386,7 +390,7 @@ function loadHome(){
     document.getElementById('g-week').innerHTML=ring(pct,wk.완료일수+'/'+wk.목표일수,'이번 주');
     renderCal(h);
     var hv=document.getElementById('home-ver');
-    if(hv&&h.config)hv.textContent='v'+(h.config.version||'')+(h.config.배포시각?' · '+h.config.배포시각+' 배포':'');
+    if(hv)hv.textContent=verLine();
   });
 }
 function parseYmd(s){var p=String(s).split('-');return new Date(+p[0],(+p[1]||1)-1,(+p[2]||1));}
@@ -633,7 +637,8 @@ function mock(fn,args){
   call('getPublicConfig',[],function(c){if(c){ST.config=c;
     if(c.앱_제목)document.getElementById('lg-title').textContent=c.앱_제목;
     if(c.평가명)document.getElementById('lg-sub').textContent=c.평가명;
-    if(c.version)document.getElementById('ver').textContent='v'+c.version+(c.배포시각?' · '+c.배포시각+' 배포':'');}});
+  }});
+  document.getElementById('ver').textContent=verLine();
   // 자동 로그인(저장된 토큰)
   var saved=localStorage.getItem('grofit_student');
   if(saved && localStorage.getItem('grofit_token')){
