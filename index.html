@@ -1,5 +1,5 @@
-<!-- 코드명: 그로핏 PWA 학생앱 | index.html | @version pwa-0.3.1 -->
-<!-- 수정요약: [pwa-0.3.1] 로그인 화면에 항상 보이는 '홈 화면에 앱 설치' 버튼(미설치 시). [pwa-0.3.0] 설치 배너. [pwa-0.2.0] 분석버튼+내기록. [pwa-0.1.0] PWA 이식 -->
+<!-- 코드명: 그로핏 PWA 학생앱 | index.html | @version pwa-0.3.2 -->
+<!-- 수정요약: [pwa-0.3.2] 상단 설치배너를 로그인여부 무관 항상 표시(로그인 상태로 새로고침해도 홈 상단에 보임). [pwa-0.3.1] 로그인 설치버튼. [pwa-0.3.0] 설치배너 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -623,10 +623,11 @@ function mock(fn,args){
     navigator.serviceWorker.addEventListener('controllerchange',function(){if(refreshing)return;refreshing=true;location.reload();});
   }
   addStrRow();
-  // 설치 안 된 상태면 로그인 화면 설치 버튼 노출
-  if(!isStandalone()){var li=document.getElementById('login-install');if(li)li.classList.remove('hidden');}
-  // 아이폰(사파리)은 beforeinstallprompt가 없어 안내 배너
-  if(!isStandalone() && /iphone|ipad|ipod/i.test(navigator.userAgent)) showInstallBar('ios');
+  // 미설치 상태면: 로그인 버튼 + 상단 배너를 항상 표시(로그인/홈 어디서든 보이게)
+  if(!isStandalone()){
+    var li=document.getElementById('login-install');if(li)li.classList.remove('hidden');
+    showInstallBar(/iphone|ipad|ipod/i.test(navigator.userAgent)?'ios':'general');
+  }
   call('getPublicConfig',[],function(c){if(c){ST.config=c;
     if(c.앱_제목)document.getElementById('lg-title').textContent=c.앱_제목;
     if(c.평가명)document.getElementById('lg-sub').textContent=c.평가명;
