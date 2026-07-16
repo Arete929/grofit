@@ -1,5 +1,5 @@
-<!-- 코드명: 그로핏 PWA 학생앱 | index.html | @version pwa-0.2.2 -->
-<!-- 수정요약: [pwa-0.2.2] 홈 화면 하단에도 버전+배포시각 표시. [pwa-0.2.1] 기록탭 로그아웃. [pwa-0.2.0] 유산소 분석버튼+내 운동기록. [pwa-0.1.0] PWA 이식 -->
+<!-- 코드명: 그로핏 PWA 학생앱 | index.html | @version pwa-0.3.0 -->
+<!-- 수정요약: [pwa-0.3.0] 설치 안내 배너(안드로이드 설치프롬프트+아이폰 안내, 설치시 자동숨김). [pwa-0.2.2] 홈 버전표시. [pwa-0.2.0] 분석버튼+내기록. [pwa-0.1.0] PWA 이식 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -90,6 +90,9 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 .toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;
   border-radius:12px;font-size:13px;z-index:50;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90%}
 .toast.on{opacity:1}
+#install-bar{display:flex;align-items:center;gap:8px;background:var(--primary-tint);color:var(--primary-dark);padding:11px 14px;font-size:13px;font-weight:600;border-bottom:1px solid var(--primary)}
+#install-bar #install-btn{border:none;background:var(--primary);color:#fff;border-radius:8px;padding:7px 13px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+#install-bar .x{border:none;background:none;color:var(--primary-dark);font-size:17px;padding:2px 4px;cursor:pointer;line-height:1}
 .daysel{display:flex;gap:5px;margin-bottom:12px;overflow-x:auto}
 .daysel button{flex:1;min-width:40px;height:54px;border-radius:12px;border:1.5px solid var(--line2);background:#fff;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
 .daysel button span{font-size:11px;color:var(--muted)} .daysel button b{font-size:15px;color:var(--ink)}
@@ -101,6 +104,13 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 </head>
 <body>
 <div class="app">
+
+  <!-- 설치 안내 배너 -->
+  <div id="install-bar" class="hidden">
+    <span id="install-text" style="flex:1">📲 홈 화면에 <b>그로핏 앱</b> 설치하기</span>
+    <button id="install-btn" onclick="doInstall()">설치</button>
+    <button class="x" onclick="dismissInstall()" aria-label="닫기">✕</button>
+  </div>
 
   <!-- 1. 로그인 -->
   <section id="s-login" class="scr on" style="padding-top:8vh">
@@ -290,6 +300,22 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 var ST = { student:null, config:null, inbody:[], metric:'체중' };
+
+/* ---------- 설치 배너 ---------- */
+var deferredPrompt=null;
+function isStandalone(){return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true;}
+function showInstallBar(mode){
+  if(isStandalone())return; if(localStorage.getItem('grofit_install_dismissed'))return;
+  if(mode==='ios'){document.getElementById('install-text').innerHTML='📲 설치: 하단 <b>공유</b> → <b>홈 화면에 추가</b>';document.getElementById('install-btn').style.display='none';}
+  document.getElementById('install-bar').classList.remove('hidden');
+}
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;showInstallBar('android');});
+window.addEventListener('appinstalled',function(){var b=document.getElementById('install-bar');if(b)b.classList.add('hidden');});
+function doInstall(){
+  if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(){deferredPrompt=null;document.getElementById('install-bar').classList.add('hidden');});}
+  else{toast('브라우저 메뉴(⋮ 또는 공유)에서 "홈 화면에 추가"를 눌러주세요');}
+}
+function dismissInstall(){localStorage.setItem('grofit_install_dismissed','1');document.getElementById('install-bar').classList.add('hidden');}
 
 /* ---------- 화면 전환 ---------- */
 var TABS = {home:1,cert:1,inbody:1,reflect:1,score:1,notice:1};
@@ -595,6 +621,8 @@ function mock(fn,args){
     navigator.serviceWorker.addEventListener('controllerchange',function(){if(refreshing)return;refreshing=true;location.reload();});
   }
   addStrRow();
+  // 아이폰(사파리)은 beforeinstallprompt가 없어 안내 배너
+  if(!isStandalone() && /iphone|ipad|ipod/i.test(navigator.userAgent)) showInstallBar('ios');
   call('getPublicConfig',[],function(c){if(c){ST.config=c;
     if(c.앱_제목)document.getElementById('lg-title').textContent=c.앱_제목;
     if(c.평가명)document.getElementById('lg-sub').textContent=c.평가명;
