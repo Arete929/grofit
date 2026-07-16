@@ -1,5 +1,5 @@
-<!-- 코드명: 그로핏 PWA 학생앱 | index.html | @version pwa-0.2.1 -->
-<!-- 수정요약: [pwa-0.2.1] 기록탭에 로그아웃 버튼 추가(자동로그인 상태 전환). [pwa-0.2.0] 유산소 분석버튼+내 운동기록 목록. [pwa-0.1.0] PWA 이식 -->
+<!-- 코드명: 그로핏 PWA 학생앱 | index.html | @version pwa-0.2.2 -->
+<!-- 수정요약: [pwa-0.2.2] 홈 화면 하단에도 버전+배포시각 표시. [pwa-0.2.1] 기록탭 로그아웃. [pwa-0.2.0] 유산소 분석버튼+내 운동기록. [pwa-0.1.0] PWA 이식 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -141,6 +141,7 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
       <p class="cap" style="text-align:center;margin:6px 0 0">연초록 칸=운동기간(숫자는 주차) · 초록 테두리=오늘</p>
     </div>
     <button class="btn" onclick="go('cert')">＋ 오늘 인증하기</button>
+    <p class="ver" id="home-ver" style="margin-top:16px"></p>
   </section>
 
   <!-- 인증 종류 선택 -->
@@ -354,6 +355,8 @@ function loadHome(){
     var pct=Math.min(100,Math.round(wk.완료일수/wk.목표일수*100));
     document.getElementById('g-week').innerHTML=ring(pct,wk.완료일수+'/'+wk.목표일수,'이번 주');
     renderCal(h);
+    var hv=document.getElementById('home-ver');
+    if(hv&&h.config)hv.textContent='v'+(h.config.version||'')+(h.config.배포시각?' · '+h.config.배포시각+' 배포':'');
   });
 }
 function parseYmd(s){var p=String(s).split('-');return new Date(+p[0],(+p[1]||1)-1,(+p[2]||1));}
