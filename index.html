@@ -1,5 +1,5 @@
-<!-- 코드명: 그로핏 PWA 학생앱 | index.html | @version pwa-0.3.2 -->
-<!-- 수정요약: [pwa-0.3.2] 상단 설치배너를 로그인여부 무관 항상 표시(로그인 상태로 새로고침해도 홈 상단에 보임). [pwa-0.3.1] 로그인 설치버튼. [pwa-0.3.0] 설치배너 -->
+<!-- 코드명: 그로핏 PWA 학생앱 | index.html | @version pwa-0.3.3 -->
+<!-- 수정요약: [pwa-0.3.3] 로그인 화면 버전+배포시각을 화면 하단 고정. [pwa-0.3.2] 설치배너 항상표시. [pwa-0.3.1] 로그인 설치버튼. [pwa-0.3.0] 설치배너 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -30,6 +30,8 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .scr{display:none;flex:1;padding:16px 16px 96px}
 .scr.on{display:block}
 #s-login.on{display:flex;flex-direction:column;justify-content:center}
+#s-login{position:relative}
+#s-login #ver{position:absolute;left:0;right:0;bottom:14px;margin:0}
 .hidden{display:none!important}
 h1{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0}
 h2{font-size:15px;font-weight:700;margin:0 0 10px}
