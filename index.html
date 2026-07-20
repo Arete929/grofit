@@ -1,5 +1,5 @@
-<!-- 코드명: 그로핏 PWA 학생앱 | index.html | @version pwa-0.3.4 -->
-<!-- 수정요약: [pwa-0.3.4] 버전/배포시각을 PWA 자체 버전+KST 빌드시각으로 표시(PWA_VER/PWA_BUILD, 배포마다 갱신). [pwa-0.3.3] 로그인 버전 하단고정 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version pwa-0.4.0 -->
+<!-- 수정요약: [pwa-0.4.0] 앱 이름 그로핏→혜원핏(manifest/타이틀/로고💪), 아이콘 아령+혜원여중 교체. [pwa-0.3.4] PWA 버전표시 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -12,8 +12,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="그로핏">
-<title>그로핏 · 운동처방일지</title>
+<meta name="apple-mobile-web-app-title" content="혜원핏">
+<title>혜원핏 · 운동처방일지</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <style>
 :root{
@@ -116,8 +116,8 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 
   <!-- 1. 로그인 -->
   <section id="s-login" class="scr on" style="padding-top:8vh">
-    <div class="logo">🌱</div>
-    <h1 style="text-align:center" id="lg-title">그로핏</h1>
+    <div class="logo">💪</div>
+    <h1 style="text-align:center" id="lg-title">혜원핏</h1>
     <p class="muted" style="text-align:center;margin:6px 0 26px" id="lg-sub">운동처방일지</p>
     <div class="card">
       <div class="field"><label>학번</label><input id="in-sid" inputmode="numeric" placeholder="예: 3277"></div>
@@ -303,8 +303,8 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.3.4';
-var PWA_BUILD = '2026.07.16 12:38';
+var PWA_VER = '0.4.0';
+var PWA_BUILD = '2026.07.20 23:23';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 var ST = { student:null, config:null, inbody:[], metric:'체중' };
 
