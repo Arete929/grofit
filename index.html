@@ -1,5 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version pwa-0.6.0 -->
-<!-- 수정요약: [pwa-0.6.0] 로그인 로고 대형화(min(190px,46vw))·홈 우측상단 로고 추가(테마 연동). [pwa-0.5.0] 6테마 시스템 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version pwa-0.7.0 -->
+<!-- 수정요약: [pwa-0.7.0] 유산소·근력 매일 인증에 "오늘의 성찰" 입력(300자)·기록탭 표시. [pwa-0.6.0] 로고 대형화+홈 우측상단 로고 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -197,6 +197,11 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
         <div class="field"><label>칼로리</label><input id="c-kcal" inputmode="numeric"></div>
       </div>
     </div>
+    <div class="card">
+      <h2>오늘의 성찰 <span class="cap">선택</span></h2>
+      <textarea id="c-reflect" rows="3" maxlength="300" placeholder="오늘 운동은 어땠나요? (예: 초반엔 힘들었는데 20분 넘으니 리듬이 잡혔다)"></textarea>
+      <p class="cap" style="text-align:right;margin:6px 0 0"><span id="c-reflect-n">0</span>/300자</p>
+    </div>
     <div class="row"><button class="btn sec" onclick="resetCardio()">다시</button><button class="btn" onclick="saveCardio()">저장하기</button></div>
   </section>
 
@@ -213,6 +218,11 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
       <h2>운동 내용</h2>
       <div id="str-list"></div>
       <button class="btn sec sm" onclick="addStrRow()" style="margin-top:8px">＋ 운동 추가</button>
+    </div>
+    <div class="card">
+      <h2>오늘의 성찰 <span class="cap">선택</span></h2>
+      <textarea id="s-reflect" rows="3" maxlength="300" placeholder="오늘 운동은 어땠나요? (예: 스쿼트 자세를 신경 쓰니 허벅지에 자극이 확실했다)"></textarea>
+      <p class="cap" style="text-align:right;margin:6px 0 0"><span id="s-reflect-n">0</span>/300자</p>
     </div>
     <div class="row"><button class="btn sec" onclick="go('cert')">취소</button><button class="btn" onclick="saveStrength()">저장하기</button></div>
   </section>
@@ -311,8 +321,8 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.6.0';
-var PWA_BUILD = '2026.08.13 00:50';
+var PWA_VER = '0.7.0';
+var PWA_BUILD = '2026.08.13 01:02';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -492,14 +502,19 @@ function analyzeCardioNow(){
     } else {document.getElementById('cardio-ai').textContent='· 인식 실패 · 직접 입력';toast((r&&r.msg)||'분석 실패');}
   });
 }
-function resetCardio(){cardioB64=null;['c-dist','c-dur','c-pace','c-kcal'].forEach(function(id){document.getElementById(id).value=''});
+function resetCardio(){cardioB64=null;['c-dist','c-dur','c-pace','c-kcal','c-reflect'].forEach(function(id){document.getElementById(id).value=''});
+  countReflect('c-reflect','c-reflect-n');
   document.getElementById('cardio-prev').classList.add('hidden');document.getElementById('cardio-result').classList.add('hidden');
   document.getElementById('cardio-analyze').classList.add('hidden');}
 function saveCardio(){
   call('submitCardio',[ST.student.학번,{imageBase64:cardioB64,date:ST.cardioDate,
-    distanceKm:val('c-dist'),durationMin:val('c-dur'),summary:'페이스 '+val('c-pace')+' · '+val('c-kcal')+'kcal',source:'앱'}],
+    distanceKm:val('c-dist'),durationMin:val('c-dur'),summary:'페이스 '+val('c-pace')+' · '+val('c-kcal')+'kcal',source:'앱',
+    reflect:val('c-reflect')}],
     function(){toast('유산소 인증 저장!');resetCardio();go('home');});
 }
+/* 성찰 글자수 카운터 */
+function countReflect(id,nid){var t=document.getElementById(id),n=document.getElementById(nid);
+  if(t&&n)n.textContent=t.value.length;}
 
 /* ---------- 근력 ---------- */
 var strB64=null;
@@ -512,8 +527,9 @@ function saveStrength(){
     var n=r.querySelector('.s-name').value.trim();if(!n)return;
     rows.push(n+' '+r.querySelector('.s-set').value+'세트×'+r.querySelector('.s-rep').value);});
   if(!rows.length&&!strB64){toast('사진이나 운동을 입력하세요');return;}
-  call('submitStrength',[ST.student.학번,{imageBase64:strB64,date:ST.strDate,summary:rows.join(', ')}],
+  call('submitStrength',[ST.student.학번,{imageBase64:strB64,date:ST.strDate,summary:rows.join(', '),reflect:val('s-reflect')}],
     function(){toast('근력 인증 저장!');strB64=null;document.getElementById('str-list').innerHTML='';addStrRow();
+    document.getElementById('s-reflect').value='';countReflect('s-reflect','s-reflect-n');
     document.getElementById('str-prev').classList.add('hidden');go('home');});
 }
 
@@ -598,7 +614,9 @@ function loadMyRecords(){
       var sub=(r.종류==='유산소' && (r.거리||r.시간))?((r.거리?r.거리+'km ':'')+(r.시간?r.시간+'분':'')):'';
       html+='<div class="list-item" style="align-items:flex-start">'
         +'<div style="flex:1"><div>'+r.날짜+' '+chip+'</div>'
-        +'<div class="cap" style="margin-top:3px">'+esc(sub||r.내용||'')+'</div></div>'
+        +'<div class="cap" style="margin-top:3px">'+esc(sub||r.내용||'')+'</div>'
+        +(r.성찰?'<div class="bubble" style="margin-top:6px">✍️ '+esc(r.성찰)+'</div>':'')
+        +'</div>'
         +(r.사진?'<a class="cap" style="background:var(--cardio-tint);color:var(--cardio);padding:4px 9px;border-radius:8px;text-decoration:none;white-space:nowrap" href="'+r.사진+'" target="_blank" rel="noopener">📷 사진</a>':'')
         +'</div>';
     });
@@ -657,6 +675,10 @@ function mock(fn,args){
     navigator.serviceWorker.addEventListener('controllerchange',function(){if(refreshing)return;refreshing=true;location.reload();});
   }
   addStrRow();
+  // 성찰 글자수 카운터 연결
+  [['c-reflect','c-reflect-n'],['s-reflect','s-reflect-n']].forEach(function(p){
+    var t=document.getElementById(p[0]); if(t)t.addEventListener('input',function(){countReflect(p[0],p[1]);});
+  });
   // 미설치 상태면: 로그인 버튼 + 상단 배너를 항상 표시(로그인/홈 어디서든 보이게)
   if(!isStandalone()){
     var li=document.getElementById('login-install');if(li)li.classList.remove('hidden');
