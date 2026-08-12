@@ -1,5 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version pwa-0.4.0 -->
-<!-- 수정요약: [pwa-0.4.0] 앱 이름 그로핏→혜원핏(manifest/타이틀/로고💪), 아이콘 아령+혜원여중 교체. [pwa-0.3.4] PWA 버전표시 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version pwa-0.5.0 -->
+<!-- 수정요약: [pwa-0.5.0] 6테마 시스템(관리자 설정값 테마1~6 → 색 CSS변수+로고 전환, applyTheme, ring/그래프 테마색). [pwa-0.4.0] 혜원핏 이름/아이콘 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -116,7 +116,7 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 
   <!-- 1. 로그인 -->
   <section id="s-login" class="scr on" style="padding-top:8vh">
-    <div class="logo">💪</div>
+    <img id="lg-logo" alt="혜원핏" src="theme5.png" style="width:72px;height:72px;border-radius:18px;display:block;margin:0 auto 14px">
     <h1 style="text-align:center" id="lg-title">혜원핏</h1>
     <p class="muted" style="text-align:center;margin:6px 0 26px" id="lg-sub">운동처방일지</p>
     <div class="card">
@@ -303,9 +303,28 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.4.0';
-var PWA_BUILD = '2026.07.20 23:23';
+var PWA_VER = '0.5.0';
+var PWA_BUILD = '2026.08.12 22:04';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
+
+/* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
+var THEMES={
+  1:{p:'#FD1843',d:'#D6113B',t:'#FFE1E8',logo:'theme1.png'},
+  2:{p:'#FD1843',d:'#D6113B',t:'#FFE1E8',logo:'theme2.png'},
+  3:{p:'#27187E',d:'#1B1258',t:'#E6E3F5',logo:'theme3.png'},
+  4:{p:'#27187E',d:'#1B1258',t:'#E6E3F5',logo:'theme4.png'},
+  5:{p:'#5FAE00',d:'#4A8A00',t:'#EDFAD6',logo:'theme5.png'},
+  6:{p:'#5FAE00',d:'#4A8A00',t:'#EDFAD6',logo:'theme6.png'}
+};
+var THEME_P='#19c37d';
+function applyTheme(n){
+  var th=THEMES[String(n)]||THEMES['5'];
+  var r=document.documentElement.style;
+  r.setProperty('--primary',th.p); r.setProperty('--primary-dark',th.d); r.setProperty('--primary-tint',th.t);
+  THEME_P=th.p;
+  var lg=document.getElementById('lg-logo'); if(lg)lg.src=th.logo;
+  var mt=document.querySelector('meta[name=theme-color]'); if(mt)mt.setAttribute('content',th.p);
+}
 var ST = { student:null, config:null, inbody:[], metric:'체중' };
 
 /* ---------- 설치 배너 ---------- */
@@ -516,9 +535,9 @@ function drawTrend(){
   var W=300,H=160,pad=24,n=vals.length;
   var pts=vals.map(function(v,i){var x=pad+(n>1?i/(n-1):0)*(W-2*pad);var y=H-pad-((v-min)/rng)*(H-2*pad);return [x,y]});
   var poly=pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1)}).join(' ');
-  var dots=pts.map(function(p){return '<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="4" fill="#19c37d"/>'}).join('');
+  var dots=pts.map(function(p){return '<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="4" fill="'+THEME_P+'"/>'}).join('');
   var svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%">'
-    +'<polyline points="'+poly+'" fill="none" stroke="#19c37d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+dots
+    +'<polyline points="'+poly+'" fill="none" stroke="'+THEME_P+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+dots
     +rows.map(function(r,i){return '<text x="'+pts[i][0].toFixed(1)+'" y="'+(H-6)+'" font-size="9" fill="#8a978c" text-anchor="middle">'+r.주차+'주</text>'}).join('')
     +'</svg>';
   document.getElementById('inb-chart').innerHTML='<h2>'+k+' 추이</h2>'+svg;
@@ -590,7 +609,7 @@ function loadNoticesStudent(){
 /* ---------- 공용 렌더 ---------- */
 function ring(pct,center,label,gold){
   pct=Math.max(0,Math.min(100,pct));var r=52,c=2*Math.PI*r,off=c*(1-pct/100);
-  var col=gold?'#f2b134':'#19c37d';
+  var col=gold?'#f2b134':THEME_P;
   return '<svg width="120" height="120" viewBox="0 0 120 120">'
     +'<circle cx="60" cy="60" r="52" fill="none" stroke="#eef2ee" stroke-width="13"/>'
     +'<circle cx="60" cy="60" r="52" fill="none" stroke="'+col+'" stroke-width="13" stroke-linecap="round" '
@@ -634,7 +653,9 @@ function mock(fn,args){
     var li=document.getElementById('login-install');if(li)li.classList.remove('hidden');
     showInstallBar(/iphone|ipad|ipod/i.test(navigator.userAgent)?'ios':'general');
   }
+  applyTheme(localStorage.getItem('grofit_theme')||'5'); // 마지막 테마 우선 적용(깜빡임 방지)
   call('getPublicConfig',[],function(c){if(c){ST.config=c;
+    if(c.테마){applyTheme(c.테마);localStorage.setItem('grofit_theme',String(c.테마));}
     if(c.앱_제목)document.getElementById('lg-title').textContent=c.앱_제목;
     if(c.평가명)document.getElementById('lg-sub').textContent=c.평가명;
   }});
