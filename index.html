@@ -1,5 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version pwa-0.5.0 -->
-<!-- 수정요약: [pwa-0.5.0] 6테마 시스템(관리자 설정값 테마1~6 → 색 CSS변수+로고 전환, applyTheme, ring/그래프 테마색). [pwa-0.4.0] 혜원핏 이름/아이콘 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version pwa-0.6.0 -->
+<!-- 수정요약: [pwa-0.6.0] 로그인 로고 대형화(min(190px,46vw))·홈 우측상단 로고 추가(테마 연동). [pwa-0.5.0] 6테마 시스템 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -31,6 +31,11 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .scr.on{display:block}
 #s-login.on{display:flex;flex-direction:column;justify-content:center}
 #s-login{position:relative}
+/* 홈 우측 상단 로고 + D-day */
+.hm-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
+.hm-logo{width:52px;height:52px;border-radius:14px;display:block;box-shadow:0 3px 10px rgba(0,0,0,.12)}
+/* 로그인 로고 — 모바일에서 시원하게(화면폭 비례, 최대 190px) */
+#lg-logo{width:min(190px,46vw);height:min(190px,46vw);border-radius:24px;display:block;margin:0 auto 16px;box-shadow:0 8px 22px rgba(0,0,0,.13)}
 #s-login #ver{position:absolute;left:0;right:0;bottom:14px;margin:0}
 .hidden{display:none!important}
 h1{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0}
@@ -115,8 +120,8 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
   </div>
 
   <!-- 1. 로그인 -->
-  <section id="s-login" class="scr on" style="padding-top:8vh">
-    <img id="lg-logo" alt="혜원핏" src="theme5.png" style="width:72px;height:72px;border-radius:18px;display:block;margin:0 auto 14px">
+  <section id="s-login" class="scr on" style="padding-top:4vh">
+    <img id="lg-logo" alt="혜원핏" src="theme5.png">
     <h1 style="text-align:center" id="lg-title">혜원핏</h1>
     <p class="muted" style="text-align:center;margin:6px 0 26px" id="lg-sub">운동처방일지</p>
     <div class="card">
@@ -132,8 +137,11 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
   <!-- 2. 홈 -->
   <section id="s-home" class="scr">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
-      <div><h1 id="hi-name">안녕하세요</h1><p class="muted" id="hi-week" style="margin:2px 0 0">1주차</p></div>
-      <span class="badge-dday" id="hi-dday">마감 D-—</span>
+      <div style="flex:1;min-width:0"><h1 id="hi-name">안녕하세요</h1><p class="muted" id="hi-week" style="margin:2px 0 0">1주차</p></div>
+      <div class="hm-right">
+        <img id="hm-logo" class="hm-logo" alt="혜원핏" src="theme5.png">
+        <span class="badge-dday" id="hi-dday">마감 D-—</span>
+      </div>
     </div>
     <div class="card">
       <div class="gauge">
@@ -303,8 +311,8 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.5.0';
-var PWA_BUILD = '2026.08.12 22:04';
+var PWA_VER = '0.6.0';
+var PWA_BUILD = '2026.08.13 00:50';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -323,6 +331,7 @@ function applyTheme(n){
   r.setProperty('--primary',th.p); r.setProperty('--primary-dark',th.d); r.setProperty('--primary-tint',th.t);
   THEME_P=th.p;
   var lg=document.getElementById('lg-logo'); if(lg)lg.src=th.logo;
+  var hm=document.getElementById('hm-logo'); if(hm)hm.src=th.logo;
   var mt=document.querySelector('meta[name=theme-color]'); if(mt)mt.setAttribute('content',th.p);
 }
 var ST = { student:null, config:null, inbody:[], metric:'체중' };
