@@ -380,8 +380,8 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.9.0';
-var PWA_BUILD = '2026.08.13 12:40';
+var PWA_VER = '0.9.1';
+var PWA_BUILD = '2026.08.13 12:52';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -776,7 +776,9 @@ function chartCard(m,recs){
   var vals=FIT_ROUNDS.map(function(rd){var f=null;recs.forEach(function(x){if(x.회차===rd)f=x;});return fitVal(f,m.k);});
   var got=vals.filter(function(v){return v!==null;});
   if(!got.length)return '';                     // 아직 한 번도 입력 안 한 항목은 숨김
-  var first=got[0],last=got[got.length-1],d=Math.round((last-first)*10)/10;
+  var first=got[0],last=got[got.length-1],raw=last-first;
+  /* WHR처럼 변화폭이 작은 항목은 소수 둘째자리까지 살린다 */
+  var d=(Math.abs(raw)<1)?Math.round(raw*100)/100:Math.round(raw*10)/10;
   /* 향상 판정 */
   var tone='wait',word='변화 없음';
   if(d!==0&&m.dir!=='none'){
