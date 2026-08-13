@@ -1,5 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.26.0 -->
-<!-- 수정요약: [0.26.0] 성찰 화면에 이번 주 운동 요약 카드(기록 없으면 예시 표시) + 내 기록 넣고 쓰기·질문 보기 도우미. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.27.0 -->
+<!-- 수정요약: [0.27.0] 근력 3종목 필수(칸 3개 기본·미달 시 팝업), 사진 없이 제출 시 미인정 안내 후 동의하면 기록만 저장. -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -52,6 +52,9 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .swrow button.on{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-tint)}
 .swrow button.on::after{content:'✓';position:absolute;right:2px;bottom:0;font-size:12px;font-weight:800;color:#fff;
   text-shadow:0 1px 3px rgba(0,0,0,.7)}
+/* 근력 운동 입력 칸 번호 */
+.strno{width:22px;height:22px;flex:none;border-radius:50%;background:var(--strength-tint);color:var(--strength-dark);
+  font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
 /* 성찰 — 이번 주 기록 요약 */
 .wk{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px;
   box-shadow:0 10px 34px rgba(20,40,25,.05)}
@@ -301,7 +304,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       <div id="str-check"></div>
     </div>
     <div class="card">
-      <h2>운동 내용</h2>
+      <h2>운동 내용 <span class="cap">· 3가지 이상 필수</span></h2>
+      <p class="cap" style="margin:-4px 0 8px">아래 <b>3칸을 모두 채워야</b> 저장할 수 있어요. 더 했으면 ＋로 추가하세요.</p>
       <div id="str-list"></div>
       <button class="btn sec sm" onclick="addStrRow()" style="margin-top:8px">＋ 운동 추가</button>
     </div>
@@ -450,8 +454,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.26.0';
-var PWA_BUILD = '2026.08.13 21:45';
+var PWA_VER = '0.27.0';
+var PWA_BUILD = '2026.08.13 22:05';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -759,22 +763,65 @@ function askException(){
   setChk('wait','🙋 <b>선생님 확인 요청으로 제출합니다</b><br><span class="cap">사유: '+esc(why)
     +'<br>선생님이 확인한 뒤 인정 여부가 정해집니다.</span>');
 }
-function addStrRow(){var d=document.createElement('div');d.className='row';d.style.marginBottom='8px';
-  d.innerHTML='<input class="s-name" placeholder="운동명(예: 스쿼트)" style="flex:2"><input class="s-set" placeholder="세트" style="flex:1"><input class="s-rep" placeholder="횟수" style="flex:1">';
-  document.getElementById('str-list').appendChild(d);}
+var STR_MIN=3;                       // 근력은 최소 3종목 필수
+function addStrRow(){
+  var list=document.getElementById('str-list');
+  var i=list.querySelectorAll('.row').length+1;
+  var d=document.createElement('div');d.className='row';d.style.cssText='margin-bottom:8px;align-items:center';
+  d.innerHTML='<span class="strno">'+i+'</span>'
+    +'<input class="s-name" placeholder="운동명(예: 스쿼트)" style="flex:2">'
+    +'<input class="s-set" inputmode="numeric" placeholder="세트" style="flex:1">'
+    +'<input class="s-rep" inputmode="numeric" placeholder="횟수" style="flex:1">';
+  list.appendChild(d);
+}
+/* 최소 개수만큼 빈 칸을 미리 만들어 둔다 */
+function resetStrRows(){
+  document.getElementById('str-list').innerHTML='';
+  for(var i=0;i<STR_MIN;i++)addStrRow();
+}
 function saveStrength(){
-  var rows=[];document.querySelectorAll('#str-list .row').forEach(function(r){
-    var n=r.querySelector('.s-name').value.trim();if(!n)return;
-    rows.push(n+' '+r.querySelector('.s-set').value+'세트×'+r.querySelector('.s-rep').value);});
-  if(!rows.length&&!strB64){toast('사진이나 운동을 입력하세요');return;}
+  var rows=[],미완=0;
+  document.querySelectorAll('#str-list .row').forEach(function(r){
+    var nm=r.querySelector('.s-name').value.trim();
+    var st=r.querySelector('.s-set').value.trim();
+    var rp=r.querySelector('.s-rep').value.trim();
+    if(!nm&&!st&&!rp)return;                       // 완전히 빈 칸은 그냥 넘어감
+    if(!nm||!st||!rp){미완++;return;}               // 일부만 쓴 칸
+    rows.push(nm+' '+st+'세트×'+rp);
+  });
+  // 근력은 3종목 이상 필수
+  if(rows.length<STR_MIN){
+    var N=String.fromCharCode(10);
+    var msg='근력 운동은 '+STR_MIN+'가지 이상 기록해야 해요.'+N+N
+      +'지금 '+rows.length+'가지만 입력했어요.'
+      +(미완?' ('+미완+'칸은 운동명·세트·횟수 중 빠진 게 있어요)':'')
+      +N+N+STR_MIN+'가지를 모두 채워 주세요.'+N
+      +'예: 스쿼트 3세트×15 / 런지 3세트×12 / 플랭크 3세트×60초';
+    alert(msg);
+    var el=document.querySelector('#str-list .row .s-name');
+    document.querySelectorAll('#str-list .row').forEach(function(r){
+      if(!r.querySelector('.s-name').value.trim()&&!el.__done){el=r.querySelector('.s-name');el.__done=1;}
+    });
+    if(el)el.focus();
+    return;
+  }
+  if(미완){alert('운동명 · 세트 · 횟수를 모두 채워 주세요. ('+미완+'칸이 비어 있어요)');return;}
+  if(!strB64){
+    var N2=String.fromCharCode(10);
+    if(!confirm('사진 없이 제출할까요?'+N2+N2
+      +'기록은 남지만 운동한 것으로 인정되지 않습니다.'+N2
+      +'(주 3일 달성 일수에 들어가지 않아요)'+N2+N2
+      +'타임마크로 찍은 사진을 넣으면 인정됩니다.'))return;
+  }
   if(strB64 && !strCheck){toast('사진 확인이 끝날 때까지 잠시만 기다려주세요');return;}
   if(strB64 && strCheck && !strCheck.pass && !strCheck.skipped && !strException){
     toast('타임마크 사진이 아니에요. 다시 찍거나 선생님께 확인 요청을 눌러주세요');return;
   }
   call('submitStrength',[ST.student.학번,{imageBase64:strB64,date:ST.strDate,summary:rows.join(', '),reflect:val('s-reflect'),
     check:strCheck,exception:strException}],
-    function(r){toast('✅ 근력 인증 저장'+savedMsg(r));strB64=null;strCheck=null;strException=null;
-    document.getElementById('str-check').innerHTML='';document.getElementById('str-list').innerHTML='';addStrRow();
+    function(r){toast(strB64?('✅ 근력 인증 저장'+savedMsg(r)):'📝 기록만 저장됨 · 사진이 없어 인정되지 않아요');
+    strB64=null;strCheck=null;strException=null;
+    document.getElementById('str-check').innerHTML='';resetStrRows();
     document.getElementById('s-reflect').value='';countReflect('s-reflect','s-reflect-n');
     document.getElementById('str-prev').classList.add('hidden');go('home');});
 }
@@ -1169,7 +1216,7 @@ function mock(fn,args){
     var refreshing=false;
     navigator.serviceWorker.addEventListener('controllerchange',function(){if(refreshing)return;refreshing=true;location.reload();});
   }
-  addStrRow();
+  resetStrRows();
   // 체력측정 입력 → 등급 즉시 판정
   document.querySelectorAll('.fi').forEach(function(el){el.addEventListener('input',judgeNow);});
   // 성찰 글자수 카운터 연결
