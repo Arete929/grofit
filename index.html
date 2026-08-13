@@ -1,5 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.25.0 -->
-<!-- 수정요약: [0.25.0] 하단 탭바 아이콘을 그림(홈·인증·체력·기록·공지)으로 교체. 미선택 탭은 흐리게. 성찰은 아이콘 대기중. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.26.0 -->
+<!-- 수정요약: [0.26.0] 성찰 화면에 이번 주 운동 요약 카드(기록 없으면 예시 표시) + 내 기록 넣고 쓰기·질문 보기 도우미. -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -52,6 +52,19 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .swrow button.on{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-tint)}
 .swrow button.on::after{content:'✓';position:absolute;right:2px;bottom:0;font-size:12px;font-weight:800;color:#fff;
   text-shadow:0 1px 3px rgba(0,0,0,.7)}
+/* 성찰 — 이번 주 기록 요약 */
+.wk{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px;
+  box-shadow:0 10px 34px rgba(20,40,25,.05)}
+.wk.demo{border-style:dashed;background:#fbfcfa}
+.wk .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.wk .big{font-size:26px;font-weight:800;color:var(--primary-dark);line-height:1.1}
+.wk .st{display:flex;gap:8px;margin:10px 0 12px}
+.wk .st div{flex:1;background:var(--bg);border-radius:11px;padding:9px 10px;text-align:center}
+.wk .st b{display:block;font-size:17px} .wk .st span{font-size:11px;color:var(--muted)}
+.wk .dl{border-top:1px solid var(--divider);padding:9px 0 0;margin-top:2px}
+.wk .di{display:flex;gap:9px;padding:6px 0;align-items:flex-start;font-size:13px}
+.wk .di .dd{width:44px;flex:none;font-weight:700;color:var(--ink2)}
+.badge-demo{background:var(--warning-tint);color:var(--warning);font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px}
 /* 근력 사진 타임마크 검사 */
 .tmnote{background:var(--warning-tint);border:1px solid #f0c98a;border-radius:12px;padding:11px 13px;margin-bottom:12px;font-size:13px}
 .tmnote b{color:var(--warning)}
@@ -373,9 +386,14 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
   <section id="s-reflect" class="scr">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
       <h1>성찰일지</h1><span class="badge-dday" id="rf-week">이번 주차</span></div>
+    <div id="rf-summary"></div>
     <div class="card">
       <h2>이번 주 성찰</h2>
-      <textarea id="rf-text" rows="5" placeholder="이번 주 운동하며 느낀 점, 몸의 변화, 다음 주 목표를 적어보세요."></textarea>
+      <div class="row" style="gap:6px;margin-bottom:8px;flex-wrap:wrap">
+        <button class="btn sec sm" style="width:auto;padding:0 12px" onclick="insertSummary()">📋 내 기록 넣고 쓰기</button>
+        <button class="btn sec sm" style="width:auto;padding:0 12px" onclick="insertGuide()">💡 질문 보기</button>
+      </div>
+      <textarea id="rf-text" rows="7" placeholder="위 기록을 보면서, 이번 주 운동하며 느낀 점·몸의 변화·다음 주 목표를 적어보세요."></textarea>
       <button class="btn" style="margin-top:10px" onclick="saveReflect()">제출하기</button>
       <p class="savedat" id="saved-reflect"></p>
     </div>
@@ -432,8 +450,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.25.0';
-var PWA_BUILD = '2026.08.13 21:25';
+var PWA_VER = '0.26.0';
+var PWA_BUILD = '2026.08.13 21:45';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -976,8 +994,71 @@ function renderFitTable(){
 }
 
 /* ---------- 성찰 ---------- */
+/* ---------- 이번 주 운동 요약 (성찰 쓸 때 보면서) ---------- */
+var WK=null, WK_DEMO=false;
+/* 기록이 하나도 없을 때 보여줄 예시 */
+var WK_SAMPLE={주차:1,시작일:'2026-08-10',종료일:'2026-08-16',운동일수:3,유산소일수:2,근력일수:1,
+  목표일수:3,유산소필수:2,달성:true,총거리:6.0,총시간:53,
+  기록:[{날짜:'2026-08-11',요일:'화',종류:'유산소',거리:3.2,시간:28,내용:'페이스 8분45초 · 240kcal',성찰:'초반엔 힘들었는데 20분 넘으니 리듬이 잡혔다.'},
+        {날짜:'2026-08-13',요일:'목',종류:'근력',내용:'스쿼트 3세트×15, 런지 3세트×12',성찰:'자세를 신경 쓰니 허벅지에 자극이 확실했다.'},
+        {날짜:'2026-08-15',요일:'토',종류:'유산소',거리:2.8,시간:25,내용:'가볍게 걷기',성찰:''}]};
+
+function renderWeek(w,demo){
+  WK=w; WK_DEMO=!!demo;
+  var box=document.getElementById('rf-summary');
+  var 일=w.기록.map(function(r){
+    var sub=(r.종류==='유산소'&&(r.거리||r.시간))?((r.거리?r.거리+'km ':'')+(r.시간?r.시간+'분':'')):(r.내용||'');
+    return '<div class="di"><span class="dd">'+r.날짜.slice(5).replace('-','/')+'('+r.요일+')</span>'
+      +'<div style="flex:1"><span class="chip '+(r.종류==='유산소'?'cardio':'strength')+'">'+r.종류+'</span> '
+      +'<span class="cap">'+esc(sub)+'</span>'
+      +(r.성찰?'<div class="cap" style="margin-top:3px">✍️ '+esc(r.성찰)+'</div>':'')+'</div></div>';
+  }).join('');
+  box.innerHTML='<div class="wk'+(demo?' demo':'')+'">'
+    +'<div class="hd"><h2 style="margin:0">📊 이번 주 내 운동</h2>'
+    +(demo?'<span class="badge-demo">예시</span>':'<span class="cap">'+w.시작일.slice(5).replace('-','/')+' ~ '+w.종료일.slice(5).replace('-','/')+'</span>')+'</div>'
+    +'<div class="big">'+w.운동일수+'일 운동 <span style="font-size:14px;color:var(--muted);font-weight:600">/ 목표 '+w.목표일수+'일</span> '
+    +(w.달성?'<span class="chip ok">목표 달성 ✓</span>':'<span class="chip warn">'+Math.max(0,w.목표일수-w.운동일수)+'일 남음</span>')+'</div>'
+    +'<div class="st"><div><b>'+w.유산소일수+'/'+w.유산소필수+'</b><span>유산소</span></div>'
+    +'<div><b>'+w.근력일수+'</b><span>근력</span></div>'
+    +'<div><b>'+(w.총거리||0)+'km</b><span>달린 거리</span></div>'
+    +'<div><b>'+(w.총시간||0)+'분</b><span>운동 시간</span></div></div>'
+    +(일?'<div class="dl">'+일+'</div>':'<p class="muted" style="margin:0">이번 주 기록이 아직 없어요.</p>')
+    +(demo?'<p class="cap" style="margin:10px 0 0;color:var(--warning)">※ 아직 기록이 없어서 <b>예시</b>를 보여드려요. 운동을 인증하면 내 기록으로 바뀝니다.</p>':'')
+    +'</div>';
+}
+/* 요약을 문장으로 만들어 성찰 입력창에 넣어준다 */
+function insertSummary(){
+  if(!WK){toast('기록을 불러오는 중이에요');return;}
+  var w=WK, lines=[];
+  lines.push('[이번 주 내 운동] '+w.운동일수+'일 운동(유산소 '+w.유산소일수+'일, 근력 '+w.근력일수+'일)'
+    +(w.총거리?' · 총 '+w.총거리+'km':'')+(w.총시간?' · '+w.총시간+'분':''));
+  w.기록.forEach(function(r){
+    var sub=(r.종류==='유산소'&&(r.거리||r.시간))?((r.거리?r.거리+'km ':'')+(r.시간?r.시간+'분':'')):(r.내용||'');
+    lines.push('· '+r.날짜.slice(5).replace('-','/')+'('+r.요일+') '+r.종류+' '+sub);
+  });
+  lines.push('');
+  lines.push('[느낀 점] ');
+  lines.push('[몸의 변화] ');
+  lines.push('[다음 주 목표] ');
+  var el=document.getElementById('rf-text');
+  el.value=lines.join(String.fromCharCode(10)); el.focus();
+  el.setSelectionRange(el.value.length,el.value.length);
+  toast(WK_DEMO?'예시 기록으로 넣었어요':'내 기록을 넣었어요. 아래에 이어서 쓰세요');
+}
+function insertGuide(){
+  var el=document.getElementById('rf-text');
+  var N=String.fromCharCode(10);
+  var q='- 이번 주 운동 중 가장 힘들었던 순간은?'+N+'- 지난주보다 나아진 점이 있다면?'+N+'- 몸이나 컨디션에 어떤 변화가 있었나?'+N+'- 다음 주에는 무엇을 바꿔볼까?'+N+N;
+  el.value=q+el.value; el.focus();
+  toast('질문을 참고해서 답하듯 써보세요');
+}
+
 function loadReflect(){
   document.getElementById('rf-week').textContent=(ST.config?ST.config.평가명:'')+' 성찰';
+  call('getWeekSummary',[ST.student.학번],function(w){
+    if(w&&w.기록&&w.기록.length)renderWeek(w,false);
+    else renderWeek(WK_SAMPLE,true);        // 기록 없으면 예시로 보여주기
+  });
   call('getReflections',[ST.student.학번],function(list){
     var html='';(list||[]).forEach(function(r){
       html+='<div class="card"><div class="row" style="justify-content:space-between"><b>'+r.주차+'주차</b><span class="cap">'+r.작성일+'</span></div>'
@@ -1067,6 +1148,7 @@ function mock(fn,args){
   if(fn==='getFitness')return{회차목록:['방학 전','개학 후','1주차','2주차','3주차','4주차'],savedAt:'',
     기록:['방학 전','개학 후','1주차','2주차','3주차','4주차'].map(function(r){return {회차:r,있음:false};})};
   if(fn==='submitFitness')return{ok:true,savedAt:'2026.08.13 01:20:00'};
+  if(fn==='getWeekSummary')return{주차:1,시작일:'2026-08-10',종료일:'2026-08-16',운동일수:0,유산소일수:0,근력일수:0,목표일수:3,유산소필수:2,달성:false,총거리:0,총시간:0,기록:[]};
   if(fn==='verifyStrengthPhoto')return{ok:true,pass:true,stamp:true,sign:true,date:'2026-08-13',time:'19:45',code:'X4HNRDCHEG4PYP',exercise:true,what:'플랭크 자세'};
   if(fn==='getInbodyTrend')return[{측정일:'2026-07-01',주차:1,체중:64,체지방률:20,근육량:28},{측정일:'2026-07-08',주차:2,체중:63,체지방률:19,근육량:28.5},{측정일:'2026-07-15',주차:3,체중:62.4,체지방률:18.2,근육량:29.5}];
   if(fn==='getReflections')return[{주차:1,작성일:'2026-07-06',내용:'첫 주라 힘들었지만 뿌듯했다.',교사코멘트:'꾸준함이 좋아요! 페이스 조절 잘 하고 있습니다.'}];
