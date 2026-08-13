@@ -1,5 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.24.0 -->
-<!-- 수정요약: [0.24.0] 근력사진=타임마크 '사진 코드' 템플릿 안내, 코드 중복(재사용) 차단 반영. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.25.0 -->
+<!-- 수정요약: [0.25.0] 하단 탭바 아이콘을 그림(홈·인증·체력·기록·공지)으로 교체. 미선택 탭은 흐리게. 성찰은 아이콘 대기중. -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -96,6 +96,10 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
   display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;font-weight:600}
 .tabbar button.on{color:var(--primary-dark)}
 .tabbar .ic{font-size:19px;line-height:1}
+img.ic{width:24px;height:24px;display:block;object-fit:contain;
+  filter:grayscale(.55) opacity(.5);transition:filter .15s}
+.tabbar button.on img.ic{filter:none}
+.tabbar button.on .ic{transform:scale(1.05)}
 .topbar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
 .topbar .back{width:38px;height:38px;border-radius:12px;border:1.5px solid var(--line2);background:#fff;font-size:18px;cursor:pointer}
 .gauge{display:flex;align-items:center;gap:18px}
@@ -415,12 +419,12 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 
   <!-- 하단 탭바 -->
   <nav class="tabbar hidden" id="tabbar">
-    <button data-t="home" onclick="go('home')"><span class="ic">🏠</span>홈</button>
-    <button data-t="cert" onclick="go('cert')"><span class="ic">✔️</span>인증</button>
-    <button data-t="inbody" onclick="go('inbody')"><span class="ic">📊</span>체력</button>
+    <button data-t="home" onclick="go('home')"><img class="ic" src="tab-home.png" alt="">홈</button>
+    <button data-t="cert" onclick="go('cert')"><img class="ic" src="tab-cert.png" alt="">인증</button>
+    <button data-t="inbody" onclick="go('inbody')"><img class="ic" src="tab-fit.png" alt="">체력</button>
     <button data-t="reflect" onclick="go('reflect')"><span class="ic">✍️</span>성찰</button>
-    <button data-t="score" onclick="go('score')"><span class="ic">🏅</span>기록</button>
-    <button data-t="notice" onclick="go('notice')"><span class="ic">📢</span>공지</button>
+    <button data-t="score" onclick="go('score')"><img class="ic" src="tab-score.png" alt="">기록</button>
+    <button data-t="notice" onclick="go('notice')"><img class="ic" src="tab-notice.png" alt="">공지</button>
   </nav>
 </div>
 <div class="toast" id="toast"></div>
@@ -428,8 +432,8 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.24.0';
-var PWA_BUILD = '2026.08.13 21:10';
+var PWA_VER = '0.25.0';
+var PWA_BUILD = '2026.08.13 21:25';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
