@@ -1,5 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version pwa-0.8.0 -->
-<!-- 수정요약: [pwa-0.8.0] 체력측정 화면 신설(인바디 사진AI 폐기→직접입력) — 입력 즉시 PAPS 등급 표시, 6회차 그래프+등급 배경띠+회차별 표. [pwa-0.7.0] 인증 성찰 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version pwa-0.9.0 -->
+<!-- 수정요약: [pwa-0.9.0] 변화그래프=측정요소별 꺾은선 전부 표시(향상/감소 배지). 캘린더 날짜 탭→그날 운동기록 아코디언. [pwa-0.8.0] 체력측정 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -85,6 +85,15 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 .cal .d .num{font-size:12px}
 .cal .d .wtag{position:absolute;top:2px;right:4px;font-size:8px;font-weight:700;color:var(--primary-dark);opacity:.75}
 .cal .d .dots{display:flex;gap:2px;position:absolute;bottom:4px}
+.cal .d.has{cursor:pointer}
+.cal .d.sel{border:2px solid var(--primary);background:var(--primary-tint);font-weight:800}
+/* 날짜 클릭 시 펼쳐지는 그날의 기록 */
+#cal-detail{overflow:hidden;max-height:0;transition:max-height .25s ease}
+#cal-detail.open{max-height:900px;margin-top:12px}
+.dayrec{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.dayrec .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.dayrec .it{padding:8px 0;border-top:1px solid var(--divider)}
+.dayrec .it:first-of-type{border-top:none}
 .bubble{background:#f0f7f2;border-radius:4px 14px 14px 14px;padding:10px 12px;font-size:13px;color:var(--ink2);margin-top:8px}
 .list-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--divider)}
 .list-item:last-child{border-bottom:none}
@@ -166,6 +175,7 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
     <div class="card">
       <h2>달력 <span id="cal-month" style="color:var(--muted);font-size:13px;font-weight:600"></span></h2>
       <div class="cal" id="cal"></div>
+      <div id="cal-detail"></div>
       <div class="row" style="margin-top:10px;justify-content:center;gap:12px;font-size:11px">
         <span class="cap"><span class="dot" style="background:var(--cardio)"></span> 유산소</span>
         <span class="cap"><span class="dot" style="background:var(--strength)"></span> 근력</span>
@@ -302,11 +312,8 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
   <!-- 6. 체력측정 그래프 -->
   <section id="s-inbody-graph" class="scr">
     <div class="topbar"><button class="back" onclick="go('inbody')">←</button><h1>체력 변화</h1></div>
-    <div class="chiprow" id="fit-metric" style="margin-bottom:12px"></div>
-    <div class="card">
-      <div id="fit-chart"></div>
-      <p class="cap" id="fit-chart-note" style="margin-top:8px"></p>
-    </div>
+    <p class="cap" style="margin:0 4px 12px">방학 전 → 4주차까지 측정요소별로 어떻게 변했는지 한눈에 볼 수 있어요.</p>
+    <div id="fit-charts"></div>
     <div class="card"><h2>회차별 기록</h2><div id="fit-table"></div></div>
   </section>
 
@@ -373,8 +380,8 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.8.0';
-var PWA_BUILD = '2026.08.13 11:57';
+var PWA_VER = '0.9.0';
+var PWA_BUILD = '2026.08.13 12:40';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -485,6 +492,8 @@ function loadHome(){
     document.getElementById('g-cardio-c').textContent=wk.유산소일수+'/'+wk.유산소필수;
     var pct=Math.min(100,Math.round(wk.완료일수/wk.목표일수*100));
     document.getElementById('g-week').innerHTML=ring(pct,wk.완료일수+'/'+wk.목표일수,'이번 주');
+    ST.home=h; ST.myRecords=null; ST.calDay=null;
+    document.getElementById('cal-detail').classList.remove('open');
     renderCal(h);
     var hv=document.getElementById('home-ver');
     if(hv)hv.textContent=verLine();
@@ -507,14 +516,42 @@ function renderCal(h){
     var d=new Date(y,m,day),ds=fmtLocal(d);
     var isToday=d.getTime()===today.getTime();
     var w=weekOfDate(ds,start,totalW),rec=map[ds];
-    var cls='d'+(w?' inperiod':'')+(isToday?' today':'');
+    var cls='d'+(w?' inperiod':'')+(isToday?' today':'')+(rec?' has':'')+(ST.calDay===ds?' sel':'');
     var wtag=w?'<span class="wtag">'+w+'주</span>':'';
     var dots=rec?('<div class="dots">'+(rec.c?'<span class="dot" style="background:var(--cardio)"></span>':'')+(rec.s?'<span class="dot" style="background:var(--strength)"></span>':'')+'</div>'):'';
-    html+='<div class="'+cls+'">'+wtag+'<span class="num">'+day+'</span>'+dots+'</div>';
+    var click=rec?' onclick="toggleCalDay(&quot;'+ds+'&quot;)"':'';
+    html+='<div class="'+cls+'"'+click+'>'+wtag+'<span class="num">'+day+'</span>'+dots+'</div>';
   }
   document.getElementById('cal').innerHTML=html;
   var hdr=document.getElementById('cal-month');if(hdr)hdr.textContent=y+'년 '+(m+1)+'월';
 }
+/* 캘린더 날짜 탭 → 그날 운동기록 아코디언 */
+function toggleCalDay(ds){
+  var box=document.getElementById('cal-detail');
+  if(ST.calDay===ds){ ST.calDay=null; box.classList.remove('open'); box.innerHTML=''; renderCal(ST.home); return; }
+  ST.calDay=ds; renderCal(ST.home);
+  var show=function(list){
+    var day=(list||[]).filter(function(r){return r.날짜===ds;});
+    var d=parseYmd(ds), wk=['일','월','화','수','목','금','토'][d.getDay()];
+    var html='<div class="dayrec"><div class="hd"><b>'+(d.getMonth()+1)+'월 '+d.getDate()+'일 ('+wk+')</b>'
+      +'<button class="btn sec sm" style="width:auto;height:30px;padding:0 12px;font-size:12px" onclick="toggleCalDay(&quot;'+ds+'&quot;)">닫기</button></div>';
+    if(!day.length) html+='<p class="muted" style="margin:0">이 날의 기록을 찾을 수 없어요.</p>';
+    day.forEach(function(r){
+      var chip=(r.종류==='유산소')?'<span class="chip cardio">유산소</span>':'<span class="chip strength">근력</span>';
+      var sub=(r.종류==='유산소'&&(r.거리||r.시간))?((r.거리?r.거리+'km ':'')+(r.시간?r.시간+'분':'')):(r.내용||'');
+      html+='<div class="it"><div class="row" style="justify-content:space-between;align-items:center">'
+        +'<span>'+chip+' <span class="cap">'+esc(sub)+'</span></span>'
+        +(r.사진?'<a class="cap" style="background:var(--cardio-tint);color:var(--cardio);padding:3px 8px;border-radius:8px;text-decoration:none" href="'+r.사진+'" target="_blank" rel="noopener">📷</a>':'')
+        +'</div>'+(r.성찰?'<div class="bubble" style="margin-top:6px">✍️ '+esc(r.성찰)+'</div>':'')+'</div>';
+    });
+    document.getElementById('cal-detail').innerHTML=html+'</div>';
+    box.classList.add('open');
+  };
+  if(ST.myRecords) show(ST.myRecords);
+  else { box.innerHTML='<div class="dayrec"><p class="muted" style="margin:0">불러오는 중…</p></div>'; box.classList.add('open');
+    call('getMyExercises',[ST.student.학번],function(list){ST.myRecords=list||[];show(ST.myRecords);}); }
+}
+
 /* ---------- 요일 선택 (이번 주 다른 요일도 제출) ---------- */
 function fmtLocal(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
 function currentWeekDates(){
@@ -702,16 +739,20 @@ function saveFitness(){
   });
 }
 
-/* ---------- 체력 변화 그래프 ---------- */
+/* ---------- 체력 변화 그래프 (측정요소별 꺾은선 전부 표시) ---------- */
+/* 향상 방향: up=값이 클수록 좋음, down=작을수록 좋음, none=좋고나쁨 판단 안 함 */
 var FIT_METRICS=[
-  {k:'악력최고',n:'악력',u:'kg',std:'악력'},
-  {k:'팔굽혀펴기',n:'팔굽혀펴기',u:'회',std:'팔굽혀펴기'},
-  {k:'앉았다일어나기',n:'앉았다일어나기',u:'회'},
-  {k:'앞으로굽히기최고',n:'앞으로굽히기',u:'cm',std:'앞으로굽히기'},
-  {k:'뒤로젖히기최고',n:'뒤로젖히기',u:'cm'},
-  {k:'BMI',n:'BMI',u:''},{k:'체중',n:'체중',u:'kg'},
-  {k:'체지방률',n:'체지방률',u:'%'},{k:'골격근량',n:'골격근량',u:'kg'},
-  {k:'내장비만',n:'내장비만',u:'lv'},{k:'WHR',n:'WHR',u:''}
+  {k:'악력최고',n:'악력',u:'kg',std:'악력',dir:'up'},
+  {k:'팔굽혀펴기',n:'팔굽혀펴기',u:'회',std:'팔굽혀펴기',dir:'up'},
+  {k:'앉았다일어나기',n:'앉았다 일어나기',u:'회',dir:'up'},
+  {k:'앞으로굽히기최고',n:'앉아 앞으로 굽히기',u:'cm',std:'앞으로굽히기',dir:'up'},
+  {k:'뒤로젖히기최고',n:'엎드려 뒤로 젖히기',u:'cm',dir:'up'},
+  {k:'체중',n:'체중',u:'kg',dir:'none'},
+  {k:'BMI',n:'BMI',u:'',dir:'none'},
+  {k:'체지방률',n:'체지방률',u:'%',dir:'down'},
+  {k:'골격근량',n:'골격근량',u:'kg',dir:'up'},
+  {k:'내장비만',n:'내장비만',u:'lv',dir:'down'},
+  {k:'WHR',n:'W.H.R.',u:'',dir:'down'}
 ];
 function fitVal(rec,k){
   if(!rec||!rec.있음)return null;
@@ -719,30 +760,37 @@ function fitVal(rec,k){
   if(v===''||v===null||v===undefined)return null;
   v=Number(v);return isNaN(v)?null:v;
 }
-function selFitMetric(k){ST.fitMetric=k;renderFitMetrics();drawFitChart();}
-function renderFitMetrics(){
-  var html='';FIT_METRICS.forEach(function(m){
-    html+='<button class="dbtn'+(ST.fitMetric===m.k?' on':'')+'" onclick="selFitMetric(&quot;'+m.k+'&quot;)">'+m.n+'</button>';});
-  document.getElementById('fit-metric').innerHTML=html;
+function loadFitChart(){ loadFitness(function(){renderAllCharts();renderFitTable();}); }
+
+/* 측정요소별 꺾은선 그래프를 전부 세로로 쌓아서 보여준다 */
+function renderAllCharts(){
+  var recs=ST.fitness||[],box=document.getElementById('fit-charts');
+  var any=false;recs.forEach(function(r){if(r.있음)any=true;});
+  if(!any){box.innerHTML='<div class="card"><p class="muted" style="text-align:center;padding:26px 0">아직 측정 기록이 없어요.<br><span class="cap">체력측정 화면에서 회차를 골라 입력해 주세요.</span></p></div>';
+    return;}
+  var html='';
+  FIT_METRICS.forEach(function(m){html+=chartCard(m,recs);});
+  box.innerHTML=html;
 }
-function loadFitChart(){
-  if(!ST.fitMetric)ST.fitMetric='악력최고';
-  loadFitness(function(){renderFitMetrics();drawFitChart();renderFitTable();});
-}
-function drawFitChart(){
-  var m=FIT_METRICS[0];FIT_METRICS.forEach(function(x){if(x.k===ST.fitMetric)m=x;});
-  var recs=ST.fitness||[];
+function chartCard(m,recs){
   var vals=FIT_ROUNDS.map(function(rd){var f=null;recs.forEach(function(x){if(x.회차===rd)f=x;});return fitVal(f,m.k);});
   var got=vals.filter(function(v){return v!==null;});
-  var box=document.getElementById('fit-chart');
-  if(!got.length){box.innerHTML='<p class="muted" style="text-align:center;padding:30px">'+m.n+' 기록이 아직 없습니다.</p>';
-    document.getElementById('fit-chart-note').textContent='';return;}
-  var W=320,H=190,padL=34,padR=12,padT=16,padB=30;
+  if(!got.length)return '';                     // 아직 한 번도 입력 안 한 항목은 숨김
+  var first=got[0],last=got[got.length-1],d=Math.round((last-first)*10)/10;
+  /* 향상 판정 */
+  var tone='wait',word='변화 없음';
+  if(d!==0&&m.dir!=='none'){
+    var better=(m.dir==='up')?(d>0):(d<0);
+    tone=better?'ok':'bad';word=better?'향상':'감소';
+  }else if(d!==0){tone='wait';word=(d>0?'증가':'감소');}
+  var badge='<span class="chip '+tone+'">'+(d>0?'+':'')+d+(m.u?m.u:'')+' '+word+'</span>';
+
+  var W=320,H=150,padL=30,padR=10,padT=18,padB=28;
   var lo=Math.min.apply(null,got),hi=Math.max.apply(null,got);
   var bands=m.std?FIT_STD[m.std]:null;
   if(bands){var fin=[];bands.forEach(function(b){if(b[0]>-999)fin.push(b[0]);if(b[1]<999)fin.push(b[1]);});
     lo=Math.min(lo,Math.min.apply(null,fin));hi=Math.max(hi,Math.max.apply(null,fin));}
-  var rng=(hi-lo)||1;lo-=rng*0.1;hi+=rng*0.1;rng=hi-lo;
+  var rng=(hi-lo)||1;lo-=rng*0.12;hi+=rng*0.12;rng=hi-lo;
   var X=function(i){return padL+(i/(FIT_ROUNDS.length-1))*(W-padL-padR);};
   var Y=function(v){return padT+(1-(v-lo)/rng)*(H-padT-padB);};
   var svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;overflow:visible">';
@@ -752,23 +800,29 @@ function drawFitChart(){
       var y1=Y(Math.min(b[1],hi)),y2=Y(Math.max(b[0],lo));
       if(y2<=y1)return;
       svg+='<rect x="'+padL+'" y="'+y1.toFixed(1)+'" width="'+(W-padL-padR)+'" height="'+(y2-y1).toFixed(1)+'" fill="'+TONE[b[2]]+'"/>'
-        +'<text x="'+(padL-4)+'" y="'+((y1+y2)/2+3).toFixed(1)+'" font-size="8" fill="#8a978c" text-anchor="end">'+b[2]+'등</text>';});
+        +'<text x="'+(padL-3)+'" y="'+((y1+y2)/2+3).toFixed(1)+'" font-size="7.5" fill="#8a978c" text-anchor="end">'+b[2]+'등</text>';});
+  }else{
+    svg+='<line x1="'+padL+'" y1="'+Y(lo+rng*0.5).toFixed(1)+'" x2="'+(W-padR)+'" y2="'+Y(lo+rng*0.5).toFixed(1)+'" stroke="#eef1ec" stroke-width="1"/>';
   }
   var pts=[];
   vals.forEach(function(v,i){if(v!==null)pts.push([X(i),Y(v),v]);});
   for(var i=1;i<pts.length;i++)
     svg+='<line x1="'+pts[i-1][0].toFixed(1)+'" y1="'+pts[i-1][1].toFixed(1)+'" x2="'+pts[i][0].toFixed(1)+'" y2="'+pts[i][1].toFixed(1)+'" stroke="'+THEME_P+'" stroke-width="2.5" stroke-linecap="round"/>';
-  pts.forEach(function(p){
-    svg+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="4.5" fill="#fff" stroke="'+THEME_P+'" stroke-width="2.5"/>'
+  pts.forEach(function(p,i){
+    var lastOne=(i===pts.length-1);
+    svg+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="'+(lastOne?5:4)+'" fill="'+(lastOne?THEME_P:'#fff')+'" stroke="'+THEME_P+'" stroke-width="2.5"/>'
       +'<text x="'+p[0].toFixed(1)+'" y="'+(p[1]-9).toFixed(1)+'" font-size="9" font-weight="700" fill="#2b3a30" text-anchor="middle">'+p[2]+'</text>';});
   FIT_ROUNDS.forEach(function(rd,i){
-    svg+='<text x="'+X(i).toFixed(1)+'" y="'+(H-8)+'" font-size="8.5" fill="#8a978c" text-anchor="middle">'+rd.replace('주차','주')+'</text>';});
+    svg+='<text x="'+X(i).toFixed(1)+'" y="'+(H-7)+'" font-size="8" fill="#8a978c" text-anchor="middle">'+rd.replace('주차','주').replace(' ','')+'</text>';});
   svg+='</svg>';
-  box.innerHTML='<h2>'+m.n+' 추이'+(m.u?' <span class="cap">('+m.u+')</span>':'')+'</h2>'+svg;
-  var first=got[0],last=got[got.length-1],d=Math.round((last-first)*10)/10;
-  document.getElementById('fit-chart-note').innerHTML=
-    '처음 <b>'+first+'</b> → 최근 <b>'+last+'</b> · 변화 <b>'+(d>0?'+':'')+d+'</b>'
-    +(bands?' <span class="muted">· 배경은 PAPS 5등급 구간</span>':' <span class="muted">· 등급 기준이 없는 항목</span>');
+
+  return '<div class="card" style="padding:14px 16px">'
+    +'<div class="row" style="justify-content:space-between;align-items:center;margin-bottom:2px">'
+    +'<h2 style="margin:0">'+m.n+(m.u?' <span class="cap">('+m.u+')</span>':'')+'</h2>'+badge+'</div>'
+    +svg
+    +'<p class="cap" style="margin:4px 0 0">처음 <b>'+first+'</b> → 최근 <b>'+last+'</b>'
+    +(bands?' <span class="muted">· 배경은 PAPS 5등급 구간</span>':' <span class="muted">· 등급 기준 없는 항목</span>')+'</p>'
+    +'</div>';
 }
 function renderFitTable(){
   var recs=ST.fitness||[];
