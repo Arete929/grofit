@@ -1,5 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.36.0 -->
-<!-- 수정요약: [0.36.0] 홈아이콘 원형 잘림 해결(maskable 아이콘 별도 생성·안전영역 80%), 운동자각도 버튼에 단계 숫자 표시. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.37.0 -->
+<!-- 수정요약: [0.37.0] 근력 입력을 2줄 구조로 개편 — 운동명 한 줄, 아래에 무게(kg)·세트·횟수. 무게는 선택. -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -52,6 +52,14 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .swrow button.on{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-tint)}
 .swrow button.on::after{content:'✓';position:absolute;right:2px;bottom:0;font-size:12px;font-weight:800;color:#fff;
   text-shadow:0 1px 3px rgba(0,0,0,.7)}
+/* 근력 운동 입력 — 운동명 한 줄 + 무게·세트·횟수 한 줄 */
+.exrow{border:1px solid var(--line);border-radius:12px;padding:10px 11px;margin-bottom:9px;background:#fbfcfa}
+.exname{display:flex;align-items:center;gap:8px}
+.exname input{flex:1}
+.exnum{display:flex;gap:7px;margin-top:8px}
+.exnum label{flex:1;display:block;font-size:11px;font-weight:600;color:var(--muted);margin:0;position:relative}
+.exnum input{margin-top:3px;padding-right:30px;text-align:center}
+.exnum .unit{position:absolute;right:9px;bottom:12px;font-size:11px;color:var(--muted2);pointer-events:none}
 /* 근력 운동 입력 칸 번호 */
 .strno{width:22px;height:22px;flex:none;border-radius:50%;background:var(--strength-tint);color:var(--strength-dark);
   font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
@@ -344,7 +352,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
     </div>
     <div class="card">
       <h2>운동 내용 <span class="cap">· 3가지 이상 필수</span></h2>
-      <p class="cap" style="margin:-4px 0 8px">아래 <b>3칸을 모두 채워야</b> 저장할 수 있어요. 더 했으면 ＋로 추가하세요.</p>
+      <p class="cap" style="margin:-4px 0 10px">운동명 · 세트 · 횟수는 <b>필수</b>, 무게는 기구 운동일 때만 적으면 돼요.<br>3가지를 모두 채워야 저장됩니다. 더 했으면 ＋로 추가하세요.</p>
       <div id="str-list"></div>
       <button class="btn sec sm" onclick="addStrRow()" style="margin-top:8px">＋ 운동 추가</button>
     </div>
@@ -513,8 +521,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.36.0';
-var PWA_BUILD = '2026.08.14 00:30';
+var PWA_VER = '0.37.0';
+var PWA_BUILD = '2026.08.14 00:55';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -830,12 +838,15 @@ function askException(){
 var STR_MIN=3;                       // 근력은 최소 3종목 필수
 function addStrRow(){
   var list=document.getElementById('str-list');
-  var i=list.querySelectorAll('.row').length+1;
-  var d=document.createElement('div');d.className='row';d.style.cssText='margin-bottom:8px;align-items:center';
-  d.innerHTML='<span class="strno">'+i+'</span>'
-    +'<input class="s-name" placeholder="운동명(예: 스쿼트)" style="flex:2">'
-    +'<input class="s-set" inputmode="numeric" placeholder="세트" style="flex:1">'
-    +'<input class="s-rep" inputmode="numeric" placeholder="횟수" style="flex:1">';
+  var i=list.querySelectorAll('.exrow').length+1;
+  var d=document.createElement('div');d.className='exrow';
+  d.innerHTML='<div class="exname"><span class="strno">'+i+'</span>'
+      +'<input class="s-name" placeholder="운동명 (예: 스쿼트)"></div>'
+    +'<div class="exnum">'
+      +'<label>무게<input class="s-wt" inputmode="decimal" placeholder="kg"><span class="unit">kg</span></label>'
+      +'<label>세트<input class="s-set" inputmode="numeric" placeholder="0"><span class="unit">세트</span></label>'
+      +'<label>횟수<input class="s-rep" inputmode="numeric" placeholder="0"><span class="unit">회</span></label>'
+    +'</div>';
   list.appendChild(d);
 }
 /* 최소 개수만큼 빈 칸을 미리 만들어 둔다 */
@@ -845,13 +856,14 @@ function resetStrRows(){
 }
 function saveStrength(){
   var rows=[],미완=0;
-  document.querySelectorAll('#str-list .row').forEach(function(r){
+  document.querySelectorAll('#str-list .exrow').forEach(function(r){
     var nm=r.querySelector('.s-name').value.trim();
+    var wt=r.querySelector('.s-wt').value.trim();     // 무게는 선택(맨몸운동은 비움)
     var st=r.querySelector('.s-set').value.trim();
     var rp=r.querySelector('.s-rep').value.trim();
-    if(!nm&&!st&&!rp)return;                       // 완전히 빈 칸은 그냥 넘어감
-    if(!nm||!st||!rp){미완++;return;}               // 일부만 쓴 칸
-    rows.push(nm+' '+st+'세트×'+rp);
+    if(!nm&&!wt&&!st&&!rp)return;                     // 완전히 빈 칸
+    if(!nm||!st||!rp){미완++;return;}                  // 운동명·세트·횟수는 필수
+    rows.push(nm+(wt?' '+wt+'kg':'')+' '+st+'세트×'+rp);
   });
   // 근력은 3종목 이상 필수
   if(rows.length<STR_MIN){
