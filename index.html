@@ -1,5 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.28.0 -->
-<!-- 수정요약: [0.28.0] 하단 탭바 6개 아이콘 전부 그림으로 완성(성찰 포함). -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.30.0 -->
+<!-- 수정요약: [0.30.0] 안 읽은 공지 팝업(접속 시마다, 확인해야 닫힘) + 공지 탭 읽음/새공지 표시. -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -55,6 +55,11 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 /* 근력 운동 입력 칸 번호 */
 .strno{width:22px;height:22px;flex:none;border-radius:50%;background:var(--strength-tint);color:var(--strength-dark);
   font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+/* 안 읽은 공지 팝업 */
+.pop{position:fixed;inset:0;background:rgba(10,20,12,.55);z-index:60;display:flex;align-items:center;justify-content:center;padding:22px}
+.pop.hidden{display:none}
+.pop-in{background:#fff;border-radius:18px;padding:20px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.pop-hd{display:flex;justify-content:space-between;align-items:center}
 /* 성찰 — 이번 주 기록 요약 */
 .wk{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px;
   box-shadow:0 10px 34px rgba(20,40,25,.05)}
@@ -440,6 +445,19 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
   </section>
 
   <!-- 하단 탭바 -->
+  <!-- 안 읽은 공지 팝업 -->
+  <div id="nt-pop" class="pop hidden">
+    <div class="pop-in">
+      <div class="pop-hd">
+        <span class="chip warn" id="pop-cnt">새 공지</span>
+        <span class="cap" id="pop-date"></span>
+      </div>
+      <h2 id="pop-title" style="font-size:19px;margin:8px 0 6px"></h2>
+      <div id="pop-body" style="white-space:pre-wrap;font-size:14px;color:var(--ink2);max-height:46vh;overflow:auto"></div>
+      <button class="btn" style="margin-top:16px" onclick="popConfirm()" id="pop-btn">확인했어요</button>
+    </div>
+  </div>
+
   <nav class="tabbar hidden" id="tabbar">
     <button data-t="home" onclick="go('home')"><img class="ic" src="tab-home.png" alt="">홈</button>
     <button data-t="cert" onclick="go('cert')"><img class="ic" src="tab-cert.png" alt="">인증</button>
@@ -454,8 +472,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.28.0';
-var PWA_BUILD = '2026.08.13 21:45';
+var PWA_VER = '0.30.0';
+var PWA_BUILD = '2026.08.13 22:40';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -603,6 +621,7 @@ function loadHome(){
     ST.home=h; ST.myRecords=null; ST.calDay=null;
     document.getElementById('cal-detail').classList.remove('open');
     renderCal(h);
+    checkNotices();          // 안 읽은 공지가 있으면 팝업
     var hv=document.getElementById('home-ver');
     if(hv)hv.textContent=verLine();
   });
@@ -1160,11 +1179,49 @@ function loadMyRecords(){
 
 /* ---------- 공지사항 ---------- */
 function loadNoticesStudent(){
-  call('getNotices',[],function(list){var html='';
+  call('getNotices',[ST.student?ST.student.학번:''],function(list){var html='';
     (list||[]).forEach(function(n){
-      html+='<div class="card"><div class="row" style="justify-content:space-between"><b>'+esc(n.제목)+'</b><span class="cap">'+(n.날짜||'')+'</span></div>'
-        +'<p style="margin:8px 0 0;white-space:pre-wrap">'+esc(n.내용)+'</p></div>';});
+      html+='<div class="card"><div class="row" style="justify-content:space-between"><b>'+esc(n.제목)+'</b>'
+        +'<span>'+(n.읽음?'<span class="chip ok">읽음</span>':'<span class="chip bad">새 공지</span>')
+        +' <span class="cap">'+(n.날짜||'')+'</span></span></div>'
+        +'<p style="margin:8px 0 0;white-space:pre-wrap">'+esc(n.내용)+'</p>'
+        +(n.읽음?'':'<button class="btn sec sm" style="margin-top:10px" onclick="readOne(&quot;'+n.공지ID+'&quot;)">확인했어요</button>')
+        +'</div>';});
     document.getElementById('nt-list').innerHTML=html||'<p class="muted" style="padding:0 4px">등록된 공지가 없습니다.</p>';});
+}
+function readOne(id){
+  call('markNoticeRead',[ST.student.학번,id],function(){toast('확인 완료');loadNoticesStudent();});
+}
+
+/* ---------- 안 읽은 공지 팝업 (접속할 때마다, 다 읽을 때까지) ---------- */
+var POP=[], POPi=0;
+function checkNotices(){
+  if(!ST.student)return;
+  call('getNotices',[ST.student.학번],function(list){
+    POP=(list||[]).filter(function(n){return !n.읽음 && n.공지ID;}).reverse();  // 오래된 것부터
+    POPi=0; showPop();
+  });
+}
+function showPop(){
+  var box=document.getElementById('nt-pop');
+  if(POPi>=POP.length){box.classList.add('hidden');return;}
+  var n=POP[POPi];
+  document.getElementById('pop-cnt').textContent='새 공지 '+(POPi+1)+'/'+POP.length;
+  document.getElementById('pop-date').textContent=n.날짜||'';
+  document.getElementById('pop-title').textContent=n.제목||'';
+  document.getElementById('pop-body').textContent=n.내용||'';
+  document.getElementById('pop-btn').textContent=(POPi+1<POP.length)?'확인했어요 · 다음':'확인했어요';
+  box.classList.remove('hidden');
+}
+function popConfirm(){
+  var n=POP[POPi];
+  if(!n){document.getElementById('nt-pop').classList.add('hidden');return;}
+  document.getElementById('pop-btn').disabled=true;
+  call('markNoticeRead',[ST.student.학번,n.공지ID],function(){
+    document.getElementById('pop-btn').disabled=false;
+    POPi++; showPop();
+    if(POPi>=POP.length)toast('공지를 모두 확인했어요');
+  });
 }
 
 /* ---------- 공용 렌더 ---------- */
@@ -1200,6 +1257,7 @@ function mock(fn,args){
   if(fn==='getInbodyTrend')return[{측정일:'2026-07-01',주차:1,체중:64,체지방률:20,근육량:28},{측정일:'2026-07-08',주차:2,체중:63,체지방률:19,근육량:28.5},{측정일:'2026-07-15',주차:3,체중:62.4,체지방률:18.2,근육량:29.5}];
   if(fn==='getReflections')return[{주차:1,작성일:'2026-07-06',내용:'첫 주라 힘들었지만 뿌듯했다.',교사코멘트:'꾸준함이 좋아요! 페이스 조절 잘 하고 있습니다.'}];
   if(fn==='getMyScore')return{운동달성률:75,정시성:100,성취율:79,점수:17,달성주차:3,총주차:4,급간배점:20};
+  if(fn==='markNoticeRead')return{ok:true};
   if(fn==='getNotices')return[{날짜:'2026-07-15',제목:'1주차 시작!',내용:'주 3일 이상 운동, 유산소 2일 필수예요. 화이팅! 💪'}];
   return {ok:true};
 }
