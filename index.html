@@ -1,5 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version pwa-0.10.0 -->
-<!-- 수정요약: [pwa-0.10.0] 학생이 테마 선택(로그인화면 스와치). 설치 전 고르면 홈 아이콘도 그 색 — head에서 manifest{n}/icon{n} 선교체. 관리자 잠금(학생_테마선택) 지원. [pwa-0.9.1] 그래프·캘린더 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version pwa-0.10.1 -->
+<!-- 수정요약: [pwa-0.10.1] 홈 화면에 로그인 계정 표시+로그아웃 버튼(확인창). 로그아웃해도 고른 테마는 유지. [pwa-0.10.0] 학생 테마 선택 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -210,7 +210,13 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
       <p class="cap" style="text-align:center;margin:6px 0 0">연초록 칸=운동기간(숫자는 주차) · 초록 테두리=오늘</p>
     </div>
     <button class="btn" onclick="go('cert')">＋ 오늘 인증하기</button>
-    <p class="ver" id="home-ver" style="margin-top:16px"></p>
+    <div class="card" style="margin-top:14px;padding:14px 16px">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <span class="cap">👤 <b id="who">—</b> 으로 로그인 중</span>
+        <button class="btn sec sm" onclick="logout()" style="width:auto;padding:0 16px">로그아웃</button>
+      </div>
+    </div>
+    <p class="ver" id="home-ver" style="margin-top:10px"></p>
   </section>
 
   <!-- 인증 종류 선택 -->
@@ -407,8 +413,8 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.10.0';
-var PWA_BUILD = '2026.08.13 13:30';
+var PWA_VER = '0.10.1';
+var PWA_BUILD = '2026.08.13 13:52';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -516,8 +522,11 @@ function call(fn,args,cb){
    .catch(function(e){toast('네트워크 오류 · 연결을 확인하세요');});
 }
 function logout(){
+  if(!confirm('로그아웃할까요? 다시 쓰려면 학번과 학생코드를 입력해야 합니다.'))return;
+  /* 토큰·학생정보만 지우고 고른 테마(grofit_theme)는 그대로 둔다 */
   localStorage.removeItem('grofit_token');localStorage.removeItem('grofit_student');
-  ST.student=null;go('login');toast('다시 로그인해 주세요');
+  ST.student=null;ST.home=null;ST.myRecords=null;ST.fitness=null;ST.calDay=null;
+  go('login');toast('로그아웃했습니다');
 }
 
 /* ---------- 로그인 ---------- */
@@ -541,6 +550,7 @@ function loadHome(){
   call('getStudentHome',[ST.student.학번],function(h){
     if(!h)return; ST.config=h.config; ST.week=h.현재주차||1;
     document.getElementById('hi-name').textContent=ST.student.학번+' '+ST.student.이름;
+    var who=document.getElementById('who');if(who)who.textContent=ST.student.학번+' '+ST.student.이름;
     document.getElementById('hi-week').textContent=h.현재주차+'주차 · '+(h.config.평가명||'');
     document.getElementById('hi-dday').textContent='마감 '+dday(h.config.제출_마감일);
     var wk=h.이번주;
