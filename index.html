@@ -1,5 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.35.0 -->
-<!-- 수정요약: [0.35.0] 유산소·근력 이모지를 그림 아이콘으로 교체(인증선택·각 화면 상단·종류 칩·체력측정 제목). -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.36.0 -->
+<!-- 수정요약: [0.36.0] 홈아이콘 원형 잘림 해결(maskable 아이콘 별도 생성·안전영역 80%), 운동자각도 버튼에 단계 숫자 표시. -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -70,6 +70,7 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .rpe button{flex:1;border:1.5px solid var(--line2);background:#fff;border-radius:10px;padding:9px 2px 8px;
   font-family:inherit;font-size:10.5px;font-weight:700;color:var(--muted);cursor:pointer;line-height:1.25}
 .rpe button i{display:block;height:6px;border-radius:3px;margin:0 4px 5px}
+.rpe button u{text-decoration:none;line-height:1.1;margin-bottom:2px}
 .rpe button.on{color:#fff;border-color:transparent}
 .rpe button.on i{background:rgba(255,255,255,.65)!important}
 .sat{display:flex;gap:8px;margin-top:4px}
@@ -512,8 +513,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.35.0';
-var PWA_BUILD = '2026.08.14 00:05';
+var PWA_VER = '0.36.0';
+var PWA_BUILD = '2026.08.14 00:30';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -1114,7 +1115,8 @@ function renderRpe(k){
   box.innerHTML=RPE.map(function(r){
     var on=PICK[k].rpe===r.v;
     return '<button class="'+(on?'on':'')+'" style="'+(on?'background:'+r.c:'')+'" '
-      +'onclick="pickRpe(&quot;'+k+'&quot;,'+r.v+')"><i style="background:'+r.c+'"></i>'+r.n+'</button>';
+      +'onclick="pickRpe(&quot;'+k+'&quot;,'+r.v+')"><i style="background:'+r.c+'"></i>'
+      +'<u style="display:block;font-size:13px;font-weight:800;'+(on?'':'color:'+r.c)+'">'+r.v+'</u>'+r.n+'</button>';
   }).join('');
 }
 function renderSat(k){
