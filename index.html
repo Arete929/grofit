@@ -1,5 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.31.0 -->
-<!-- 수정요약: [0.31.0] 인증 화면에 운동자각도 5단계(색상)·운동 만족도 3단계 선택 추가, 기록·주간요약에 표시. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.32.0 -->
+<!-- 수정요약: [0.32.0] 홈 헤더 재구성 — 부제 작게, 아래 줄에 N주차·D-N 칩, 우측에 큰 로고(최대 92px). -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -94,8 +94,13 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .chk.no{background:var(--danger-tint);border:1px solid var(--danger);color:var(--danger)}
 .chk ul{margin:6px 0 0 16px} .chk li{margin:2px 0}
 /* 홈 우측 상단 로고 + D-day */
-.hm-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
-.hm-logo{width:52px;height:52px;border-radius:14px;display:block;box-shadow:0 3px 10px rgba(0,0,0,.12)}
+.hm-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.hm-txt{flex:1;min-width:0}
+.hm-sub{font-size:11.5px;color:var(--muted2);margin:3px 0 0;line-height:1.35}
+.hm-row{display:flex;align-items:center;gap:6px;margin-top:7px;flex-wrap:wrap}
+/* 우측 여백을 최대한 채우는 로고 */
+.hm-logo{width:min(92px,26vw);height:min(92px,26vw);border-radius:20px;flex:none;display:block;
+  box-shadow:0 5px 16px rgba(0,0,0,.14)}
 /* 로그인 로고 — 모바일에서 시원하게(화면폭 비례, 최대 190px) */
 #lg-logo{width:min(190px,46vw);height:min(190px,46vw);border-radius:24px;display:block;margin:0 auto 16px;box-shadow:0 8px 22px rgba(0,0,0,.13)}
 #s-login #ver{position:absolute;left:0;right:0;bottom:14px;margin:0}
@@ -228,12 +233,16 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 
   <!-- 2. 홈 -->
   <section id="s-home" class="scr">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
-      <div style="flex:1;min-width:0"><h1 id="hi-name">안녕하세요</h1><p class="muted" id="hi-week" style="margin:2px 0 0">1주차</p></div>
-      <div class="hm-right">
-        <img id="hm-logo" class="hm-logo" alt="혜원핏" src="theme5.png">
-        <span class="badge-dday" id="hi-dday">마감 D-—</span>
+    <div class="hm-head">
+      <div class="hm-txt">
+        <h1 id="hi-name">안녕하세요</h1>
+        <p class="hm-sub" id="hi-sub"></p>
+        <div class="hm-row">
+          <span class="chip ok" id="hi-week">1주차</span>
+          <span class="badge-dday" id="hi-dday">D-—</span>
+        </div>
       </div>
+      <img id="hm-logo" class="hm-logo" alt="혜원핏" src="theme5.png">
     </div>
     <div class="card">
       <div class="gauge">
@@ -498,8 +507,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.31.0';
-var PWA_BUILD = '2026.08.13 23:20';
+var PWA_VER = '0.32.0';
+var PWA_BUILD = '2026.08.13 23:40';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -636,8 +645,12 @@ function loadHome(){
     if(!h)return; ST.config=h.config; ST.week=h.현재주차||1;
     document.getElementById('hi-name').textContent=ST.student.학번+' '+ST.student.이름;
     var who=document.getElementById('who');if(who)who.textContent=ST.student.학번+' '+ST.student.이름;
-    document.getElementById('hi-week').textContent=h.현재주차+'주차 · '+(h.config.평가명||'');
-    document.getElementById('hi-dday').textContent='마감 '+dday(h.config.제출_마감일);
+    // 부제(작게) = 학년도·학기·평가명 / 아래 줄 = N주차 · D-N
+    var c=h.config||{};
+    var sub=[(c.학년도?c.학년도+'학년도':''),'3학년 2학기',(c.평가명||'')].filter(Boolean).join(' ');
+    document.getElementById('hi-sub').textContent=sub;
+    document.getElementById('hi-week').textContent=(h.현재주차||1)+'주차';
+    document.getElementById('hi-dday').textContent=dday(c.제출_마감일);
     var wk=h.이번주;
     document.getElementById('g-total-l').textContent='주 '+wk.목표일수+'일 목표';
     document.getElementById('g-total-c').textContent=wk.완료일수+'/'+wk.목표일수;
