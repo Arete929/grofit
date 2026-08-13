@@ -1,5 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.32.0 -->
-<!-- 수정요약: [0.32.0] 홈 헤더 재구성 — 부제 작게, 아래 줄에 N주차·D-N 칩, 우측에 큰 로고(최대 92px). -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.35.0 -->
+<!-- 수정요약: [0.35.0] 유산소·근력 이모지를 그림 아이콘으로 교체(인증선택·각 화면 상단·종류 칩·체력측정 제목). -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -60,6 +60,11 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .pop.hidden{display:none}
 .pop-in{background:#fff;border-radius:18px;padding:20px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
 .pop-hd{display:flex;justify-content:space-between;align-items:center}
+/* 유산소·근력 아이콘 */
+.ic-big{width:52px;height:52px;flex:none;display:block}
+.ic-t{width:30px;height:30px;flex:none;display:block}
+.ic-s{width:22px;height:22px;vertical-align:-4px}
+.chip img{width:15px;height:15px;vertical-align:-3px;margin-right:2px}
 /* 운동자각도 · 만족도 */
 .rpe{display:flex;gap:4px;margin-top:4px}
 .rpe button{flex:1;border:1.5px solid var(--line2);background:#fff;border-radius:10px;padding:9px 2px 8px;
@@ -277,18 +282,18 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
   <section id="s-cert" class="scr">
     <div class="topbar"><button class="back" onclick="go('home')">←</button><h1>오늘 인증</h1></div>
     <div class="card" style="cursor:pointer" onclick="go('cardio')">
-      <div class="row" style="align-items:center"><span style="font-size:30px">🏃</span>
+      <div class="row" style="align-items:center"><img class="ic-big" src="ic-cardio.png" alt="">
         <div><h2 style="margin:0">유산소 인증</h2><p class="cap" style="margin:2px 0 0">삼성헬스·NRC·애플피트니스 스크린샷</p></div></div>
     </div>
     <div class="card" style="cursor:pointer" onclick="go('strength')">
-      <div class="row" style="align-items:center"><span style="font-size:30px">💪</span>
+      <div class="row" style="align-items:center"><img class="ic-big" src="ic-strength.png" alt="">
         <div><h2 style="margin:0">근력 인증</h2><p class="cap" style="margin:2px 0 0">운동 사진 + 세트·횟수 입력</p></div></div>
     </div>
   </section>
 
   <!-- 3. 유산소 -->
   <section id="s-cardio" class="scr">
-    <div class="topbar"><button class="back" onclick="go('cert')">←</button><h1>유산소 인증</h1><span class="chip cardio">유산소</span></div>
+    <div class="topbar"><button class="back" onclick="go('cert')">←</button><img class="ic-t" src="ic-cardio.png" alt=""><h1>유산소 인증</h1></div>
     <label>운동한 요일 (이번 주)</label><div id="cardio-days" class="daysel"></div>
     <div class="card">
       <div class="drop" id="cardio-drop" onclick="pick('cardio-file')">📷 운동 앱 스크린샷 업로드<br><span class="cap">탭하여 사진 선택</span></div>
@@ -322,7 +327,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 
   <!-- 4. 근력 -->
   <section id="s-strength" class="scr">
-    <div class="topbar"><button class="back" onclick="go('cert')">←</button><h1>근력 인증</h1><span class="chip strength">근력</span></div>
+    <div class="topbar"><button class="back" onclick="go('cert')">←</button><img class="ic-t" src="ic-strength.png" alt=""><h1>근력 인증</h1></div>
     <label>운동한 요일 (이번 주)</label><div id="str-days" class="daysel"></div>
     <div class="card">
       <div class="tmnote" id="str-guide">
@@ -364,7 +369,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
     <div id="fit-rounds" class="chiprow" style="margin-bottom:14px"></div>
 
     <div class="card">
-      <h2>💪 근력 · 근지구력</h2>
+      <h2><img class="ic-s" src="ic-strength.png" alt=""> 근력 · 근지구력</h2>
       <div class="grid2">
         <div class="field"><label>악력 왼손 (kg)</label><input class="fi" id="f-gripL" inputmode="decimal"></div>
         <div class="field"><label>악력 오른손 (kg)</label><input class="fi" id="f-gripR" inputmode="decimal"></div>
@@ -507,8 +512,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.34.0';
-var PWA_BUILD = '2026.08.13 23:40';
+var PWA_VER = '0.35.0';
+var PWA_BUILD = '2026.08.14 00:05';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -703,7 +708,7 @@ function toggleCalDay(ds){
       +'<button class="btn sec sm" style="width:auto;height:30px;padding:0 12px;font-size:12px" onclick="toggleCalDay(&quot;'+ds+'&quot;)">닫기</button></div>';
     if(!day.length) html+='<p class="muted" style="margin:0">이 날의 기록을 찾을 수 없어요.</p>';
     day.forEach(function(r){
-      var chip=(r.종류==='유산소')?'<span class="chip cardio">유산소</span>':'<span class="chip strength">근력</span>';
+      var chip=kindChip(r.종류);
       var sub=(r.종류==='유산소'&&(r.거리||r.시간))?((r.거리?r.거리+'km ':'')+(r.시간?r.시간+'분':'')):(r.내용||'');
       html+='<div class="it"><div class="row" style="justify-content:space-between;align-items:center">'
         +'<span>'+chip+' <span class="cap">'+esc(sub)+'</span></span>'
@@ -1123,6 +1128,11 @@ function renderSat(k){
 function pickRpe(k,v){PICK[k].rpe=(PICK[k].rpe===v?null:v);renderRpe(k);}
 function pickSat(k,v){PICK[k].sat=(PICK[k].sat===v?null:v);renderSat(k);}
 function resetPick(k){PICK[k]={rpe:null,sat:null};renderRpe(k);renderSat(k);}
+/* 유산소·근력 칩 (아이콘 포함) */
+function kindChip(kind){
+  var c=(kind==='유산소');
+  return '<span class="chip '+(c?'cardio':'strength')+'"><img src="ic-'+(c?'cardio':'strength')+'.png" alt="">'+kind+'</span>';
+}
 function rpeName(v){var f=RPE.filter(function(r){return String(r.v)===String(v);});return f.length?f[0].n:'';}
 function rpeColor(v){var f=RPE.filter(function(r){return String(r.v)===String(v);});return f.length?f[0].c:'#999';}
 function satEmoji(v){var f=SAT.filter(function(s){return s.v===v;});return f.length?f[0].e:'';}
@@ -1142,7 +1152,7 @@ function renderWeek(w,demo){
   var 일=w.기록.map(function(r){
     var sub=(r.종류==='유산소'&&(r.거리||r.시간))?((r.거리?r.거리+'km ':'')+(r.시간?r.시간+'분':'')):(r.내용||'');
     return '<div class="di"><span class="dd">'+r.날짜.slice(5).replace('-','/')+'('+r.요일+')</span>'
-      +'<div style="flex:1"><span class="chip '+(r.종류==='유산소'?'cardio':'strength')+'">'+r.종류+'</span> '
+      +'<div style="flex:1">'+kindChip(r.종류)+' '
       +'<span class="cap">'+esc(sub)+'</span>'
       +(r.자각도?' <span class="chip" style="background:'+rpeColor(r.자각도)+'22;color:'+rpeColor(r.자각도)+'">'+esc(rpeName(r.자각도))+'</span>':'')
       +(r.만족도?' <span class="chip ok">'+satEmoji(r.만족도)+'</span>':'')
@@ -1231,7 +1241,7 @@ function loadScore(){
 function loadMyRecords(){
   call('getMyExercises',[ST.student.학번],function(list){
     var html='';(list||[]).forEach(function(r){
-      var chip=(r.종류==='유산소')?'<span class="chip cardio">유산소</span>':'<span class="chip strength">근력</span>';
+      var chip=kindChip(r.종류);
       var sub=(r.종류==='유산소' && (r.거리||r.시간))?((r.거리?r.거리+'km ':'')+(r.시간?r.시간+'분':'')):'';
       html+='<div class="list-item" style="align-items:flex-start">'
         +'<div style="flex:1"><div>'+r.날짜+' '+chip+'</div>'
