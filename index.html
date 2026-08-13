@@ -1,5 +1,5 @@
 <!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version pwa-0.8.0 -->
-<!-- 수정요약: [pwa-0.8.0] 저장시각 전면 표시(인증·인바디·성찰 토스트+저장시각줄, 기록탭 🕒저장, getMySaveStamps 복원). [pwa-0.7.0] 매일 성찰 -->
+<!-- 수정요약: [pwa-0.8.0] 체력측정 화면 신설(인바디 사진AI 폐기→직접입력) — 입력 즉시 PAPS 등급 표시, 6회차 그래프+등급 배경띠+회차별 표. [pwa-0.7.0] 인증 성찰 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -104,6 +104,14 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 #install-bar #install-btn{border:none;background:var(--primary);color:#fff;border-radius:8px;padding:7px 13px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
 #install-bar .x{border:none;background:none;color:var(--primary-dark);font-size:17px;padding:2px 4px;cursor:pointer;line-height:1}
 .daysel{display:flex;gap:5px;margin-bottom:12px;overflow-x:auto}
+/* 회차·항목 선택 칩 (체력측정) */
+.chiprow{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.chiprow .dbtn{flex:none;height:36px;padding:0 13px;border-radius:999px;border:1.5px solid var(--line2);background:#fff;
+  font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+.chiprow .dbtn.on{background:var(--primary);border-color:var(--primary);color:#fff}
+/* 판정 결과 줄 */
+.jr{margin:-6px 0 12px;min-height:4px;display:flex;align-items:center;flex-wrap:wrap;gap:2px}
+.jr:empty{margin:0;min-height:0}
 .daysel button{flex:1;min-width:40px;height:54px;border-radius:12px;border:1.5px solid var(--line2);background:#fff;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
 .daysel button span{font-size:11px;color:var(--muted)} .daysel button b{font-size:15px;color:var(--ink)}
 .daysel button.on{background:var(--primary);border-color:var(--primary)} .daysel button.on span,.daysel button.on b{color:#fff}
@@ -230,37 +238,76 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
     <div class="row"><button class="btn sec" onclick="go('cert')">취소</button><button class="btn" onclick="saveStrength()">저장하기</button></div>
   </section>
 
-  <!-- 5. 인바디 업로드 -->
+  <!-- 5. 체력측정 입력 -->
   <section id="s-inbody" class="scr">
-    <div class="topbar"><button class="back" onclick="go('home')">←</button><h1>인바디 측정</h1></div>
+    <div class="topbar"><button class="back" onclick="go('home')">←</button><h1>체력측정</h1></div>
+    <label>측정 회차</label>
+    <div id="fit-rounds" class="chiprow" style="margin-bottom:14px"></div>
+
     <div class="card">
-      <div class="drop" id="inb-drop" onclick="pick('inb-file')">📷 인바디 결과지 촬영<br><span class="cap">탭하여 사진 선택</span></div>
-      <input type="file" id="inb-file" accept="image/*" class="hidden" onchange="onInbImg(this)">
-      <img id="inb-prev" class="hidden" style="width:100%;border-radius:12px;margin-top:12px">
+      <h2>💪 근력 · 근지구력</h2>
+      <div class="grid2">
+        <div class="field"><label>악력 왼손 (kg)</label><input class="fi" id="f-gripL" inputmode="decimal"></div>
+        <div class="field"><label>악력 오른손 (kg)</label><input class="fi" id="f-gripR" inputmode="decimal"></div>
+      </div>
+      <div class="jr" id="j-grip"></div>
+      <div class="field"><label>무릎대고 팔굽혀펴기 (회)</label><input class="fi" id="f-push" inputmode="numeric"></div>
+      <div class="jr" id="j-push"></div>
+      <div class="field"><label>앉았다 일어나기 (회)</label><input class="fi" id="f-squat" inputmode="numeric"></div>
+      <p class="cap">※ 기록지에 등급 기준이 없는 항목이라 기록만 남겨요.</p>
     </div>
-    <div class="card hidden" id="inb-result">
-      <h2>추출 수치 <span class="cap" id="inb-ai"></span></h2>
-      <div class="field"><label>체중 (kg)</label><input id="i-weight" inputmode="decimal"></div>
-      <div class="field"><label>신장 (cm)</label><input id="i-height" inputmode="decimal"></div>
-      <div class="field"><label>체지방률 (%)</label><input id="i-fat" inputmode="decimal"></div>
-      <div class="field"><label>골격근량 (kg)</label><input id="i-muscle" inputmode="decimal"></div>
-      <div class="field"><label>내장지방 (레벨)</label><input id="i-visc" inputmode="decimal"></div>
-      <button class="btn" onclick="saveInbody()">확인하고 저장</button>
-      <p class="savedat" id="saved-inbody"></p>
+
+    <div class="card">
+      <h2>🤸 유연성</h2>
+      <label>앉아 윗몸 앞으로 굽히기 (cm)</label>
+      <div class="grid2">
+        <div class="field"><input class="fi" id="f-flex1" inputmode="decimal" placeholder="1차"></div>
+        <div class="field"><input class="fi" id="f-flex2" inputmode="decimal" placeholder="2차"></div>
+      </div>
+      <div class="jr" id="j-flex"></div>
+      <label>엎드려 윗몸 뒤로 젖히기 (cm)</label>
+      <div class="grid2">
+        <div class="field"><input class="fi" id="f-back1" inputmode="decimal" placeholder="1차"></div>
+        <div class="field"><input class="fi" id="f-back2" inputmode="decimal" placeholder="2차"></div>
+      </div>
+      <p class="cap">※ 등급 기준이 없는 항목이라 기록만 남겨요. 등급은 <b>1·2차 중 높은 기록</b>으로 판정합니다.</p>
     </div>
-    <button class="btn sec" onclick="go('inbody-graph')">📊 변화 그래프 보기</button>
+
+    <div class="card">
+      <h2>⚖️ 신체조성</h2>
+      <div class="grid2">
+        <div class="field"><label>신장 (cm)</label><input class="fi" id="f-height" inputmode="decimal"></div>
+        <div class="field"><label>체중 (kg)</label><input class="fi" id="f-weight" inputmode="decimal"></div>
+      </div>
+      <div class="jr" id="j-bmi"></div>
+      <div class="field"><label>체지방률 (%)</label><input class="fi" id="f-fat" inputmode="decimal"></div>
+      <div class="jr" id="j-fat"></div>
+      <div class="field"><label>골격근량 (kg)</label><input class="fi" id="f-muscle" inputmode="decimal"></div>
+      <div class="jr" id="j-muscle"></div>
+      <div class="field"><label>내장비만 (level)</label><input class="fi" id="f-visc" inputmode="decimal"></div>
+      <div class="jr" id="j-visc"></div>
+      <label>W.H.R. — 허리 ÷ 엉덩이 둘레</label>
+      <div class="grid2">
+        <div class="field"><input class="fi" id="f-waist" inputmode="decimal" placeholder="허리 cm"></div>
+        <div class="field"><input class="fi" id="f-hip" inputmode="decimal" placeholder="엉덩이 cm"></div>
+      </div>
+      <div class="jr" id="j-whr"></div>
+    </div>
+
+    <button class="btn" onclick="saveFitness()">저장하기</button>
+    <p class="savedat" id="saved-fitness"></p>
+    <button class="btn sec" onclick="go('inbody-graph')" style="margin-top:10px">📊 6회차 변화 그래프</button>
   </section>
 
-  <!-- 6. 인바디 그래프 -->
+  <!-- 6. 체력측정 그래프 -->
   <section id="s-inbody-graph" class="scr">
-    <div class="topbar"><button class="back" onclick="go('inbody')">←</button><h1>인바디 변화</h1></div>
-    <div class="seg" id="inb-seg">
-      <button class="on" data-k="체중" onclick="selMetric('체중')">체중</button>
-      <button data-k="체지방률" onclick="selMetric('체지방률')">체지방률</button>
-      <button data-k="근육량" onclick="selMetric('근육량')">근육량</button>
+    <div class="topbar"><button class="back" onclick="go('inbody')">←</button><h1>체력 변화</h1></div>
+    <div class="chiprow" id="fit-metric" style="margin-bottom:12px"></div>
+    <div class="card">
+      <div id="fit-chart"></div>
+      <p class="cap" id="fit-chart-note" style="margin-top:8px"></p>
     </div>
-    <div class="card"><div id="inb-chart"></div></div>
-    <div class="grid2" id="inb-summary"></div>
+    <div class="card"><h2>회차별 기록</h2><div id="fit-table"></div></div>
   </section>
 
   <!-- 7. 성찰일지 -->
@@ -315,7 +362,7 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
   <nav class="tabbar hidden" id="tabbar">
     <button data-t="home" onclick="go('home')"><span class="ic">🏠</span>홈</button>
     <button data-t="cert" onclick="go('cert')"><span class="ic">✔️</span>인증</button>
-    <button data-t="inbody" onclick="go('inbody')"><span class="ic">📊</span>인바디</button>
+    <button data-t="inbody" onclick="go('inbody')"><span class="ic">📊</span>체력</button>
     <button data-t="reflect" onclick="go('reflect')"><span class="ic">✍️</span>성찰</button>
     <button data-t="score" onclick="go('score')"><span class="ic">🏅</span>기록</button>
     <button data-t="notice" onclick="go('notice')"><span class="ic">📢</span>공지</button>
@@ -381,8 +428,8 @@ function go(name){
   if(name==='home') loadHome();
   if(name==='cardio') renderDayPicker('cardio');
   if(name==='strength') renderDayPicker('strength');
-  if(name==='inbody'){loadInbody();loadMyStamps();}
-  if(name==='inbody-graph') loadTrend();
+  if(name==='inbody'){loadFitness();loadMyStamps();}
+  if(name==='inbody-graph')loadFitChart();
   if(name==='reflect'){loadReflect();loadMyStamps();}
   if(name==='score') loadScore();
   if(name==='notice') loadNoticesStudent();
@@ -545,42 +592,199 @@ function saveStrength(){
     document.getElementById('str-prev').classList.add('hidden');go('home');});
 }
 
-/* ---------- 인바디 ---------- */
-var inbB64=null;
-function loadInbody(){document.getElementById('inb-result').classList.add('hidden');}
-function onInbImg(inp){readImg(inp,function(b64){inbB64=b64;var p=document.getElementById('inb-prev');p.src=b64;p.classList.remove('hidden');
-  document.getElementById('inb-ai').textContent='· AI 분석 중…';document.getElementById('inb-result').classList.remove('hidden');
-  call('analyzeInbody',[b64],function(r){
-    if(r&&r.ok&&r.data){var d=r.data;setv('i-weight',d.weight);setv('i-height',d.height);setv('i-fat',d.bodyFat);setv('i-muscle',d.muscle);setv('i-visc',d.visceral);
-      document.getElementById('inb-ai').textContent='· 자동 인식됨 (확인·수정)';}
-    else{document.getElementById('inb-ai').textContent='· 직접 입력해주세요';}
-  });
-});}
-function saveInbody(){
-  call('submitInbody',[ST.student.학번,{imageBase64:inbB64,weight:val('i-weight'),height:val('i-height'),
-    bodyFat:val('i-fat'),muscle:val('i-muscle'),visceral:val('i-visc')}],
-    function(r){toast('✅ 인바디 저장'+savedMsg(r));showSaved('saved-inbody',r&&r.savedAt,true);inbB64=null;go('inbody-graph');});
+/* ---------- 체력측정 (PAPS 자동 판정) ----------
+   ※ 기준값은 서버 Code.gs 의 FIT_STD / FIT_DIAG / MUSCLE_STD 와 동일하게 유지할 것.
+      여기 것은 "입력 즉시 등급 표시"용 사본이고, 저장 시 서버가 다시 판정합니다. */
+var FIT_ROUNDS=['방학 전','개학 후','1주차','2주차','3주차','4주차'];
+var FIT_STD={
+  악력:[[36.0,999,1],[27.5,35.9,2],[19.5,27.4,3],[16.0,19.4,4],[-999,15.9,5]],
+  팔굽혀펴기:[[40,999,1],[24,39,2],[14,23,3],[6,13,4],[-999,5,5]],
+  앞으로굽히기:[[16.0,999,1],[11.0,15.9,2],[8.0,10.9,3],[2.0,7.9,4],[-999,1.9,5]],
+  BMI:[[36.4,999,1],[26.3,36.3,2],[23.4,26.2,3],[16.0,23.3,4],[-999,15.9,5]]
+};
+var GRADE_LABEL={1:'아주 높음',2:'높음',3:'보통',4:'낮음',5:'아주 낮음'};
+var FIT_DIAG={
+  BMI:[[-999,16.2,'마름'],[16.3,23.2,'정상'],[23.3,24.9,'과체중'],[25.0,29.9,'경도비만'],[30.0,999,'고도비만']],
+  체지방률:[[-999,14.9,'마름'],[15,26.9,'정상'],[27,31.9,'과체중'],[32,39.9,'경도비만'],[40,999,'고도비만']],
+  내장비만:[[-999,2,'매우낮음'],[3,4,'낮음'],[5,9,'정상'],[10,14,'위험'],[15,999,'매우위험']],
+  WHR:[[-999,0.8,'저체중'],[0.8,0.9,'정상'],[0.9,999,'과체중 의심']]
+};
+var MUSCLE_STD=[[150,155,15.5,18.5],[156,160,16.5,19.5],[161,165,17.5,20.5],[166,170,18.5,21.5]];
+var GRADE_TONE={1:'ok',2:'ok',3:'warn',4:'bad',5:'bad'};
+var DIAG_TONE={'정상':'ok','마름':'warn','과체중':'warn','경도비만':'bad','고도비만':'bad',
+  '매우낮음':'warn','낮음':'ok','위험':'bad','매우위험':'bad','저체중':'warn','과체중 의심':'bad',
+  '표준':'ok','표준 이하':'warn','표준 이상':'warn'};
+
+function nz(id){var e=document.getElementById(id);var v=e?e.value.trim():'';return v===''?null:Number(v);}
+function inBand(v,lo,hi){return v>=lo&&v<=hi;}
+function grade5(item,v){if(v===null||isNaN(v))return null;
+  var t=FIT_STD[item];for(var i=0;i<t.length;i++)if(inBand(v,t[i][0],t[i][1]))return {등급:t[i][2],라벨:GRADE_LABEL[t[i][2]]};return null;}
+function diagOf(item,v){if(v===null||isNaN(v))return '';
+  var t=FIT_DIAG[item];for(var i=0;i<t.length;i++)if(inBand(v,t[i][0],t[i][1]))return t[i][2];return '';}
+function muscleJudge(m,h){if(m===null||h===null)return null;
+  var band=null,approx=false;
+  for(var i=0;i<MUSCLE_STD.length;i++)if(inBand(h,MUSCLE_STD[i][0],MUSCLE_STD[i][1]))band=MUSCLE_STD[i];
+  if(!band){approx=true;band=(h<MUSCLE_STD[0][0])?MUSCLE_STD[0]:MUSCLE_STD[MUSCLE_STD.length-1];}
+  var label=(m<band[2])?'표준 이하':(m>band[3])?'표준 이상':'표준';
+  return {라벨:label,범위:band[2]+'~'+band[3]+'kg',근사:approx,구간:band[0]+'~'+band[1]+'cm'};}
+function calcBmi(h,w){if(!h||!w)return null;return Math.round((w/Math.pow(h/100,2))*10)/10;}
+function calcWhr(a,b){if(!a||!b)return null;return Math.round((a/b)*100)/100;}
+function jrHtml(main,tone,sub){return '<span class="chip '+(tone||'ok')+'">'+main+'</span>'+(sub?'<span class="cap" style="margin-left:8px">'+sub+'</span>':'');}
+function setJr(id,html){var el=document.getElementById(id);if(el)el.innerHTML=html||'';}
+
+/* 입력할 때마다 등급 즉시 표시 */
+function judgeNow(){
+  var gl=nz('f-gripL'),gr=nz('f-gripR');
+  var gmax=(gl===null&&gr===null)?null:Math.max(gl||0,gr||0);
+  var g=grade5('악력',gmax);
+  setJr('j-grip',g?jrHtml(g.등급+'등급 · '+g.라벨,GRADE_TONE[g.등급],'높은 손 '+gmax+'kg 기준'):'');
+  var p=grade5('팔굽혀펴기',nz('f-push'));
+  setJr('j-push',p?jrHtml(p.등급+'등급 · '+p.라벨,GRADE_TONE[p.등급]):'');
+  var f1=nz('f-flex1'),f2=nz('f-flex2');
+  var fmax=(f1===null&&f2===null)?null:Math.max(f1===null?-999:f1,f2===null?-999:f2);
+  var fg=grade5('앞으로굽히기',fmax);
+  setJr('j-flex',fg?jrHtml(fg.등급+'등급 · '+fg.라벨,GRADE_TONE[fg.등급],'최고 기록 '+fmax+'cm 기준'):'');
+  var H=nz('f-height'),W=nz('f-weight'),bmi=calcBmi(H,W);
+  if(bmi!==null){var bg=grade5('BMI',bmi),bd=diagOf('BMI',bmi);
+    setJr('j-bmi',jrHtml('BMI '+bmi,DIAG_TONE[bd]||'ok',(bg?'PAPS '+bg.등급+'등급 · ':'')+'진단 '+bd));}
+  else setJr('j-bmi','');
+  var fd=diagOf('체지방률',nz('f-fat'));
+  setJr('j-fat',fd?jrHtml(fd,DIAG_TONE[fd]):'');
+  var mj=muscleJudge(nz('f-muscle'),H);
+  setJr('j-muscle',mj?jrHtml(mj.라벨,DIAG_TONE[mj.라벨],'표준 '+mj.범위+(mj.근사?' ※기준표에 없는 신장이라 가장 가까운 구간('+mj.구간+') 적용':'')):'');
+  var vd=diagOf('내장비만',nz('f-visc'));
+  setJr('j-visc',vd?jrHtml(vd,DIAG_TONE[vd],'인바디 기준 · 10 미만 권장'):'');
+  var whr=calcWhr(nz('f-waist'),nz('f-hip'));
+  if(whr!==null){var wd=diagOf('WHR',whr);setJr('j-whr',jrHtml('WHR '+whr,DIAG_TONE[wd],wd));}
+  else setJr('j-whr','');
 }
-function selMetric(k){ST.metric=k;document.querySelectorAll('#inb-seg button').forEach(function(b){b.classList.toggle('on',b.dataset.k===k)});drawTrend();}
-function loadTrend(){call('getInbodyTrend',[ST.student.학번],function(rows){ST.inbody=rows||[];drawTrend();});}
-function drawTrend(){
-  var rows=ST.inbody,k=ST.metric;
-  if(!rows.length){document.getElementById('inb-chart').innerHTML='<p class="muted" style="text-align:center;padding:30px">측정 기록이 없습니다.</p>';
-    document.getElementById('inb-summary').innerHTML='';return;}
-  var vals=rows.map(function(r){return Number(r[k])||0});
-  var min=Math.min.apply(null,vals),max=Math.max.apply(null,vals),rng=(max-min)||1;
-  var W=300,H=160,pad=24,n=vals.length;
-  var pts=vals.map(function(v,i){var x=pad+(n>1?i/(n-1):0)*(W-2*pad);var y=H-pad-((v-min)/rng)*(H-2*pad);return [x,y]});
-  var poly=pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1)}).join(' ');
-  var dots=pts.map(function(p){return '<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="4" fill="'+THEME_P+'"/>'}).join('');
-  var svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%">'
-    +'<polyline points="'+poly+'" fill="none" stroke="'+THEME_P+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+dots
-    +rows.map(function(r,i){return '<text x="'+pts[i][0].toFixed(1)+'" y="'+(H-6)+'" font-size="9" fill="#8a978c" text-anchor="middle">'+r.주차+'주</text>'}).join('')
-    +'</svg>';
-  document.getElementById('inb-chart').innerHTML='<h2>'+k+' 추이</h2>'+svg;
-  var first=vals[0],last=vals[vals.length-1],diff=(last-first).toFixed(1);
-  document.getElementById('inb-summary').innerHTML=
-    stat('현재',last)+stat('시작',first)+stat('변화',(diff>0?'+':'')+diff);
+
+function renderFitRounds(){
+  var html='';
+  FIT_ROUNDS.forEach(function(r){
+    var done=(ST.fitness||[]).find(function(x){return x.회차===r&&x.있음;});
+    html+='<button class="dbtn'+(ST.fitRound===r?' on':'')+'" onclick="selFitRound(&quot;'+r+'&quot;)">'+r+(done?' ✓':'')+'</button>';});
+  document.getElementById('fit-rounds').innerHTML=html;
+}
+function selFitRound(r){ST.fitRound=r;renderFitRounds();fillFitForm();}
+var FIT_FIELDS=[['f-gripL','악력_왼손'],['f-gripR','악력_오른손'],['f-push','팔굽혀펴기'],['f-squat','앉았다일어나기'],
+  ['f-flex1','앞으로굽히기_1차'],['f-flex2','앞으로굽히기_2차'],['f-back1','뒤로젖히기_1차'],['f-back2','뒤로젖히기_2차'],
+  ['f-height','신장'],['f-weight','체중'],['f-fat','체지방률'],['f-muscle','골격근량'],['f-visc','내장비만'],
+  ['f-waist','허리둘레'],['f-hip','엉덩이둘레']];
+/* 선택 회차에 저장된 값이 있으면 불러와 채움(수정 가능) */
+function fillFitForm(){
+  var rec=null;(ST.fitness||[]).forEach(function(x){if(x.회차===ST.fitRound)rec=x;});
+  FIT_FIELDS.forEach(function(p){var el=document.getElementById(p[0]);
+    if(el)el.value=(rec&&rec.있음&&rec[p[1]]!==''&&rec[p[1]]!==undefined)?rec[p[1]]:'';});
+  judgeNow();
+}
+function loadFitness(cb){
+  call('getFitness',[ST.student.학번],function(r){
+    ST.fitness=(r&&r.기록)||[];
+    if(!ST.fitRound){
+      var next=null;ST.fitness.forEach(function(x){if(!next&&!x.있음)next=x;});
+      ST.fitRound=next?next.회차:FIT_ROUNDS[0];
+    }
+    renderFitRounds();fillFitForm();
+    showSaved('saved-fitness',r&&r.savedAt,false);
+    if(cb)cb();
+  });
+}
+function saveFitness(){
+  if(!ST.fitRound){toast('측정 회차를 선택하세요');return;}
+  var p={회차:ST.fitRound};
+  FIT_FIELDS.forEach(function(f){p[f[1]]=val(f[0]);});
+  call('submitFitness',[ST.student.학번,p],function(r){
+    if(r&&r.ok===false){toast(r.msg||'저장 실패');return;}
+    toast('✅ '+ST.fitRound+' 저장'+savedMsg(r));
+    showSaved('saved-fitness',r&&r.savedAt,true);
+    loadFitness();
+  });
+}
+
+/* ---------- 체력 변화 그래프 ---------- */
+var FIT_METRICS=[
+  {k:'악력최고',n:'악력',u:'kg',std:'악력'},
+  {k:'팔굽혀펴기',n:'팔굽혀펴기',u:'회',std:'팔굽혀펴기'},
+  {k:'앉았다일어나기',n:'앉았다일어나기',u:'회'},
+  {k:'앞으로굽히기최고',n:'앞으로굽히기',u:'cm',std:'앞으로굽히기'},
+  {k:'뒤로젖히기최고',n:'뒤로젖히기',u:'cm'},
+  {k:'BMI',n:'BMI',u:''},{k:'체중',n:'체중',u:'kg'},
+  {k:'체지방률',n:'체지방률',u:'%'},{k:'골격근량',n:'골격근량',u:'kg'},
+  {k:'내장비만',n:'내장비만',u:'lv'},{k:'WHR',n:'WHR',u:''}
+];
+function fitVal(rec,k){
+  if(!rec||!rec.있음)return null;
+  var v=(rec.판정&&rec.판정[k]!==undefined&&rec.판정[k]!=='')?rec.판정[k]:rec[k];
+  if(v===''||v===null||v===undefined)return null;
+  v=Number(v);return isNaN(v)?null:v;
+}
+function selFitMetric(k){ST.fitMetric=k;renderFitMetrics();drawFitChart();}
+function renderFitMetrics(){
+  var html='';FIT_METRICS.forEach(function(m){
+    html+='<button class="dbtn'+(ST.fitMetric===m.k?' on':'')+'" onclick="selFitMetric(&quot;'+m.k+'&quot;)">'+m.n+'</button>';});
+  document.getElementById('fit-metric').innerHTML=html;
+}
+function loadFitChart(){
+  if(!ST.fitMetric)ST.fitMetric='악력최고';
+  loadFitness(function(){renderFitMetrics();drawFitChart();renderFitTable();});
+}
+function drawFitChart(){
+  var m=FIT_METRICS[0];FIT_METRICS.forEach(function(x){if(x.k===ST.fitMetric)m=x;});
+  var recs=ST.fitness||[];
+  var vals=FIT_ROUNDS.map(function(rd){var f=null;recs.forEach(function(x){if(x.회차===rd)f=x;});return fitVal(f,m.k);});
+  var got=vals.filter(function(v){return v!==null;});
+  var box=document.getElementById('fit-chart');
+  if(!got.length){box.innerHTML='<p class="muted" style="text-align:center;padding:30px">'+m.n+' 기록이 아직 없습니다.</p>';
+    document.getElementById('fit-chart-note').textContent='';return;}
+  var W=320,H=190,padL=34,padR=12,padT=16,padB=30;
+  var lo=Math.min.apply(null,got),hi=Math.max.apply(null,got);
+  var bands=m.std?FIT_STD[m.std]:null;
+  if(bands){var fin=[];bands.forEach(function(b){if(b[0]>-999)fin.push(b[0]);if(b[1]<999)fin.push(b[1]);});
+    lo=Math.min(lo,Math.min.apply(null,fin));hi=Math.max(hi,Math.max.apply(null,fin));}
+  var rng=(hi-lo)||1;lo-=rng*0.1;hi+=rng*0.1;rng=hi-lo;
+  var X=function(i){return padL+(i/(FIT_ROUNDS.length-1))*(W-padL-padR);};
+  var Y=function(v){return padT+(1-(v-lo)/rng)*(H-padT-padB);};
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;overflow:visible">';
+  if(bands){
+    var TONE={1:'#d8f3c4',2:'#e9f7dc',3:'#fdf4d8',4:'#fde9e0',5:'#fbe0e0'};
+    bands.forEach(function(b){
+      var y1=Y(Math.min(b[1],hi)),y2=Y(Math.max(b[0],lo));
+      if(y2<=y1)return;
+      svg+='<rect x="'+padL+'" y="'+y1.toFixed(1)+'" width="'+(W-padL-padR)+'" height="'+(y2-y1).toFixed(1)+'" fill="'+TONE[b[2]]+'"/>'
+        +'<text x="'+(padL-4)+'" y="'+((y1+y2)/2+3).toFixed(1)+'" font-size="8" fill="#8a978c" text-anchor="end">'+b[2]+'등</text>';});
+  }
+  var pts=[];
+  vals.forEach(function(v,i){if(v!==null)pts.push([X(i),Y(v),v]);});
+  for(var i=1;i<pts.length;i++)
+    svg+='<line x1="'+pts[i-1][0].toFixed(1)+'" y1="'+pts[i-1][1].toFixed(1)+'" x2="'+pts[i][0].toFixed(1)+'" y2="'+pts[i][1].toFixed(1)+'" stroke="'+THEME_P+'" stroke-width="2.5" stroke-linecap="round"/>';
+  pts.forEach(function(p){
+    svg+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="4.5" fill="#fff" stroke="'+THEME_P+'" stroke-width="2.5"/>'
+      +'<text x="'+p[0].toFixed(1)+'" y="'+(p[1]-9).toFixed(1)+'" font-size="9" font-weight="700" fill="#2b3a30" text-anchor="middle">'+p[2]+'</text>';});
+  FIT_ROUNDS.forEach(function(rd,i){
+    svg+='<text x="'+X(i).toFixed(1)+'" y="'+(H-8)+'" font-size="8.5" fill="#8a978c" text-anchor="middle">'+rd.replace('주차','주')+'</text>';});
+  svg+='</svg>';
+  box.innerHTML='<h2>'+m.n+' 추이'+(m.u?' <span class="cap">('+m.u+')</span>':'')+'</h2>'+svg;
+  var first=got[0],last=got[got.length-1],d=Math.round((last-first)*10)/10;
+  document.getElementById('fit-chart-note').innerHTML=
+    '처음 <b>'+first+'</b> → 최근 <b>'+last+'</b> · 변화 <b>'+(d>0?'+':'')+d+'</b>'
+    +(bands?' <span class="muted">· 배경은 PAPS 5등급 구간</span>':' <span class="muted">· 등급 기준이 없는 항목</span>');
+}
+function renderFitTable(){
+  var recs=ST.fitness||[];
+  var html='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11.5px;min-width:430px">'
+    +'<thead><tr><th style="text-align:left;padding:6px 4px;color:#8a978c">항목</th>'
+    +FIT_ROUNDS.map(function(r){return '<th style="padding:6px 3px;color:#8a978c;font-size:10px">'+r.replace('주차','주')+'</th>';}).join('')
+    +'</tr></thead><tbody>';
+  FIT_METRICS.forEach(function(m){
+    html+='<tr><td style="padding:6px 4px;border-top:1px solid var(--divider)">'+m.n+'</td>';
+    FIT_ROUNDS.forEach(function(rd){
+      var f=null;recs.forEach(function(x){if(x.회차===rd)f=x;});
+      var v=fitVal(f,m.k);
+      html+='<td style="text-align:center;padding:6px 3px;border-top:1px solid var(--divider)">'+(v===null?'<span class="muted">–</span>':v)+'</td>';});
+    html+='</tr>';});
+  html+='</tbody></table></div>';
+  document.getElementById('fit-table').innerHTML=html;
 }
 
 /* ---------- 성찰 ---------- */
@@ -672,7 +876,9 @@ function mock(fn,args){
     현재주차:2,이번주:{완료일수:2,목표일수:3,유산소일수:1,유산소필수:2,충족:false},주차현황:[],최근기록:[],
     운동일자:{'2026-07-07':{c:true},'2026-07-09':{c:true,s:true},'2026-07-14':{c:true,s:true}}};
   if(fn==='analyzeCardio')return{ok:true,data:{distanceKm:3.2,durationMin:28,paceMinPerKm:"8'45\"",kcal:248}};
-  if(fn==='analyzeInbody')return{ok:true,data:{weight:62.4,height:172,bodyFat:18.2,muscle:29.5,visceral:5}};
+  if(fn==='getFitness')return{회차목록:['방학 전','개학 후','1주차','2주차','3주차','4주차'],savedAt:'',
+    기록:['방학 전','개학 후','1주차','2주차','3주차','4주차'].map(function(r){return {회차:r,있음:false};})};
+  if(fn==='submitFitness')return{ok:true,savedAt:'2026.08.13 01:20:00'};
   if(fn==='getInbodyTrend')return[{측정일:'2026-07-01',주차:1,체중:64,체지방률:20,근육량:28},{측정일:'2026-07-08',주차:2,체중:63,체지방률:19,근육량:28.5},{측정일:'2026-07-15',주차:3,체중:62.4,체지방률:18.2,근육량:29.5}];
   if(fn==='getReflections')return[{주차:1,작성일:'2026-07-06',내용:'첫 주라 힘들었지만 뿌듯했다.',교사코멘트:'꾸준함이 좋아요! 페이스 조절 잘 하고 있습니다.'}];
   if(fn==='getMyScore')return{운동달성률:75,정시성:100,성취율:79,점수:17,달성주차:3,총주차:4,급간배점:20};
@@ -689,6 +895,8 @@ function mock(fn,args){
     navigator.serviceWorker.addEventListener('controllerchange',function(){if(refreshing)return;refreshing=true;location.reload();});
   }
   addStrRow();
+  // 체력측정 입력 → 등급 즉시 판정
+  document.querySelectorAll('.fi').forEach(function(el){el.addEventListener('input',judgeNow);});
   // 성찰 글자수 카운터 연결
   [['c-reflect','c-reflect-n'],['s-reflect','s-reflect-n']].forEach(function(p){
     var t=document.getElementById(p[0]); if(t)t.addEventListener('input',function(){countReflect(p[0],p[1]);});
