@@ -1,5 +1,5 @@
 /* 그로핏 PWA 서비스워커 | 버전 올리면 캐시 갱신·자동 새로고침 */
-var CACHE = 'grofit-v0.23.2';
+var CACHE = 'grofit-v0.24.0';
 var ASSETS = ['./', './index.html'];
 /* 테마 6종의 manifest·아이콘·로고도 오프라인 캐시 (설치 아이콘이 테마별로 다름) */
 for (var i = 1; i <= 6; i++) ASSETS.push('./manifest' + i + '.webmanifest', './icon' + i + '-192.png', './icon' + i + '-512.png', './icon' + i + '-180.png', './theme' + i + '.png');

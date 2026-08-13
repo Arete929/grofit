@@ -1,5 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.23.2 -->
-<!-- 수정요약: [0.23.2] 타임마크 템플릿 다양성 반영 — 공통 필수는 촬영날짜(당일 대조), 서명은 엄격모드에서만 필수. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.24.0 -->
+<!-- 수정요약: [0.24.0] 근력사진=타임마크 '사진 코드' 템플릿 안내, 코드 중복(재사용) 차단 반영. -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -273,9 +273,10 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
     <label>운동한 요일 (이번 주)</label><div id="str-days" class="daysel"></div>
     <div class="card">
       <div class="tmnote" id="str-guide">
-        <b>⏱ 타임마크 앱으로 그날 찍은 사진만 됩니다</b>
-        <p class="cap" style="margin:4px 0 0">운동하는 모습을 <b>타임마크(Timemark)</b> 앱으로 촬영하세요.
-        템플릿은 아무거나 써도 되지만, 사진에 <b>촬영 날짜가 보여야</b> 하고 그 날짜가 <b>위에서 고른 요일과 같아야</b> 인정됩니다.</p>
+        <b>⏱ 타임마크 '사진 코드'로 찍은 사진만 됩니다</b>
+        <p class="cap" style="margin:4px 0 0">타임마크(Timemark) 앱 → <b>템플릿</b> → <b>사진 코드</b> 를 고르고 운동하는 모습을 찍으세요.<br>
+        사진에 <b>날짜와 사진 코드</b>가 보여야 하고, 날짜가 <b>위에서 고른 요일과 같아야</b> 인정됩니다.
+        <b>한 번 낸 사진은 다시 못 씁니다.</b></p>
       </div>
       <div class="drop" id="str-drop" onclick="pick('str-file')">📷 운동 사진 업로드<br><span class="cap">탭하여 사진 선택</span></div>
       <input type="file" id="str-file" accept="image/*" class="hidden" onchange="onStrImg(this)">
@@ -427,8 +428,8 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.23.2';
-var PWA_BUILD = '2026.08.13 20:55';
+var PWA_VER = '0.24.0';
+var PWA_BUILD = '2026.08.13 21:10';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
