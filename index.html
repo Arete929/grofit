@@ -1,5 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.22.0 -->
-<!-- 수정요약: [0.21.0] 관리자(GAS)와 버전 번호 통일. 서비스워커 갱신 확인 강화(열 때마다·30분마다). 홈 계정카드에 버전 표기. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.23.0 -->
+<!-- 수정요약: [0.23.0] 근력 사진=타임마크 전용. 사진 선택 시 자동 검사(워터마크+촬영날짜+당일 대조), 미통과 저장 차단, 선생님 확인요청 예외. -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -52,6 +52,14 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .swrow button.on{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-tint)}
 .swrow button.on::after{content:'✓';position:absolute;right:2px;bottom:0;font-size:12px;font-weight:800;color:#fff;
   text-shadow:0 1px 3px rgba(0,0,0,.7)}
+/* 근력 사진 타임마크 검사 */
+.tmnote{background:var(--warning-tint);border:1px solid #f0c98a;border-radius:12px;padding:11px 13px;margin-bottom:12px;font-size:13px}
+.tmnote b{color:var(--warning)}
+.chk{border-radius:12px;padding:11px 13px;margin-top:12px;font-size:13px}
+.chk.wait{background:var(--bg);border:1px solid var(--line);color:var(--muted)}
+.chk.ok{background:var(--primary-tint);border:1px solid var(--primary);color:var(--primary-dark)}
+.chk.no{background:var(--danger-tint);border:1px solid var(--danger);color:var(--danger)}
+.chk ul{margin:6px 0 0 16px} .chk li{margin:2px 0}
 /* 홈 우측 상단 로고 + D-day */
 .hm-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
 .hm-logo{width:52px;height:52px;border-radius:14px;display:block;box-shadow:0 3px 10px rgba(0,0,0,.12)}
@@ -264,9 +272,15 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
     <div class="topbar"><button class="back" onclick="go('cert')">←</button><h1>근력 인증</h1><span class="chip strength">근력</span></div>
     <label>운동한 요일 (이번 주)</label><div id="str-days" class="daysel"></div>
     <div class="card">
+      <div class="tmnote" id="str-guide">
+        <b>⏱ 타임마크 앱으로 찍은 사진만 됩니다</b>
+        <p class="cap" style="margin:4px 0 0">운동하는 모습을 <b>타임마크(Timemark)</b> 앱으로 촬영하세요.
+        사진에 <b>Timemark Verified 표시</b>와 <b>촬영 날짜</b>가 함께 보여야 인정됩니다.</p>
+      </div>
       <div class="drop" id="str-drop" onclick="pick('str-file')">📷 운동 사진 업로드<br><span class="cap">탭하여 사진 선택</span></div>
       <input type="file" id="str-file" accept="image/*" class="hidden" onchange="onStrImg(this)">
       <img id="str-prev" class="hidden" style="width:100%;border-radius:12px;margin-top:12px">
+      <div id="str-check"></div>
     </div>
     <div class="card">
       <h2>운동 내용</h2>
@@ -413,8 +427,8 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.22.1';
-var PWA_BUILD = '2026.08.13 18:12';
+var PWA_VER = '0.23.0';
+var PWA_BUILD = '2026.08.13 20:15';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -642,7 +656,9 @@ function renderDayPicker(prov){
   }).join('');
 }
 function selDay(prov,date,btn){ST[prov+'Date']=date;
-  btn.parentNode.querySelectorAll('button').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');}
+  btn.parentNode.querySelectorAll('button').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');
+  // 근력은 사진 날짜와 대조하므로 요일을 바꾸면 다시 검사
+  if(prov==='strength'&&typeof strB64!=='undefined'&&strB64)setTimeout(checkStrPhoto,60);}
 
 /* ---------- 유산소 ---------- */
 var cardioB64=null;
@@ -681,7 +697,45 @@ function countReflect(id,nid){var t=document.getElementById(id),n=document.getEl
 
 /* ---------- 근력 ---------- */
 var strB64=null;
-function onStrImg(inp){readImg(inp,function(b64){strB64=b64;var p=document.getElementById('str-prev');p.src=b64;p.classList.remove('hidden');});}
+function onStrImg(inp){readImg(inp,function(b64){
+  strB64=b64;var p=document.getElementById('str-prev');p.src=b64;p.classList.remove('hidden');
+  checkStrPhoto();
+});}
+
+/* 타임마크 검사 — 통과해야 저장 가능. 실패하면 '선생님께 확인 요청'으로 예외 제출 */
+var strCheck=null, strException=null;
+function setChk(cls,html){document.getElementById('str-check').innerHTML='<div class="chk '+cls+'">'+html+'</div>';}
+function exBtn(){return '<button class="btn sec sm" style="margin-top:10px" onclick="askException()">🙋 선생님께 확인 요청</button>';}
+function checkStrPhoto(){
+  strCheck=null; strException=null;
+  if(!strB64){document.getElementById('str-check').innerHTML='';return;}
+  setChk('wait','⏳ 사진을 확인하는 중이에요… (몇 초 걸립니다)');
+  call('verifyStrengthPhoto',[ST.student.학번,strB64,ST.strDate],function(r){
+    if(!r||r.ok===false){
+      strCheck={pass:false,요약:'검사 실패'};
+      setChk('no','⚠️ 지금은 자동 확인을 할 수 없어요.<br><span class="cap">아래 <b>선생님께 확인 요청</b>으로 제출해 주세요.</span>'+exBtn());
+      return;
+    }
+    strCheck=r;
+    if(r.skipped){setChk('ok','✅ 사진 확인 없이 제출할 수 있어요.');return;}
+    if(r.pass){
+      setChk('ok','✅ <b>타임마크 확인됨</b><br><span class="cap">'+esc(r.date||'')+' '+esc(r.time||'')
+        +(r.code?' · '+esc(r.code):'')+(r.what?'<br>'+esc(r.what):'')+'</span>');
+      return;
+    }
+    var li=(r.fails||[]).map(function(f){return '<li>'+esc(f)+'</li>';}).join('');
+    setChk('no','❌ <b>이 사진은 인정되지 않아요</b><ul>'+li+'</ul>'+exBtn());
+  });
+}
+function askException(){
+  var why=prompt('선생님께 전할 사유를 적어주세요. (예: 타임마크로 찍었는데 날짜가 잘렸어요)');
+  if(why===null)return;
+  why=String(why).trim();
+  if(!why){toast('사유를 적어주세요');return;}
+  strException=why;
+  setChk('wait','🙋 <b>선생님 확인 요청으로 제출합니다</b><br><span class="cap">사유: '+esc(why)
+    +'<br>선생님이 확인한 뒤 인정 여부가 정해집니다.</span>');
+}
 function addStrRow(){var d=document.createElement('div');d.className='row';d.style.marginBottom='8px';
   d.innerHTML='<input class="s-name" placeholder="운동명(예: 스쿼트)" style="flex:2"><input class="s-set" placeholder="세트" style="flex:1"><input class="s-rep" placeholder="횟수" style="flex:1">';
   document.getElementById('str-list').appendChild(d);}
@@ -690,8 +744,14 @@ function saveStrength(){
     var n=r.querySelector('.s-name').value.trim();if(!n)return;
     rows.push(n+' '+r.querySelector('.s-set').value+'세트×'+r.querySelector('.s-rep').value);});
   if(!rows.length&&!strB64){toast('사진이나 운동을 입력하세요');return;}
-  call('submitStrength',[ST.student.학번,{imageBase64:strB64,date:ST.strDate,summary:rows.join(', '),reflect:val('s-reflect')}],
-    function(r){toast('✅ 근력 인증 저장'+savedMsg(r));strB64=null;document.getElementById('str-list').innerHTML='';addStrRow();
+  if(strB64 && !strCheck){toast('사진 확인이 끝날 때까지 잠시만 기다려주세요');return;}
+  if(strB64 && strCheck && !strCheck.pass && !strCheck.skipped && !strException){
+    toast('타임마크 사진이 아니에요. 다시 찍거나 선생님께 확인 요청을 눌러주세요');return;
+  }
+  call('submitStrength',[ST.student.학번,{imageBase64:strB64,date:ST.strDate,summary:rows.join(', '),reflect:val('s-reflect'),
+    check:strCheck,exception:strException}],
+    function(r){toast('✅ 근력 인증 저장'+savedMsg(r));strB64=null;strCheck=null;strException=null;
+    document.getElementById('str-check').innerHTML='';document.getElementById('str-list').innerHTML='';addStrRow();
     document.getElementById('s-reflect').value='';countReflect('s-reflect','s-reflect-n');
     document.getElementById('str-prev').classList.add('hidden');go('home');});
 }
@@ -1002,6 +1062,7 @@ function mock(fn,args){
   if(fn==='getFitness')return{회차목록:['방학 전','개학 후','1주차','2주차','3주차','4주차'],savedAt:'',
     기록:['방학 전','개학 후','1주차','2주차','3주차','4주차'].map(function(r){return {회차:r,있음:false};})};
   if(fn==='submitFitness')return{ok:true,savedAt:'2026.08.13 01:20:00'};
+  if(fn==='verifyStrengthPhoto')return{ok:true,pass:true,timemark:true,date:'2026-08-13',time:'19:45',code:'X4HNRDCHEG4PYP',exercise:true,what:'플랭크 자세'};
   if(fn==='getInbodyTrend')return[{측정일:'2026-07-01',주차:1,체중:64,체지방률:20,근육량:28},{측정일:'2026-07-08',주차:2,체중:63,체지방률:19,근육량:28.5},{측정일:'2026-07-15',주차:3,체중:62.4,체지방률:18.2,근육량:29.5}];
   if(fn==='getReflections')return[{주차:1,작성일:'2026-07-06',내용:'첫 주라 힘들었지만 뿌듯했다.',교사코멘트:'꾸준함이 좋아요! 페이스 조절 잘 하고 있습니다.'}];
   if(fn==='getMyScore')return{운동달성률:75,정시성:100,성취율:79,점수:17,달성주차:3,총주차:4,급간배점:20};
