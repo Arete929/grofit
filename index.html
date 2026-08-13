@@ -1,5 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.30.0 -->
-<!-- 수정요약: [0.30.0] 안 읽은 공지 팝업(접속 시마다, 확인해야 닫힘) + 공지 탭 읽음/새공지 표시. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.31.0 -->
+<!-- 수정요약: [0.31.0] 인증 화면에 운동자각도 5단계(색상)·운동 만족도 3단계 선택 추가, 기록·주간요약에 표시. -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -60,6 +60,18 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .pop.hidden{display:none}
 .pop-in{background:#fff;border-radius:18px;padding:20px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
 .pop-hd{display:flex;justify-content:space-between;align-items:center}
+/* 운동자각도 · 만족도 */
+.rpe{display:flex;gap:4px;margin-top:4px}
+.rpe button{flex:1;border:1.5px solid var(--line2);background:#fff;border-radius:10px;padding:9px 2px 8px;
+  font-family:inherit;font-size:10.5px;font-weight:700;color:var(--muted);cursor:pointer;line-height:1.25}
+.rpe button i{display:block;height:6px;border-radius:3px;margin:0 4px 5px}
+.rpe button.on{color:#fff;border-color:transparent}
+.rpe button.on i{background:rgba(255,255,255,.65)!important}
+.sat{display:flex;gap:8px;margin-top:4px}
+.sat button{flex:1;border:1.5px solid var(--line2);background:#fff;border-radius:12px;padding:10px 4px;
+  font-family:inherit;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer}
+.sat button b{display:block;font-size:22px;line-height:1.2;margin-bottom:2px}
+.sat button.on{border-color:var(--primary);background:var(--primary-tint);color:var(--primary-dark)}
 /* 성찰 — 이번 주 기록 요약 */
 .wk{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px;
   box-shadow:0 10px 34px rgba(20,40,25,.05)}
@@ -285,6 +297,13 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       </div>
     </div>
     <div class="card">
+      <h2>오늘 운동 어땠나요?</h2>
+      <label style="margin-top:2px">운동자각도 — 얼마나 힘들었나요?</label>
+      <div class="rpe" id="c-rpe"></div>
+      <label style="margin-top:14px">운동 만족도</label>
+      <div class="sat" id="c-sat"></div>
+    </div>
+    <div class="card">
       <h2>오늘의 성찰 <span class="cap">선택</span></h2>
       <textarea id="c-reflect" rows="3" maxlength="300" placeholder="오늘 운동은 어땠나요? (예: 초반엔 힘들었는데 20분 넘으니 리듬이 잡혔다)"></textarea>
       <p class="cap" style="text-align:right;margin:6px 0 0"><span id="c-reflect-n">0</span>/300자</p>
@@ -313,6 +332,13 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       <p class="cap" style="margin:-4px 0 8px">아래 <b>3칸을 모두 채워야</b> 저장할 수 있어요. 더 했으면 ＋로 추가하세요.</p>
       <div id="str-list"></div>
       <button class="btn sec sm" onclick="addStrRow()" style="margin-top:8px">＋ 운동 추가</button>
+    </div>
+    <div class="card">
+      <h2>오늘 운동 어땠나요?</h2>
+      <label style="margin-top:2px">운동자각도 — 얼마나 힘들었나요?</label>
+      <div class="rpe" id="s-rpe"></div>
+      <label style="margin-top:14px">운동 만족도</label>
+      <div class="sat" id="s-sat"></div>
     </div>
     <div class="card">
       <h2>오늘의 성찰 <span class="cap">선택</span></h2>
@@ -472,8 +498,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.30.0';
-var PWA_BUILD = '2026.08.13 22:40';
+var PWA_VER = '0.31.0';
+var PWA_BUILD = '2026.08.13 23:20';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -555,8 +581,8 @@ function go(name){
     b.classList.toggle('on', b.dataset.t===name);
   });
   if(name==='home') loadHome();
-  if(name==='cardio') renderDayPicker('cardio');
-  if(name==='strength') renderDayPicker('strength');
+  if(name==='cardio'){renderDayPicker('cardio');renderRpe('c');renderSat('c');}
+  if(name==='strength'){renderDayPicker('strength');renderRpe('s');renderSat('s');}
   if(name==='inbody'){loadFitness();loadMyStamps();}
   if(name==='inbody-graph')loadFitChart();
   if(name==='reflect'){loadReflect();loadMyStamps();}
@@ -734,8 +760,8 @@ function resetCardio(){cardioB64=null;['c-dist','c-dur','c-pace','c-kcal','c-ref
 function saveCardio(){
   call('submitCardio',[ST.student.학번,{imageBase64:cardioB64,date:ST.cardioDate,
     distanceKm:val('c-dist'),durationMin:val('c-dur'),summary:'페이스 '+val('c-pace')+' · '+val('c-kcal')+'kcal',source:'앱',
-    reflect:val('c-reflect')}],
-    function(r){toast('✅ 유산소 인증 저장'+savedMsg(r));resetCardio();go('home');});
+    reflect:val('c-reflect'),rpe:PICK.c.rpe,sat:PICK.c.sat}],
+    function(r){toast('✅ 유산소 인증 저장'+savedMsg(r));resetCardio();resetPick('c');go('home');});
 }
 /* 성찰 글자수 카운터 */
 function countReflect(id,nid){var t=document.getElementById(id),n=document.getElementById(nid);
@@ -837,10 +863,10 @@ function saveStrength(){
     toast('타임마크 사진이 아니에요. 다시 찍거나 선생님께 확인 요청을 눌러주세요');return;
   }
   call('submitStrength',[ST.student.학번,{imageBase64:strB64,date:ST.strDate,summary:rows.join(', '),reflect:val('s-reflect'),
-    check:strCheck,exception:strException}],
+    rpe:PICK.s.rpe,sat:PICK.s.sat,check:strCheck,exception:strException}],
     function(r){toast(strB64?('✅ 근력 인증 저장'+savedMsg(r)):'📝 기록만 저장됨 · 사진이 없어 인정되지 않아요');
     strB64=null;strCheck=null;strException=null;
-    document.getElementById('str-check').innerHTML='';resetStrRows();
+    document.getElementById('str-check').innerHTML='';resetStrRows();resetPick('s');
     document.getElementById('s-reflect').value='';countReflect('s-reflect','s-reflect-n');
     document.getElementById('str-prev').classList.add('hidden');go('home');});
 }
@@ -1060,6 +1086,34 @@ function renderFitTable(){
 }
 
 /* ---------- 성찰 ---------- */
+/* ---------- 운동자각도 · 만족도 ---------- */
+var RPE=[{v:1,n:'매우 쉬움',c:'#2E86D3'},{v:2,n:'쉬움',c:'#4CAF50'},{v:3,n:'약간 힘듦',c:'#F5A623'},
+         {v:4,n:'힘듦',c:'#F2711C'},{v:5,n:'매우 힘듦',c:'#E03131'}];
+var SAT=[{v:'Bad',e:'😕',n:'아쉬움'},{v:'Soso',e:'😐',n:'보통'},{v:'Good',e:'😄',n:'좋음'}];
+var PICK={c:{rpe:null,sat:null}, s:{rpe:null,sat:null}};   // c=유산소, s=근력
+function renderRpe(k){
+  var box=document.getElementById(k+'-rpe'); if(!box)return;
+  box.innerHTML=RPE.map(function(r){
+    var on=PICK[k].rpe===r.v;
+    return '<button class="'+(on?'on':'')+'" style="'+(on?'background:'+r.c:'')+'" '
+      +'onclick="pickRpe(&quot;'+k+'&quot;,'+r.v+')"><i style="background:'+r.c+'"></i>'+r.n+'</button>';
+  }).join('');
+}
+function renderSat(k){
+  var box=document.getElementById(k+'-sat'); if(!box)return;
+  box.innerHTML=SAT.map(function(s){
+    var on=PICK[k].sat===s.v;
+    return '<button class="'+(on?'on':'')+'" onclick="pickSat(&quot;'+k+'&quot;,&quot;'+s.v+'&quot;)">'
+      +'<b>'+s.e+'</b>'+s.n+'</button>';
+  }).join('');
+}
+function pickRpe(k,v){PICK[k].rpe=(PICK[k].rpe===v?null:v);renderRpe(k);}
+function pickSat(k,v){PICK[k].sat=(PICK[k].sat===v?null:v);renderSat(k);}
+function resetPick(k){PICK[k]={rpe:null,sat:null};renderRpe(k);renderSat(k);}
+function rpeName(v){var f=RPE.filter(function(r){return String(r.v)===String(v);});return f.length?f[0].n:'';}
+function rpeColor(v){var f=RPE.filter(function(r){return String(r.v)===String(v);});return f.length?f[0].c:'#999';}
+function satEmoji(v){var f=SAT.filter(function(s){return s.v===v;});return f.length?f[0].e:'';}
+
 /* ---------- 이번 주 운동 요약 (성찰 쓸 때 보면서) ---------- */
 var WK=null, WK_DEMO=false;
 /* 기록이 하나도 없을 때 보여줄 예시 */
@@ -1077,6 +1131,8 @@ function renderWeek(w,demo){
     return '<div class="di"><span class="dd">'+r.날짜.slice(5).replace('-','/')+'('+r.요일+')</span>'
       +'<div style="flex:1"><span class="chip '+(r.종류==='유산소'?'cardio':'strength')+'">'+r.종류+'</span> '
       +'<span class="cap">'+esc(sub)+'</span>'
+      +(r.자각도?' <span class="chip" style="background:'+rpeColor(r.자각도)+'22;color:'+rpeColor(r.자각도)+'">'+esc(rpeName(r.자각도))+'</span>':'')
+      +(r.만족도?' <span class="chip ok">'+satEmoji(r.만족도)+'</span>':'')
       +(r.성찰?'<div class="cap" style="margin-top:3px">✍️ '+esc(r.성찰)+'</div>':'')+'</div></div>';
   }).join('');
   box.innerHTML='<div class="wk'+(demo?' demo':'')+'">'
@@ -1168,6 +1224,9 @@ function loadMyRecords(){
         +'<div style="flex:1"><div>'+r.날짜+' '+chip+'</div>'
         +'<div class="cap" style="margin-top:3px">'+esc(sub||r.내용||'')+'</div>'
         +(r.저장시각?'<div class="cap" style="margin-top:2px;opacity:.8">🕒 저장 '+esc(r.저장시각)+'</div>':'')
+        +(r.자각도||r.만족도?'<div style="margin-top:4px">'
+          +(r.자각도?'<span class="chip" style="background:'+rpeColor(r.자각도)+'22;color:'+rpeColor(r.자각도)+'">'+esc(rpeName(r.자각도))+'</span> ':'')
+          +(r.만족도?'<span class="chip ok">'+satEmoji(r.만족도)+' '+esc(r.만족도)+'</span>':'')+'</div>':'')
         +(r.성찰?'<div class="bubble" style="margin-top:6px">✍️ '+esc(r.성찰)+'</div>':'')
         +'</div>'
         +(r.사진?'<a class="cap" style="background:var(--cardio-tint);color:var(--cardio);padding:4px 9px;border-radius:8px;text-decoration:none;white-space:nowrap" href="'+r.사진+'" target="_blank" rel="noopener">📷 사진</a>':'')
