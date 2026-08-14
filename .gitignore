@@ -1,2 +1,4 @@
 node_modules/
 *.log
+# 로컬 확인용 미리보기 (공개 Pages에 올리지 않는다)
+_preview_*.html
