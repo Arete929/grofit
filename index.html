@@ -75,8 +75,9 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .chip img{width:15px;height:15px;vertical-align:-3px;margin-right:2px}
 /* 선생님 코멘트 말풍선 (캐릭터 스티커) */
 .tbub{display:flex;align-items:flex-start;gap:10px}
-.tbub-st{width:58px;height:58px;flex:none;object-fit:contain}
-.emo{width:32px;height:32px;object-fit:contain;vertical-align:-9px;margin:0 1px}
+.tbub-st{width:76px;height:76px;flex:none;object-fit:contain}
+.emo{width:44px;height:44px;object-fit:contain;vertical-align:-13px;margin:0 2px}
+.tbub div{line-height:1.85}
 /* 운동자각도 · 만족도 */
 .rpe{display:flex;gap:4px;margin-top:4px}
 .rpe button{flex:1;border:1.5px solid var(--line2);background:#fff;border-radius:10px;padding:9px 2px 8px;
@@ -103,6 +104,35 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .wk .di{display:flex;gap:9px;padding:6px 0;align-items:flex-start;font-size:13px}
 .wk .di .dd{width:44px;flex:none;font-weight:700;color:var(--ink2)}
 .badge-demo{background:var(--warning-tint);color:var(--warning);font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px}
+/* 이번 주 카드 — 요일 스트립 / 진행바 / 증감 / 누적 */
+.wk .strip{display:flex;gap:5px;margin:12px 0 10px}
+.wk .strip div{flex:1;border-radius:10px;background:var(--bg);border:1px solid var(--line);
+  padding:6px 0 5px;text-align:center;line-height:1.15}
+.wk .strip u{display:block;text-decoration:none;font-size:10.5px;font-weight:800;color:var(--muted)}
+.wk .strip i{display:block;font-style:normal;font-size:13px;color:var(--muted2);margin-top:3px;height:18px}
+.wk .strip i img{height:17px;vertical-align:middle;margin:0 -1px}
+.wk .strip .cs i img{height:13px}
+.wk .strip .c{background:#E8F1FC;border-color:#bcd8f5}
+.wk .strip .s{background:#FDEEDF;border-color:#f3cfa6}
+.wk .strip .cs{background:linear-gradient(135deg,#E8F1FC 50%,#FDEEDF 50%);border-color:#cdd9e8}
+.wk .strip .today{box-shadow:0 0 0 2px var(--primary-tint);border-color:var(--primary)}
+.wk .strip .c u,.wk .strip .cs u{color:#2E6DB4} .wk .strip .s u{color:#C4711A}
+.wk .bar{height:9px;border-radius:99px;background:var(--line);overflow:hidden;margin:2px 0 4px}
+.wk .bar b{display:block;height:100%;border-radius:99px;background:var(--primary);transition:width .5s}
+.wk .bar.done b{background:var(--primary-dark)}
+.wk .st .dv{display:block;font-size:10.5px;font-weight:800;margin-top:3px;letter-spacing:-.2px}
+.dv.up{color:var(--primary-dark)} .dv.down{color:#C4711A} .dv.same{color:var(--muted2)}
+.wk .cmp{border-top:1px solid var(--divider);margin-top:10px;padding-top:11px}
+.wk .cmp h3{margin:0 0 8px;font-size:13px;font-weight:800;color:var(--ink2)}
+.wk .cum{display:flex;gap:8px;align-items:flex-end;margin:10px 0 4px}
+.wk .cum div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.wk .cum i{display:block;width:100%;border-radius:6px 6px 3px 3px;background:var(--line2)}
+.wk .cum div.on i{background:var(--primary)}
+.wk .cum div.now i{box-shadow:0 0 0 2px var(--primary-tint)}
+.wk .cum em{font-style:normal;font-size:10px;font-weight:700;color:var(--muted);margin-top:5px}
+.wk .cum b{font-size:10.5px;font-weight:800;color:var(--ink2);margin-bottom:4px}
+.wk .msg{background:var(--primary-tint);border-radius:11px;padding:9px 12px;font-size:12.5px;
+  font-weight:700;color:var(--primary-dark);margin-top:9px}
 /* 근력 사진 타임마크 검사 */
 .tmnote{background:var(--warning-tint);border:1px solid #f0c98a;border-radius:12px;padding:11px 13px;margin-bottom:12px;font-size:13px}
 .tmnote b{color:var(--warning)}
@@ -525,8 +555,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.42.0';
-var PWA_BUILD = '2026.08.14 16:10';
+var PWA_VER = '0.43.0';
+var PWA_BUILD = '2026.08.14 17:05';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -1158,34 +1188,120 @@ function satEmoji(v){var f=SAT.filter(function(s){return s.v===v;});return f.len
 /* ---------- 이번 주 운동 요약 (성찰 쓸 때 보면서) ---------- */
 var WK=null, WK_DEMO=false;
 /* 기록이 하나도 없을 때 보여줄 예시 */
-var WK_SAMPLE={주차:1,시작일:'2026-08-10',종료일:'2026-08-16',운동일수:3,유산소일수:2,근력일수:1,
+var WK_SAMPLE={주차:1,총주차:4,시작일:'2026-08-10',종료일:'2026-08-16',운동일수:3,유산소일수:2,근력일수:1,
   목표일수:3,유산소필수:2,달성:true,총거리:6.0,총시간:53,
+  요일맵:{'2026-08-11':{c:true,s:false},'2026-08-13':{c:false,s:true},'2026-08-15':{c:true,s:false}},
+  지난주:null,
+  누적:{주차수:1,운동일수:3,유산소일수:2,근력일수:1,총거리:6.0,총시간:53,달성주차:1,목표일수:3},
+  주차별:[{주차:1,운동일수:3,유산소일수:2,근력일수:1,총거리:6.0,총시간:53,달성:true}],
   기록:[{날짜:'2026-08-11',요일:'화',종류:'유산소',거리:3.2,시간:28,내용:'페이스 8분45초 · 240kcal',성찰:'초반엔 힘들었는데 20분 넘으니 리듬이 잡혔다.'},
         {날짜:'2026-08-13',요일:'목',종류:'근력',내용:'스쿼트 3세트×15, 런지 3세트×12',성찰:'자세를 신경 쓰니 허벅지에 자극이 확실했다.'},
         {날짜:'2026-08-15',요일:'토',종류:'유산소',거리:2.8,시간:25,내용:'가볍게 걷기',성찰:''}]};
+
+/* yyyy-mm-dd 계산 도우미 */
+function isoAdd(iso,n){var d=new Date(iso+'T00:00:00');d.setDate(d.getDate()+n);
+  return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+function isoToday(){var d=new Date();
+  return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+function md(iso){return iso?iso.slice(5).replace('-','/'):'';}
+
+/* 월~일 7칸 스트립 — 어느 요일에 무엇을 했는지 한눈에 */
+function weekStrip(w){
+  var WD=['일','월','화','수','목','금','토'], map=w.요일맵||{}, tod=isoToday(), h='';
+  for(var i=0;i<7;i++){
+    var d=isoAdd(w.시작일,i), v=map[d], cls=v?(v.c&&v.s?'cs':(v.c?'c':'s')):'';
+    if(d===tod)cls+=' today';
+    var ic=v?((v.c?'<img src="ic-cardio.png" alt="유산소">':'')+(v.s?'<img src="ic-strength.png" alt="근력">':'')):'·';
+    h+='<div class="'+cls+'"><u>'+WD[new Date(d+'T00:00:00').getDay()]+'</u><i>'+ic+'</i></div>';
+  }
+  return '<div class="strip">'+h+'</div>';
+}
+
+/* 지난주 대비 증감 배지 (많을수록 좋은 항목 기준)
+   compact=true 면 좁은 통계칸용으로 '같음'을 — 로 줄인다 */
+function dvBadge(cur,prev,unit,dec,compact){
+  if(prev==null)return '';
+  var p=Math.pow(10,dec||0), d=Math.round((Number(cur||0)-Number(prev||0))*p)/p;
+  if(!d)return '<span class="dv same">'+(compact?'—':'지난주와 같음')+'</span>';
+  return '<span class="dv '+(d>0?'up':'down')+'">'+(d>0?'▲':'▼')+Math.abs(d)+unit+'</span>';
+}
+
+/* 누적 주차별 미니 막대 */
+function cumBars(w){
+  var arr=w.주차별||[], n=Number(w.총주차)||4, mx=Number(w.목표일수)||3, h='';
+  arr.forEach(function(x){if(x.운동일수>mx)mx=x.운동일수;});
+  for(var i=1;i<=n;i++){
+    var x=null;
+    arr.forEach(function(a){if(a.주차===i)x=a;});
+    var v=x?x.운동일수:0, px=mx?Math.max(4,Math.round(v/mx*36)):4;
+    h+='<div class="'+(x&&x.달성?'on ':'')+(i===w.주차?'now':'')+'">'
+      +'<b>'+(x?v+'일':'&nbsp;')+'</b><i style="height:'+px+'px"></i><em>'+i+'주</em></div>';
+  }
+  return '<div class="cum">'+h+'</div>';
+}
+
+/* 지난주 대비 한 줄 응원 문구 */
+function cmpMsg(w){
+  var p=w.지난주; if(!p)return '';
+  var dd=w.운동일수-p.운동일수, dk=Math.round((w.총거리-p.총거리)*10)/10;
+  if(dd>0)return '🔥 지난주보다 <b>'+dd+'일</b> 더 운동했어요. 이 페이스 그대로!';
+  if(dd===0&&dk>0)return '👏 운동 일수는 같지만 <b>'+dk+'km</b> 더 뛰었어요.';
+  if(dd===0)return '👍 지난주와 같은 페이스를 지키고 있어요.';
+  return '💪 지난주보다 <b>'+Math.abs(dd)+'일</b> 적어요. 남은 날에 한 번 더 채워볼까요?';
+}
 
 function renderWeek(w,demo){
   WK=w; WK_DEMO=!!demo;
   var box=document.getElementById('rf-summary');
   var 일=w.기록.map(function(r){
     var sub=(r.종류==='유산소'&&(r.거리||r.시간))?((r.거리?r.거리+'km ':'')+(r.시간?r.시간+'분':'')):(r.내용||'');
-    return '<div class="di"><span class="dd">'+r.날짜.slice(5).replace('-','/')+'('+r.요일+')</span>'
+    return '<div class="di"><span class="dd">'+md(r.날짜)+'('+r.요일+')</span>'
       +'<div style="flex:1">'+kindChip(r.종류)+' '
       +'<span class="cap">'+esc(sub)+'</span>'
       +(r.자각도?' <span class="chip" style="background:'+rpeColor(r.자각도)+'22;color:'+rpeColor(r.자각도)+'">'+esc(rpeName(r.자각도))+'</span>':'')
       +(r.만족도?' <span class="chip ok">'+satEmoji(r.만족도)+'</span>':'')
       +(r.성찰?'<div class="cap" style="margin-top:3px">✍️ '+esc(r.성찰)+'</div>':'')+'</div></div>';
   }).join('');
+
+  var p=w.지난주, pct=Math.min(100,Math.round((w.운동일수/(w.목표일수||3))*100));
+  var cum=w.누적||null;
+
+  // 2주차부터만 비교 섹션을 붙인다
+  var 비교='';
+  if(p&&cum){
+    비교='<div class="cmp">'
+      +'<h3>📈 지난주(' + (w.주차-1) + '주차 ' + md(p.시작일) + '~' + md(p.종료일) + ') 대비</h3>'
+      +'<div class="di" style="padding:2px 0"><span class="dd">운동</span><div style="flex:1">'
+        +'<b>'+w.운동일수+'일</b> <span class="cap">← 지난주 '+p.운동일수+'일</span> '+dvBadge(w.운동일수,p.운동일수,'일')+'</div></div>'
+      +'<div class="di" style="padding:2px 0"><span class="dd">거리</span><div style="flex:1">'
+        +'<b>'+(w.총거리||0)+'km</b> <span class="cap">← 지난주 '+(p.총거리||0)+'km</span> '+dvBadge(w.총거리,p.총거리,'km',1)+'</div></div>'
+      +'<div class="di" style="padding:2px 0"><span class="dd">시간</span><div style="flex:1">'
+        +'<b>'+(w.총시간||0)+'분</b> <span class="cap">← 지난주 '+(p.총시간||0)+'분</span> '+dvBadge(w.총시간,p.총시간,'분')+'</div></div>'
+      +'<div class="msg">'+cmpMsg(w)+'</div>'
+      +'<h3 style="margin-top:14px">🧮 1~'+w.주차+'주차 누적</h3>'
+      +'<div class="st"><div><b>'+cum.운동일수+'일</b><span>총 운동일</span></div>'
+      +'<div><b>'+cum.달성주차+'/'+cum.주차수+'</b><span>목표 달성 주</span></div>'
+      +'<div><b>'+(cum.총거리||0)+'km</b><span>누적 거리</span></div>'
+      +'<div><b>'+(cum.총시간||0)+'분</b><span>누적 시간</span></div></div>'
+      +cumBars(w)
+      +'<p class="cap" style="margin:2px 0 0">주차별 운동일수 · 색이 채워진 주가 <b>목표 달성</b>한 주예요 (목표 '+w.목표일수+'일)</p>'
+      +'</div>';
+  }
+
   box.innerHTML='<div class="wk'+(demo?' demo':'')+'">'
     +'<div class="hd"><h2 style="margin:0">📊 이번 주 내 운동</h2>'
-    +(demo?'<span class="badge-demo">예시</span>':'<span class="cap">'+w.시작일.slice(5).replace('-','/')+' ~ '+w.종료일.slice(5).replace('-','/')+'</span>')+'</div>'
+    +(demo?'<span class="badge-demo">예시</span>'
+          :'<span class="cap">'+w.주차+'주차 · '+md(w.시작일)+' ~ '+md(w.종료일)+'</span>')+'</div>'
     +'<div class="big">'+w.운동일수+'일 운동 <span style="font-size:14px;color:var(--muted);font-weight:600">/ 목표 '+w.목표일수+'일</span> '
     +(w.달성?'<span class="chip ok">목표 달성 ✓</span>':'<span class="chip warn">'+Math.max(0,w.목표일수-w.운동일수)+'일 남음</span>')+'</div>'
-    +'<div class="st"><div><b>'+w.유산소일수+'/'+w.유산소필수+'</b><span>유산소</span></div>'
-    +'<div><b>'+w.근력일수+'</b><span>근력</span></div>'
-    +'<div><b>'+(w.총거리||0)+'km</b><span>달린 거리</span></div>'
-    +'<div><b>'+(w.총시간||0)+'분</b><span>운동 시간</span></div></div>'
+    +'<div class="bar'+(w.달성?' done':'')+'"><b style="width:'+pct+'%"></b></div>'
+    +weekStrip(w)
+    +'<div class="st"><div><b>'+w.유산소일수+'/'+w.유산소필수+'</b><span>유산소</span>'+(p?dvBadge(w.유산소일수,p.유산소일수,'일',0,true):'')+'</div>'
+    +'<div><b>'+w.근력일수+'</b><span>근력</span>'+(p?dvBadge(w.근력일수,p.근력일수,'일',0,true):'')+'</div>'
+    +'<div><b>'+(w.총거리||0)+'km</b><span>달린 거리</span>'+(p?dvBadge(w.총거리,p.총거리,'km',1,true):'')+'</div>'
+    +'<div><b>'+(w.총시간||0)+'분</b><span>운동 시간</span>'+(p?dvBadge(w.총시간,p.총시간,'분',0,true):'')+'</div></div>'
     +(일?'<div class="dl">'+일+'</div>':'<p class="muted" style="margin:0">이번 주 기록이 아직 없어요.</p>')
+    +비교
     +(demo?'<p class="cap" style="margin:10px 0 0;color:var(--warning)">※ 아직 기록이 없어서 <b>예시</b>를 보여드려요. 운동을 인증하면 내 기록으로 바뀝니다.</p>':'')
     +'</div>';
 }
@@ -1197,8 +1313,16 @@ function insertSummary(){
     +(w.총거리?' · 총 '+w.총거리+'km':'')+(w.총시간?' · '+w.총시간+'분':''));
   w.기록.forEach(function(r){
     var sub=(r.종류==='유산소'&&(r.거리||r.시간))?((r.거리?r.거리+'km ':'')+(r.시간?r.시간+'분':'')):(r.내용||'');
-    lines.push('· '+r.날짜.slice(5).replace('-','/')+'('+r.요일+') '+r.종류+' '+sub);
+    lines.push('· '+md(r.날짜)+'('+r.요일+') '+r.종류+' '+sub);
   });
+  if(w.지난주){
+    var p=w.지난주, dd=w.운동일수-p.운동일수, dk=Math.round((w.총거리-p.총거리)*10)/10;
+    lines.push('');
+    lines.push('[지난주 대비] 운동 '+p.운동일수+'일 → '+w.운동일수+'일('+(dd>0?'+':'')+dd+'일)'
+      +' · 거리 '+(p.총거리||0)+'km → '+(w.총거리||0)+'km('+(dk>0?'+':'')+dk+'km)');
+    if(w.누적)lines.push('[누적 1~'+w.주차+'주차] 총 '+w.누적.운동일수+'일 운동 · '
+      +(w.누적.총거리||0)+'km · '+(w.누적.총시간||0)+'분 · 목표 달성 '+w.누적.달성주차+'/'+w.누적.주차수+'주');
+  }
   lines.push('');
   lines.push('[느낀 점] ');
   lines.push('[몸의 변화] ');
