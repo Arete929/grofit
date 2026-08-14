@@ -1,5 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.37.0 -->
-<!-- 수정요약: [0.37.0] 근력 입력을 2줄 구조로 개편 — 운동명 한 줄, 아래에 무게(kg)·세트·횟수. 무게는 선택. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.40.0 -->
+<!-- 수정요약: [0.40.0] 선생님 코멘트를 캐릭터 스티커와 함께 말풍선으로 표시. -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -73,6 +73,9 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .ic-t{width:30px;height:30px;flex:none;display:block}
 .ic-s{width:22px;height:22px;vertical-align:-4px}
 .chip img{width:15px;height:15px;vertical-align:-3px;margin-right:2px}
+/* 선생님 코멘트 말풍선 (캐릭터 스티커) */
+.tbub{display:flex;align-items:flex-start;gap:10px}
+.tbub-st{width:58px;height:58px;flex:none;object-fit:contain}
 /* 운동자각도 · 만족도 */
 .rpe{display:flex;gap:4px;margin-top:4px}
 .rpe button{flex:1;border:1.5px solid var(--line2);background:#fff;border-radius:10px;padding:9px 2px 8px;
@@ -521,8 +524,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.39.0';
-var PWA_BUILD = '2026.08.14 00:55';
+var PWA_VER = '0.40.0';
+var PWA_BUILD = '2026.08.14 12:20';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -1222,7 +1225,9 @@ function loadReflect(){
     var html='';(list||[]).forEach(function(r){
       html+='<div class="card"><div class="row" style="justify-content:space-between"><b>'+r.주차+'주차</b><span class="cap">'+r.작성일+'</span></div>'
         +'<p style="margin:8px 0 0">'+esc(r.내용)+'</p>'
-        +(r.교사코멘트?'<div class="bubble"><b>선생님</b><br>'+esc(r.교사코멘트)+'</div>':'')+'</div>';
+        +(r.교사코멘트?'<div class="bubble tbub">'
+            +(r.스티커?'<img class="tbub-st" src="st-'+esc(r.스티커)+'.png" alt="">':'')
+            +'<div><b>선생님</b><br>'+esc(r.교사코멘트)+'</div></div>':'')+'</div>';
     });
     document.getElementById('rf-list').innerHTML=html||'<p class="muted" style="padding:0 4px">아직 작성한 성찰이 없습니다.</p>';
   });
