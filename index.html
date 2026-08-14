@@ -1,5 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.46.2 -->
-<!-- 수정요약: [0.46.2] 근력 입력을 횟수/시간 선택으로 — 시간을 고르면 분·초 두 칸으로 바뀌고 '3세트×1분 30초'로 저장(초 60 이상은 분으로 올림). -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.46.3 -->
+<!-- 수정요약: [0.46.3] 새 파트너 이름 입력칸이 버튼(.btn width:100%)에 밀려 찌그러지던 것 수정 — 입력칸을 넓히고(46px) 예시문구 'New 파트너'. 안내문구를 '함께한 파트너를 1명 이상 고르거나, 새로운 파트너를 추가하세요'로. -->
+<!--   [0.46.2] 근력 입력을 횟수/시간 선택으로 — 시간을 고르면 분·초 두 칸으로 바뀌고 '3세트×1분 30초'로 저장(초 60 이상은 분으로 올림). -->
 <!--   [0.46.1] 근력 횟수 단위를 회/분 토글로(플랭크처럼 버티는 운동 대응). 저장 문구에 단위 포함 — '3세트×12회'. -->
 <!--   [0.46.0] 유산소 상단 안내(삼성헬스·애플피트니스·나이키런클럽 중 하나 선택). 근력은 상체·하체·유연성 고정 3칸으로 바꾸고 셋 다 채워야 저장(강제). 저장 문구는 '[상체] 푸시업 3세트×12' 형식. -->
 <!--   [0.45.1] 파트너 목록 응답이 배열이 아니어도 입력칸은 뜨도록 방어(서버 오류 시 태그만 비고 진행 가능). -->
@@ -134,8 +135,10 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .pntag.on{border-color:var(--primary);background:var(--primary);color:#fff}
 .pntag i{font-style:normal;font-size:11px;color:var(--muted2);margin-left:5px;font-weight:600}
 .pntag.on i{color:rgba(255,255,255,.85)}
-.pnrow{display:flex;gap:6px;margin-top:10px}
-.pnrow input{flex:1;min-width:0}
+/* .btn 이 width:100% 라 그대로 두면 버튼이 줄을 다 먹고 입력칸이 찌그러진다 */
+.pnrow{display:flex;gap:7px;margin-top:10px;align-items:stretch}
+.pnrow input{flex:1 1 auto;min-width:0;height:46px;font-size:15px;padding:0 14px}
+.pnrow .btn{flex:0 0 auto;width:auto;height:46px;padding:0 16px;white-space:nowrap}
 .pnsel{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .pnsel span{background:var(--primary-tint);color:var(--primary-dark);border-radius:999px;
   padding:6px 9px 6px 13px;font-size:13px;font-weight:800;display:inline-flex;align-items:center;gap:7px}
@@ -630,8 +633,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.46.2';
-var PWA_BUILD = '2026.08.14 20:25';
+var PWA_VER = '0.46.3';
+var PWA_BUILD = '2026.08.14 20:45';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -1338,14 +1341,14 @@ function renderPn(k){
     return '<button type="button" class="pntag'+(on?' on':'')+'" onclick="pnToggle(&quot;'+k+'&quot;,&quot;'+esc(p.이름)+'&quot;)">'
       +esc(p.이름)+'<i>'+p.횟수+'</i></button>';
   }).join('');
-  box.innerHTML=(tags?'<p class="cap" style="margin:0 0 7px">전에 함께한 친구 — 눌러서 고르세요</p><div class="pntags">'+tags+'</div>':'')
-    +'<div class="pnrow"><input id="'+k+'-pnin" maxlength="20" placeholder="친구 이름 (예: 김서연)" '
+  box.innerHTML=(tags?'<p class="cap" style="margin:0 0 7px">전에 함께한 파트너 — 눌러서 고르세요</p><div class="pntags">'+tags+'</div>':'')
+    +'<div class="pnrow"><input id="'+k+'-pnin" maxlength="20" placeholder="New 파트너" '
       +'onkeydown="if(event.key===&quot;Enter&quot;){event.preventDefault();pnAdd(&quot;'+k+'&quot;)}">'
       +'<button type="button" class="btn sec sm" onclick="pnAdd(&quot;'+k+'&quot;)">＋ 추가</button></div>'
     +(st.names.length
       ?'<div class="pnsel">'+st.names.map(function(n){
           return '<span>'+esc(n)+'<u onclick="pnDel(&quot;'+k+'&quot;,&quot;'+esc(n)+'&quot;)">✕</u></span>';}).join('')+'</div>'
-      :'<p class="cap" style="margin:9px 0 0;color:var(--warning)">함께한 친구를 1명 이상 골라주세요</p>');
+      :'<p class="cap" style="margin:9px 0 0;color:var(--warning)">함께한 파트너를 1명 이상 고르거나, 새로운 파트너를 추가하세요</p>');
 }
 function pnMode(k,m){PN[k].mode=m; if(m==='solo')PN[k].names=[]; renderPn(k);}
 function pnToggle(k,n){var a=PN[k].names,i=a.indexOf(n); if(i>=0)a.splice(i,1); else a.push(n); renderPn(k);}
@@ -1364,7 +1367,7 @@ function pnValue(k){var st=PN[k];
   return '';}
 function pnCheck(k){var st=PN[k];
   if(!st.mode){toast('먼저 누구와 운동했는지 골라주세요');window.scrollTo(0,0);return false;}
-  if(st.mode==='with'&&!st.names.length){toast('함께한 친구를 1명 이상 골라주세요');window.scrollTo(0,0);return false;}
+  if(st.mode==='with'&&!st.names.length){toast('함께한 파트너를 1명 이상 고르거나, 새로운 파트너를 추가하세요');window.scrollTo(0,0);return false;}
   return true;}
 function pnReset(k){PN[k]={mode:'',names:[]};renderPn(k);}
 /* 기록 줄에 붙는 파트너 칩 */
