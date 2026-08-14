@@ -1,5 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.44.0 -->
-<!-- 수정요약: [0.44.0] 학생앱 변경 없음 — 관리자 v0.44.0(코멘트 수정·삭제)과 버전 번호만 통일. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.45.0 -->
+<!-- 수정요약: [0.45.0] 인증 화면 맨 위에 '누구와 운동했나요?' — 🧍혼자/👥같이 팔레트, 같이면 친구 이름 입력. 한 번 적은 친구는 다음부터 태그로 바로 선택(getMyPartners, 횟수 표시). 기록 목록·이번 주 카드에 파트너 배지. -->
+<!--   [0.44.0] 학생앱 변경 없음 — 관리자 v0.44.0(코멘트 수정·삭제)과 버전 번호만 통일. -->
 <!-- 수정요약: [0.43.0] '이번 주 내 운동' 카드 개편 — 요일 스트립·목표 진행바 추가, 2주차부터 지난주 대비 증감과 1~N주차 누적(주차별 미니 막대) 표시. 성찰 자동삽입 문구에도 지난주·누적 줄 추가. 진호 캐릭터 6종 확대(본문 32→44px, 말풍선 58→76px). -->
 <!--   [0.42.0] 서비스워커를 HTML 네트워크-우선으로 변경 — 코드를 고쳐도 옛 화면이 뜨던 문제 근본 해결. -->
 <!DOCTYPE html>
@@ -93,6 +94,25 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
   font-family:inherit;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer}
 .sat button b{display:block;font-size:22px;line-height:1.2;margin-bottom:2px}
 .sat button.on{border-color:var(--primary);background:var(--primary-tint);color:var(--primary-dark)}
+/* 운동 파트너 */
+.pnmode{display:flex;gap:8px}
+.pnmode button{flex:1;border:1.5px solid var(--line2);background:#fff;border-radius:13px;padding:13px 6px 11px;
+  font-family:inherit;font-size:13.5px;font-weight:800;color:var(--muted);cursor:pointer;line-height:1.3}
+.pnmode button b{display:block;font-size:24px;margin-bottom:4px;line-height:1}
+.pnmode button.on{border-color:var(--primary);background:var(--primary-tint);color:var(--primary-dark)}
+.pntags{display:flex;flex-wrap:wrap;gap:6px}
+.pntag{border:1.5px solid var(--line2);background:#fff;border-radius:999px;padding:7px 13px;
+  font-family:inherit;font-size:13px;font-weight:700;color:var(--ink2);cursor:pointer}
+.pntag.on{border-color:var(--primary);background:var(--primary);color:#fff}
+.pntag i{font-style:normal;font-size:11px;color:var(--muted2);margin-left:5px;font-weight:600}
+.pntag.on i{color:rgba(255,255,255,.85)}
+.pnrow{display:flex;gap:6px;margin-top:10px}
+.pnrow input{flex:1;min-width:0}
+.pnsel{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.pnsel span{background:var(--primary-tint);color:var(--primary-dark);border-radius:999px;
+  padding:6px 9px 6px 13px;font-size:13px;font-weight:800;display:inline-flex;align-items:center;gap:7px}
+.pnsel span u{text-decoration:none;cursor:pointer;font-size:14px;line-height:1;opacity:.6}
+.chip.pn{background:#EEE9FA;color:#5B4B9E}
 /* 성찰 — 이번 주 기록 요약 */
 .wk{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px;
   box-shadow:0 10px 34px rgba(20,40,25,.05)}
@@ -341,6 +361,12 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
     <div class="topbar"><button class="back" onclick="go('cert')">←</button><img class="ic-t" src="ic-cardio.png" alt=""><h1>유산소 인증</h1></div>
     <label>운동한 요일 (이번 주)</label><div id="cardio-days" class="daysel"></div>
     <div class="card">
+      <h2>누구와 운동했나요?</h2>
+      <p class="cap" style="margin:-4px 0 10px">먼저 골라주세요. 함께한 친구는 다음부터 태그로 바로 나와요</p>
+      <div class="pnmode" id="c-pnmode"></div>
+      <div id="c-pnbox" class="hidden" style="margin-top:12px"></div>
+    </div>
+    <div class="card">
       <div class="drop" id="cardio-drop" onclick="pick('cardio-file')">📷 운동 앱 스크린샷 업로드<br><span class="cap">탭하여 사진 선택</span></div>
       <input type="file" id="cardio-file" accept="image/*" class="hidden" onchange="onCardioImg(this)">
       <img id="cardio-prev" class="hidden" style="width:100%;border-radius:12px;margin-top:12px">
@@ -374,6 +400,12 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
   <section id="s-strength" class="scr">
     <div class="topbar"><button class="back" onclick="go('cert')">←</button><img class="ic-t" src="ic-strength.png" alt=""><h1>근력 인증</h1></div>
     <label>운동한 요일 (이번 주)</label><div id="str-days" class="daysel"></div>
+    <div class="card">
+      <h2>누구와 운동했나요?</h2>
+      <p class="cap" style="margin:-4px 0 10px">먼저 골라주세요. 함께한 친구는 다음부터 태그로 바로 나와요</p>
+      <div class="pnmode" id="s-pnmode"></div>
+      <div id="s-pnbox" class="hidden" style="margin-top:12px"></div>
+    </div>
     <div class="card">
       <div class="tmnote" id="str-guide">
         <b>⏱ 타임마크 '사진 코드'로 찍은 사진만 됩니다</b>
@@ -557,8 +589,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.44.0';
-var PWA_BUILD = '2026.08.14 17:45';
+var PWA_VER = '0.45.0';
+var PWA_BUILD = '2026.08.14 18:20';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -640,8 +672,8 @@ function go(name){
     b.classList.toggle('on', b.dataset.t===name);
   });
   if(name==='home') loadHome();
-  if(name==='cardio'){renderDayPicker('cardio');renderRpe('c');renderSat('c');}
-  if(name==='strength'){renderDayPicker('strength');renderRpe('s');renderSat('s');}
+  if(name==='cardio'){renderDayPicker('cardio');renderRpe('c');renderSat('c');renderPn('c');loadPartners();}
+  if(name==='strength'){renderDayPicker('strength');renderRpe('s');renderSat('s');renderPn('s');loadPartners();}
   if(name==='inbody'){loadFitness();loadMyStamps();}
   if(name==='inbody-graph')loadFitChart();
   if(name==='reflect'){loadReflect();loadMyStamps();}
@@ -821,10 +853,11 @@ function resetCardio(){cardioB64=null;['c-dist','c-dur','c-pace','c-kcal','c-ref
   document.getElementById('cardio-prev').classList.add('hidden');document.getElementById('cardio-result').classList.add('hidden');
   document.getElementById('cardio-analyze').classList.add('hidden');}
 function saveCardio(){
+  if(!pnCheck('c'))return;
   call('submitCardio',[ST.student.학번,{imageBase64:cardioB64,date:ST.cardioDate,
     distanceKm:val('c-dist'),durationMin:val('c-dur'),summary:'페이스 '+val('c-pace')+' · '+val('c-kcal')+'kcal',source:'앱',
-    reflect:val('c-reflect'),rpe:PICK.c.rpe,sat:PICK.c.sat}],
-    function(r){toast('✅ 유산소 인증 저장'+savedMsg(r));resetCardio();resetPick('c');go('home');});
+    reflect:val('c-reflect'),rpe:PICK.c.rpe,sat:PICK.c.sat,partner:pnValue('c')}],
+    function(r){toast('✅ 유산소 인증 저장'+savedMsg(r));resetCardio();resetPick('c');pnReset('c');loadPartners();go('home');});
 }
 /* 성찰 글자수 카운터 */
 function countReflect(id,nid){var t=document.getElementById(id),n=document.getElementById(nid);
@@ -929,11 +962,12 @@ function saveStrength(){
   if(strB64 && strCheck && !strCheck.pass && !strCheck.skipped && !strException){
     toast('타임마크 사진이 아니에요. 다시 찍거나 선생님께 확인 요청을 눌러주세요');return;
   }
+  if(!pnCheck('s'))return;
   call('submitStrength',[ST.student.학번,{imageBase64:strB64,date:ST.strDate,summary:rows.join(', '),reflect:val('st-reflect'),
-    rpe:PICK.s.rpe,sat:PICK.s.sat,check:strCheck,exception:strException}],
+    rpe:PICK.s.rpe,sat:PICK.s.sat,check:strCheck,exception:strException,partner:pnValue('s')}],
     function(r){toast(strB64?('✅ 근력 인증 저장'+savedMsg(r)):'📝 기록만 저장됨 · 사진이 없어 인정되지 않아요');
     strB64=null;strCheck=null;strException=null;
-    document.getElementById('str-check').innerHTML='';resetStrRows();resetPick('s');
+    document.getElementById('str-check').innerHTML='';resetStrRows();resetPick('s');pnReset('s');loadPartners();
     document.getElementById('st-reflect').value='';countReflect('st-reflect','st-reflect-n');
     document.getElementById('str-prev').classList.add('hidden');go('home');});
 }
@@ -1178,6 +1212,67 @@ function renderSat(k){
 function pickRpe(k,v){PICK[k].rpe=(PICK[k].rpe===v?null:v);renderRpe(k);}
 function pickSat(k,v){PICK[k].sat=(PICK[k].sat===v?null:v);renderSat(k);}
 function resetPick(k){PICK[k]={rpe:null,sat:null};renderRpe(k);renderSat(k);}
+/* ---------- 운동 파트너 ----------
+   인증 화면 맨 위에서 먼저 고른다. 저장값은 '혼자' 또는 '이름1, 이름2'.
+   한 번 적은 친구는 getMyPartners 로 다시 내려와 태그로 바로 보인다. */
+var PN={c:{mode:'',names:[]}, s:{mode:'',names:[]}};
+var PN_RECENT=[];
+function pnClean(s){return String(s||'').replace(/["'<>&,·\/]/g,'').replace(/\s+/g,' ').trim().slice(0,20);}
+function loadPartners(){
+  if(!ST.student)return;
+  call('getMyPartners',[ST.student.학번],function(list){
+    PN_RECENT=list||[]; renderPn('c'); renderPn('s');
+  });
+}
+function renderPn(k){
+  var m=document.getElementById(k+'-pnmode'); if(!m)return;
+  var st=PN[k];
+  m.innerHTML='<button type="button" class="'+(st.mode==='solo'?'on':'')+'" onclick="pnMode(&quot;'+k+'&quot;,&quot;solo&quot;)"><b>🧍</b>혼자 했어요</button>'
+    +'<button type="button" class="'+(st.mode==='with'?'on':'')+'" onclick="pnMode(&quot;'+k+'&quot;,&quot;with&quot;)"><b>👥</b>같이 했어요</button>';
+  var box=document.getElementById(k+'-pnbox'); if(!box)return;
+  if(st.mode!=='with'){box.classList.add('hidden');box.innerHTML='';return;}
+  box.classList.remove('hidden');
+  var tags=PN_RECENT.map(function(p){
+    var on=st.names.indexOf(p.이름)>=0;
+    return '<button type="button" class="pntag'+(on?' on':'')+'" onclick="pnToggle(&quot;'+k+'&quot;,&quot;'+esc(p.이름)+'&quot;)">'
+      +esc(p.이름)+'<i>'+p.횟수+'</i></button>';
+  }).join('');
+  box.innerHTML=(tags?'<p class="cap" style="margin:0 0 7px">전에 함께한 친구 — 눌러서 고르세요</p><div class="pntags">'+tags+'</div>':'')
+    +'<div class="pnrow"><input id="'+k+'-pnin" maxlength="20" placeholder="친구 이름 (예: 김서연)" '
+      +'onkeydown="if(event.key===&quot;Enter&quot;){event.preventDefault();pnAdd(&quot;'+k+'&quot;)}">'
+      +'<button type="button" class="btn sec sm" onclick="pnAdd(&quot;'+k+'&quot;)">＋ 추가</button></div>'
+    +(st.names.length
+      ?'<div class="pnsel">'+st.names.map(function(n){
+          return '<span>'+esc(n)+'<u onclick="pnDel(&quot;'+k+'&quot;,&quot;'+esc(n)+'&quot;)">✕</u></span>';}).join('')+'</div>'
+      :'<p class="cap" style="margin:9px 0 0;color:var(--warning)">함께한 친구를 1명 이상 골라주세요</p>');
+}
+function pnMode(k,m){PN[k].mode=m; if(m==='solo')PN[k].names=[]; renderPn(k);}
+function pnToggle(k,n){var a=PN[k].names,i=a.indexOf(n); if(i>=0)a.splice(i,1); else a.push(n); renderPn(k);}
+function pnAdd(k){
+  var el=document.getElementById(k+'-pnin'); if(!el)return;
+  var n=pnClean(el.value);
+  if(!n){toast('친구 이름을 입력하세요');return;}
+  if(PN[k].names.indexOf(n)<0)PN[k].names.push(n);
+  renderPn(k);
+  var f=document.getElementById(k+'-pnin'); if(f)f.focus();
+}
+function pnDel(k,n){var a=PN[k].names,i=a.indexOf(n); if(i>=0)a.splice(i,1); renderPn(k);}
+function pnValue(k){var st=PN[k];
+  if(st.mode==='solo')return '혼자';
+  if(st.mode==='with')return st.names.join(', ');
+  return '';}
+function pnCheck(k){var st=PN[k];
+  if(!st.mode){toast('먼저 누구와 운동했는지 골라주세요');window.scrollTo(0,0);return false;}
+  if(st.mode==='with'&&!st.names.length){toast('함께한 친구를 1명 이상 골라주세요');window.scrollTo(0,0);return false;}
+  return true;}
+function pnReset(k){PN[k]={mode:'',names:[]};renderPn(k);}
+/* 기록 줄에 붙는 파트너 칩 */
+function pnChip(v){
+  var s=String(v||'').trim(); if(!s)return '';
+  if(s==='혼자')return ' <span class="chip">🧍 혼자</span>';
+  return ' <span class="chip pn">👥 '+esc(s)+'</span>';
+}
+
 /* 유산소·근력 칩 (아이콘 포함) */
 function kindChip(kind){
   var c=(kind==='유산소');
@@ -1262,6 +1357,7 @@ function renderWeek(w,demo){
       +'<span class="cap">'+esc(sub)+'</span>'
       +(r.자각도?' <span class="chip" style="background:'+rpeColor(r.자각도)+'22;color:'+rpeColor(r.자각도)+'">'+esc(rpeName(r.자각도))+'</span>':'')
       +(r.만족도?' <span class="chip ok">'+satEmoji(r.만족도)+'</span>':'')
+      +pnChip(r.파트너)
       +(r.성찰?'<div class="cap" style="margin-top:3px">✍️ '+esc(r.성찰)+'</div>':'')+'</div></div>';
   }).join('');
 
@@ -1390,7 +1486,7 @@ function loadMyRecords(){
       var chip=kindChip(r.종류);
       var sub=(r.종류==='유산소' && (r.거리||r.시간))?((r.거리?r.거리+'km ':'')+(r.시간?r.시간+'분':'')):'';
       html+='<div class="list-item" style="align-items:flex-start">'
-        +'<div style="flex:1"><div>'+r.날짜+' '+chip+'</div>'
+        +'<div style="flex:1"><div>'+r.날짜+' '+chip+pnChip(r.파트너)+'</div>'
         +'<div class="cap" style="margin-top:3px">'+esc(sub||r.내용||'')+'</div>'
         +(r.저장시각?'<div class="cap" style="margin-top:2px;opacity:.8">🕒 저장 '+esc(r.저장시각)+'</div>':'')
         +(r.자각도||r.만족도?'<div style="margin-top:4px">'
