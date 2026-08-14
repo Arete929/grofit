@@ -1,5 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.45.0 -->
-<!-- 수정요약: [0.45.0] 인증 화면 맨 위에 '누구와 운동했나요?' — 🧍혼자/👥같이 팔레트, 같이면 친구 이름 입력. 한 번 적은 친구는 다음부터 태그로 바로 선택(getMyPartners, 횟수 표시). 기록 목록·이번 주 카드에 파트너 배지. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.45.1 -->
+<!-- 수정요약: [0.45.1] 파트너 목록 응답이 배열이 아니어도 입력칸은 뜨도록 방어(서버 오류 시 태그만 비고 진행 가능). -->
+<!--   [0.45.0] 인증 화면 맨 위에 '누구와 운동했나요?' — 🧍혼자/👥같이 팔레트, 같이면 친구 이름 입력. 한 번 적은 친구는 다음부터 태그로 바로 선택(getMyPartners, 횟수 표시). 기록 목록·이번 주 카드에 파트너 배지. -->
 <!--   [0.44.0] 학생앱 변경 없음 — 관리자 v0.44.0(코멘트 수정·삭제)과 버전 번호만 통일. -->
 <!-- 수정요약: [0.43.0] '이번 주 내 운동' 카드 개편 — 요일 스트립·목표 진행바 추가, 2주차부터 지난주 대비 증감과 1~N주차 누적(주차별 미니 막대) 표시. 성찰 자동삽입 문구에도 지난주·누적 줄 추가. 진호 캐릭터 6종 확대(본문 32→44px, 말풍선 58→76px). -->
 <!--   [0.42.0] 서비스워커를 HTML 네트워크-우선으로 변경 — 코드를 고쳐도 옛 화면이 뜨던 문제 근본 해결. -->
@@ -589,8 +590,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.45.0';
-var PWA_BUILD = '2026.08.14 18:20';
+var PWA_VER = '0.45.1';
+var PWA_BUILD = '2026.08.14 18:55';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -1221,7 +1222,9 @@ function pnClean(s){return String(s||'').replace(/["'<>&,·\/]/g,'').replace(/\s
 function loadPartners(){
   if(!ST.student)return;
   call('getMyPartners',[ST.student.학번],function(list){
-    PN_RECENT=list||[]; renderPn('c'); renderPn('s');
+    /* 서버가 오류객체를 주면 배열이 아니어서 아래 map이 터진다 → 입력칸까지 안 나왔던 원인 */
+    PN_RECENT=(list&&list.length!==undefined&&typeof list.length==='number')?list:[];
+    renderPn('c'); renderPn('s');
   });
 }
 function renderPn(k){
@@ -1232,7 +1235,8 @@ function renderPn(k){
   var box=document.getElementById(k+'-pnbox'); if(!box)return;
   if(st.mode!=='with'){box.classList.add('hidden');box.innerHTML='';return;}
   box.classList.remove('hidden');
-  var tags=PN_RECENT.map(function(p){
+  var recent=(PN_RECENT&&typeof PN_RECENT.length==='number')?PN_RECENT:[];
+  var tags=recent.map(function(p){
     var on=st.names.indexOf(p.이름)>=0;
     return '<button type="button" class="pntag'+(on?' on':'')+'" onclick="pnToggle(&quot;'+k+'&quot;,&quot;'+esc(p.이름)+'&quot;)">'
       +esc(p.이름)+'<i>'+p.횟수+'</i></button>';
