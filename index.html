@@ -1,5 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.40.0 -->
-<!-- 수정요약: [0.40.0] 선생님 코멘트를 캐릭터 스티커와 함께 말풍선으로 표시. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.41.0 -->
+<!-- 수정요약: [0.41.0] 성찰 탭이 안 열리던 버그 수정(근력 성찰 입력칸 id와 성찰 화면 id 충돌 → st-reflect). 코멘트·공지에 캐릭터 이모티콘 인라인 표시. -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -76,6 +76,7 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 /* 선생님 코멘트 말풍선 (캐릭터 스티커) */
 .tbub{display:flex;align-items:flex-start;gap:10px}
 .tbub-st{width:58px;height:58px;flex:none;object-fit:contain}
+.emo{width:32px;height:32px;object-fit:contain;vertical-align:-9px;margin:0 1px}
 /* 운동자각도 · 만족도 */
 .rpe{display:flex;gap:4px;margin-top:4px}
 .rpe button{flex:1;border:1.5px solid var(--line2);background:#fff;border-radius:10px;padding:9px 2px 8px;
@@ -368,8 +369,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
     </div>
     <div class="card">
       <h2>오늘의 성찰 <span class="cap">선택</span></h2>
-      <textarea id="s-reflect" rows="3" maxlength="300" placeholder="오늘 운동은 어땠나요? (예: 스쿼트 자세를 신경 쓰니 허벅지에 자극이 확실했다)"></textarea>
-      <p class="cap" style="text-align:right;margin:6px 0 0"><span id="s-reflect-n">0</span>/300자</p>
+      <textarea id="st-reflect" rows="3" maxlength="300" placeholder="오늘 운동은 어땠나요? (예: 스쿼트 자세를 신경 쓰니 허벅지에 자극이 확실했다)"></textarea>
+      <p class="cap" style="text-align:right;margin:6px 0 0"><span id="st-reflect-n">0</span>/300자</p>
     </div>
     <div class="row"><button class="btn sec" onclick="go('cert')">취소</button><button class="btn" onclick="saveStrength()">저장하기</button></div>
   </section>
@@ -524,8 +525,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.40.0';
-var PWA_BUILD = '2026.08.14 12:20';
+var PWA_VER = '0.41.0';
+var PWA_BUILD = '2026.08.14 12:45';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -896,12 +897,12 @@ function saveStrength(){
   if(strB64 && strCheck && !strCheck.pass && !strCheck.skipped && !strException){
     toast('타임마크 사진이 아니에요. 다시 찍거나 선생님께 확인 요청을 눌러주세요');return;
   }
-  call('submitStrength',[ST.student.학번,{imageBase64:strB64,date:ST.strDate,summary:rows.join(', '),reflect:val('s-reflect'),
+  call('submitStrength',[ST.student.학번,{imageBase64:strB64,date:ST.strDate,summary:rows.join(', '),reflect:val('st-reflect'),
     rpe:PICK.s.rpe,sat:PICK.s.sat,check:strCheck,exception:strException}],
     function(r){toast(strB64?('✅ 근력 인증 저장'+savedMsg(r)):'📝 기록만 저장됨 · 사진이 없어 인정되지 않아요');
     strB64=null;strCheck=null;strException=null;
     document.getElementById('str-check').innerHTML='';resetStrRows();resetPick('s');
-    document.getElementById('s-reflect').value='';countReflect('s-reflect','s-reflect-n');
+    document.getElementById('st-reflect').value='';countReflect('st-reflect','st-reflect-n');
     document.getElementById('str-prev').classList.add('hidden');go('home');});
 }
 
@@ -1227,7 +1228,7 @@ function loadReflect(){
         +'<p style="margin:8px 0 0">'+esc(r.내용)+'</p>'
         +(r.교사코멘트?'<div class="bubble tbub">'
             +(r.스티커?'<img class="tbub-st" src="st-'+esc(r.스티커)+'.png" alt="">':'')
-            +'<div><b>선생님</b><br>'+esc(r.교사코멘트)+'</div></div>':'')+'</div>';
+            +'<div><b>선생님</b><br>'+emoHtml(r.교사코멘트)+'</div></div>':'')+'</div>';
     });
     document.getElementById('rf-list').innerHTML=html||'<p class="muted" style="padding:0 4px">아직 작성한 성찰이 없습니다.</p>';
   });
@@ -1285,7 +1286,7 @@ function loadNoticesStudent(){
       html+='<div class="card"><div class="row" style="justify-content:space-between"><b>'+esc(n.제목)+'</b>'
         +'<span>'+(n.읽음?'<span class="chip ok">읽음</span>':'<span class="chip bad">새 공지</span>')
         +' <span class="cap">'+(n.날짜||'')+'</span></span></div>'
-        +'<p style="margin:8px 0 0;white-space:pre-wrap">'+esc(n.내용)+'</p>'
+        +'<p style="margin:8px 0 0;white-space:pre-wrap">'+emoHtml(n.내용)+'</p>'
         +(n.읽음?'':'<button class="btn sec sm" style="margin-top:10px" onclick="readOne(&quot;'+n.공지ID+'&quot;)">확인했어요</button>')
         +'</div>';});
     document.getElementById('nt-list').innerHTML=html||'<p class="muted" style="padding:0 4px">등록된 공지가 없습니다.</p>';});
@@ -1310,7 +1311,7 @@ function showPop(){
   document.getElementById('pop-cnt').textContent='새 공지 '+(POPi+1)+'/'+POP.length;
   document.getElementById('pop-date').textContent=n.날짜||'';
   document.getElementById('pop-title').textContent=n.제목||'';
-  document.getElementById('pop-body').textContent=n.내용||'';
+  document.getElementById('pop-body').innerHTML=emoHtml(n.내용||'');
   document.getElementById('pop-btn').textContent=(POPi+1<POP.length)?'확인했어요 · 다음':'확인했어요';
   box.classList.remove('hidden');
 }
@@ -1341,6 +1342,11 @@ function dday(deadline){if(!deadline)return'D-—';var d=Math.ceil((new Date(dea
 function readImg(inp,cb){var f=inp.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(e){cb(e.target.result)};rd.readAsDataURL(f);}
 function val(id){return document.getElementById(id).value.trim();}
 function setv(id,v){if(v!=null&&v!=='')document.getElementById(id).value=v;}
+/* 선생님 코멘트 속 :키: 를 캐릭터 이모티콘 그림으로 */
+function emoHtml(s){
+  return esc(s).replace(/:(verygood|good|nice|peace|regret|frustration):/g,function(m,k){
+    return '<img class="emo" src="st-'+k+'.png" alt="">';});
+}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
 
 /* ---------- 미리보기(mock) ---------- */
@@ -1379,7 +1385,7 @@ function mock(fn,args){
   // 체력측정 입력 → 등급 즉시 판정
   document.querySelectorAll('.fi').forEach(function(el){el.addEventListener('input',judgeNow);});
   // 성찰 글자수 카운터 연결
-  [['c-reflect','c-reflect-n'],['s-reflect','s-reflect-n']].forEach(function(p){
+  [['c-reflect','c-reflect-n'],['st-reflect','st-reflect-n']].forEach(function(p){
     var t=document.getElementById(p[0]); if(t)t.addEventListener('input',function(){countReflect(p[0],p[1]);});
   });
   // 미설치 상태면: 로그인 버튼 + 상단 배너를 항상 표시(로그인/홈 어디서든 보이게)
