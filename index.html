@@ -1,5 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.46.0 -->
-<!-- 수정요약: [0.46.0] 유산소 상단 안내(삼성헬스·애플피트니스·나이키런클럽 중 하나 선택). 근력은 상체·하체·유연성 고정 3칸으로 바꾸고 셋 다 채워야 저장(강제). 저장 문구는 '[상체] 푸시업 3세트×12' 형식. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.46.1 -->
+<!-- 수정요약: [0.46.1] 근력 횟수 단위를 회/분 토글로(플랭크처럼 버티는 운동 대응). 저장 문구에 단위 포함 — '3세트×12회' / '3세트×2분'. -->
+<!--   [0.46.0] 유산소 상단 안내(삼성헬스·애플피트니스·나이키런클럽 중 하나 선택). 근력은 상체·하체·유연성 고정 3칸으로 바꾸고 셋 다 채워야 저장(강제). 저장 문구는 '[상체] 푸시업 3세트×12' 형식. -->
 <!--   [0.45.1] 파트너 목록 응답이 배열이 아니어도 입력칸은 뜨도록 방어(서버 오류 시 태그만 비고 진행 가능). -->
 <!--   [0.45.0] 인증 화면 맨 위에 '누구와 운동했나요?' — 🧍혼자/👥같이 팔레트, 같이면 친구 이름 입력. 한 번 적은 친구는 다음부터 태그로 바로 선택(getMyPartners, 횟수 표시). 기록 목록·이번 주 카드에 파트너 배지. -->
 <!--   [0.44.0] 학생앱 변경 없음 — 관리자 v0.44.0(코멘트 수정·삭제)과 버전 번호만 통일. -->
@@ -75,6 +76,12 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .partlab.p2{background:#FDEEDF;color:#C4711A}
 .partlab.p3{background:#EAF6E2;color:#4A8A00}
 .exrow.fixed{border-color:var(--line2)}
+/* 횟수 단위 토글 (회 / 분) — 플랭크처럼 시간으로 재는 운동용 */
+.usel{display:inline-flex;border:1px solid var(--line2);border-radius:6px;overflow:hidden;
+  margin-left:5px;vertical-align:-2px;background:#fff}
+.usel button{border:0;background:transparent;color:var(--muted2);font-family:inherit;
+  font-size:10.5px;font-weight:800;padding:2px 7px;cursor:pointer;line-height:1.5}
+.usel button.on{background:var(--strength-dark);color:#fff}
 /* 화면 상단 안내 박스 (경고 아닌 안내 — 라임 톤) */
 .guidebox{background:var(--primary-tint);border:1px solid #cfe8a8;border-radius:13px;
   padding:12px 14px;margin-bottom:12px;font-size:13px;line-height:1.6;color:var(--ink2)}
@@ -616,8 +623,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.46.0';
-var PWA_BUILD = '2026.08.14 19:30';
+var PWA_VER = '0.46.1';
+var PWA_BUILD = '2026.08.14 19:55';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -948,9 +955,21 @@ function addStrRow(part){
     +'<div class="exnum">'
       +'<label>무게<input class="s-wt" inputmode="decimal" placeholder="kg"><span class="unit">kg</span></label>'
       +'<label>세트<input class="s-set" inputmode="numeric" placeholder="0"><span class="unit">세트</span></label>'
-      +'<label>횟수<input class="s-rep" inputmode="numeric" placeholder="0"><span class="unit">회</span></label>'
+      +'<label>횟수<span class="usel">'
+        +'<button type="button" class="on" onclick="pickUnit(this)">회</button>'
+        +'<button type="button" onclick="pickUnit(this)">분</button></span>'
+        +'<input class="s-rep" inputmode="decimal" placeholder="0"></label>'
     +'</div>';
   list.appendChild(d);
+}
+/* 횟수 단위 고르기 — 회(반복) / 분(플랭크처럼 버티는 운동) */
+function pickUnit(btn){
+  var box=btn.parentNode;
+  box.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b===btn);});
+}
+function strUnit(row){
+  var on=row.querySelector('.usel button.on');
+  return on?on.textContent:'회';
 }
 /* 상체·하체·유연성 고정칸을 미리 만들어 둔다 */
 function resetStrRows(){
@@ -977,7 +996,7 @@ function saveStrength(){
     var wt=r.querySelector('.s-wt').value.trim();     // 무게는 선택(맨몸운동은 비움)
     var st=r.querySelector('.s-set').value.trim();
     var rp=r.querySelector('.s-rep').value.trim();
-    var txt=nm+(wt?' '+wt+'kg':'')+' '+st+'세트×'+rp;
+    var txt=nm+(wt?' '+wt+'kg':'')+' '+st+'세트×'+rp+strUnit(r);
     if(part){                                        // 상체·하체·유연성 고정칸 = 필수
       if(!nm&&!st&&!rp){빠진.push(part);return;}
       if(!nm||!st||!rp){미완.push(part);return;}
