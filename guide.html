@@ -110,6 +110,7 @@ b{font-weight:800}
 .thumbs .th img{width:44px;height:44px;border-radius:11px;display:block;margin:0 auto 3px;border:1px solid var(--line)}
 .thumbs .th span{font-size:8.5px;color:var(--m);line-height:1.2;display:block}
 .row2{display:flex;gap:4px;margin-top:4px}
+.exbox{border:1px solid var(--line);border-radius:6px;padding:4px 5px;margin-top:4px;background:#fafbfa}
 
 /* 표 */
 table{width:100%;border-collapse:collapse;margin-top:7px}
@@ -298,9 +299,12 @@ td.l{text-align:left}
           <div class="pc" style="font-size:7.4px">2026-08-13 19:54 · SLW4369</div>
         </div>
         <div class="pc" style="margin-top:5px;font-weight:700">운동 내용 <span style="color:var(--warn)">3개 이상</span></div>
-        <div class="row2"><div style="flex:0 0 12px" class="pc">1</div><div style="flex:2"><div class="fld">스쿼트</div></div><div style="flex:1"><div class="fld">3</div></div><div style="flex:1"><div class="fld">15</div></div></div>
-        <div class="row2"><div style="flex:0 0 12px" class="pc">2</div><div style="flex:2"><div class="fld">런지</div></div><div style="flex:1"><div class="fld">3</div></div><div style="flex:1"><div class="fld">12</div></div></div>
-        <div class="row2"><div style="flex:0 0 12px" class="pc">3</div><div style="flex:2"><div class="fld">플랭크</div></div><div style="flex:1"><div class="fld">3</div></div><div style="flex:1"><div class="fld">60</div></div></div>
+        <div class="exbox"><div class="row2"><div style="flex:0 0 11px" class="pc">1</div><div style="flex:1"><div class="fld">스쿼트</div></div></div>
+          <div class="row2"><div style="flex:1"><div class="fld">20kg</div></div><div style="flex:1"><div class="fld">3세트</div></div><div style="flex:1"><div class="fld">15회</div></div></div></div>
+        <div class="exbox"><div class="row2"><div style="flex:0 0 11px" class="pc">2</div><div style="flex:1"><div class="fld">런지</div></div></div>
+          <div class="row2"><div style="flex:1"><div class="fld">—</div></div><div style="flex:1"><div class="fld">3세트</div></div><div style="flex:1"><div class="fld">12회</div></div></div></div>
+        <div class="exbox"><div class="row2"><div style="flex:0 0 11px" class="pc">3</div><div style="flex:1"><div class="fld">플랭크</div></div></div>
+          <div class="row2"><div style="flex:1"><div class="fld">—</div></div><div style="flex:1"><div class="fld">3세트</div></div><div style="flex:1"><div class="fld">60초</div></div></div></div>
         <div class="btn o">＋ 운동 추가</div>
         <div class="pc" style="margin-top:4px">오늘의 성찰</div>
         <div class="fld" style="height:20px">자세를 신경 썼더니…</div>
@@ -315,6 +319,7 @@ td.l{text-align:left}
         <li>앱에 올리면 <b>자동으로 확인</b>합니다 (2~3초). 통과하면 ✅ 표시가 떠요.</li>
         <li><b>운동은 3가지 이상 필수!</b> 칸이 3개 나와 있고, <b>운동명 · 세트 · 횟수</b>를 모두 채워야 저장됩니다.
           (더 했으면 <b>[＋ 운동 추가]</b>)</li>
+        <li><b>무게(kg)</b>는 아령·기구를 썼을 때만 적으면 돼요. 맨몸운동(플랭크·푸시업)은 비워둡니다.</li>
         <li>유산소와 마찬가지로 <b>운동자각도 · 만족도 · 성찰</b>도 남길 수 있어요.</li>
       </ul>
       <div class="warn">⛔ <b>이런 사진은 인정되지 않아요</b><br>
@@ -457,7 +462,7 @@ td.l{text-align:left}
     <tr><td class="l"><b>기간</b></td><td class="l">총 <b>4주</b> · 매주 성찰 1회</td></tr>
     <tr><td class="l"><b>체력측정</b></td><td class="l">방학 전 · 개학 후 · 1~4주차 = <b>총 6회</b></td></tr>
     <tr><td class="l"><b>성취율</b></td><td class="l">운동 달성률 <b>70%</b> + 제출 정시성 <b>30%</b> 를 합쳐 앱이 자동 계산</td></tr>
-    <tr><td class="l"><b>근력 운동</b></td><td class="l">한 번 인증할 때 <b>3가지 이상</b> (운동명·세트·횟수 모두 입력)</td></tr>
+    <tr><td class="l"><b>근력 운동</b></td><td class="l">한 번 인증할 때 <b>3가지 이상</b> · 운동명·세트·횟수 필수, <b>무게는 선택</b></td></tr>
     <tr><td class="l"><b>근력 사진</b></td><td class="l"><b>타임마크 앱 → 템플릿 → 사진 코드</b>로 운동 중 촬영 (재사용 불가)</td></tr>
     <tr><td class="l"><b>배점</b></td><td class="l"><b>40점</b> · 작성률 5%마다 2점 (100%→40점 … 25%미만→8점, 기본 6점)</td></tr>
     <tr><td class="l"><b>마무리</b></td><td class="l">4주가 끝나면 그동안의 기록을 모아 <b>감상문</b>을 제출합니다</td></tr>
