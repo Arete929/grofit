@@ -1,5 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.46.3 -->
-<!-- 수정요약: [0.46.3] 새 파트너 이름 입력칸이 버튼(.btn width:100%)에 밀려 찌그러지던 것 수정 — 입력칸을 넓히고(46px) 예시문구 'New 파트너'. 안내문구를 '함께한 파트너를 1명 이상 고르거나, 새로운 파트너를 추가하세요'로. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.47.0 -->
+<!-- 수정요약: [0.47.0] 달력을 «4주 도장판» 그리드로 교체 — 한 행이 한 주차. 주차별 달성/미달 배지, 진행 중인 주는 «유산소 N번 더» 남은 조건과 남은 날짜, 상단에 4주 도장판·연속 달성·지난주 결과 배너. 미달은 회색으로 담담하게. -->
+<!--   [0.46.3] 새 파트너 이름 입력칸이 버튼(.btn width:100%)에 밀려 찌그러지던 것 수정 — 입력칸을 넓히고(46px) 예시문구 'New 파트너'. 안내문구를 '함께한 파트너를 1명 이상 고르거나, 새로운 파트너를 추가하세요'로. -->
 <!--   [0.46.2] 근력 입력을 횟수/시간 선택으로 — 시간을 고르면 분·초 두 칸으로 바뀌고 '3세트×1분 30초'로 저장(초 60 이상은 분으로 올림). -->
 <!--   [0.46.1] 근력 횟수 단위를 회/분 토글로(플랭크처럼 버티는 운동 대응). 저장 문구에 단위 포함 — '3세트×12회'. -->
 <!--   [0.46.0] 유산소 상단 안내(삼성헬스·애플피트니스·나이키런클럽 중 하나 선택). 근력은 상체·하체·유연성 고정 3칸으로 바꾸고 셋 다 채워야 저장(강제). 저장 문구는 '[상체] 푸시업 3세트×12' 형식. -->
@@ -259,6 +260,41 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 .cal .d .dots{display:flex;gap:2px;position:absolute;bottom:4px}
 .cal .d.has{cursor:pointer}
 .cal .d.sel{border:2px solid var(--primary);background:var(--primary-tint);font-weight:800}
+/* [0.47.0] 4주 도장판 그리드 — 한 행이 한 주차 */
+.wgrid{display:flex;flex-direction:column;gap:10px}
+.wrow{border:1px solid var(--line);border-radius:14px;padding:10px 11px;background:var(--surface)}
+.wrow.met{border-color:var(--primary);background:var(--primary-tint)}
+.wrow.now{border:1.5px solid var(--primary)}
+.wrow.future{opacity:.5}
+.wrow .wh{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:8px}
+.wrow .wt{font-size:13px;font-weight:800;color:var(--ink)}
+.wrow .wd{font-size:10.5px;color:var(--muted2);font-weight:600}
+.wb{font-size:11px;font-weight:800;padding:4px 9px;border-radius:999px;white-space:nowrap}
+.wb.ok{background:var(--primary);color:#fff}
+.wb.miss{background:#eef1ec;color:var(--muted)}
+.wb.go{background:#fff2df;color:#b56a00}
+.wb.wait{background:#f3f5f2;color:var(--ph)}
+.wcells{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.wcell{aspect-ratio:1;border-radius:9px;background:#fafbfa;border:1px solid transparent;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted2)}
+.wcell .w{font-size:8.5px;line-height:1;opacity:.85}
+.wcell .n{font-size:12px;font-weight:700;line-height:1.25;color:var(--ink2)}
+.wcell .dd{display:flex;gap:2px;margin-top:2px;height:5px}
+.wcell .dd i{width:5px;height:5px;border-radius:50%;display:block}
+.wcell.on{background:var(--surface);border-color:var(--line2);cursor:pointer}
+.wcell.today{border:1.5px solid var(--primary);background:var(--primary-tint)}
+.wcell.sel{border:2px solid var(--primary);background:var(--primary-tint)}
+.stamps{display:flex;gap:6px;margin-bottom:8px}
+.stamp{flex:1;text-align:center;padding:9px 0;border-radius:10px;background:#f3f5f2;
+  font-size:13px;font-weight:800;color:var(--ph)}
+.stamp.ok{background:var(--primary);color:#fff}
+.stamp.now{background:var(--primary-tint);color:var(--primary-dark);box-shadow:inset 0 0 0 1.5px var(--primary)}
+.stamp.miss{background:var(--surface);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line2)}
+.streak{text-align:center;font-size:12.5px;font-weight:800;color:var(--primary-dark);margin-bottom:10px}
+.streak:empty{display:none}
+.lastwk{border-radius:12px;padding:10px 12px;font-size:12.5px;font-weight:700;margin-bottom:10px}
+.lastwk.ok{background:var(--primary-tint);color:var(--primary-dark)}
+.lastwk.no{background:#f6f7f5;color:var(--muted)}
 /* 날짜 클릭 시 펼쳐지는 그날의 기록 */
 #cal-detail{overflow:hidden;max-height:0;transition:max-height .25s ease}
 #cal-detail.open{max-height:900px;margin-top:12px}
@@ -355,14 +391,17 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       </div>
     </div>
     <div class="card">
-      <h2>달력 <span id="cal-month" style="color:var(--muted);font-size:13px;font-weight:600"></span></h2>
-      <div class="cal" id="cal"></div>
+      <h2>4주 도장판 <span id="cal-month" style="color:var(--muted);font-size:13px;font-weight:600"></span></h2>
+      <div id="wk-banner"></div>
+      <div class="stamps" id="wk-stamps"></div>
+      <div class="streak" id="wk-streak"></div>
+      <div class="wgrid" id="cal"></div>
       <div id="cal-detail"></div>
       <div class="row" style="margin-top:10px;justify-content:center;gap:12px;font-size:11px">
         <span class="cap"><span class="dot" style="background:var(--cardio)"></span> 유산소</span>
         <span class="cap"><span class="dot" style="background:var(--strength)"></span> 근력</span>
       </div>
-      <p class="cap" style="text-align:center;margin:6px 0 0">연초록 칸=운동기간(숫자는 주차) · 초록 테두리=오늘</p>
+      <p class="cap" style="text-align:center;margin:6px 0 0">점이 찍힌 날짜를 누르면 그날 기록을 볼 수 있어요</p>
     </div>
     <button class="btn" onclick="go('cert')">＋ 오늘 인증하기</button>
     <div class="card" style="margin-top:14px;padding:14px 16px">
@@ -796,26 +835,92 @@ function weekOfDate(ds,start,totalW){
   if(!start)return 0;var s=parseYmd(start);var d=parseYmd(ds);
   var diff=Math.floor((d.getTime()-s.getTime())/86400000);if(diff<0)return 0;
   var w=Math.floor(diff/7)+1;return w<=totalW?w:0;}
+function fmtMd(d){return (d.getMonth()+1)+'/'+d.getDate();}
+/* [0.47.0] 4주 도장판 — 한 행이 한 주차. 주차별 달성 여부와 남은 조건을 보여준다 */
 function renderCal(h){
-  var cfg=h.config||{},start=cfg.기간_시작일,totalW=cfg.총_주차수||4,map=h.운동일자||{};
-  var today=new Date();today.setHours(0,0,0,0);
-  var y=today.getFullYear(),m=today.getMonth();
-  var startDow=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate();
-  var wk=['일','월','화','수','목','금','토'],html='';
-  wk.forEach(function(d){html+='<div class="h">'+d+'</div>';});
-  for(var b=0;b<startDow;b++)html+='<div class="d empty"></div>';
-  for(var day=1;day<=dim;day++){
-    var d=new Date(y,m,day),ds=fmtLocal(d);
-    var isToday=d.getTime()===today.getTime();
-    var w=weekOfDate(ds,start,totalW),rec=map[ds];
-    var cls='d'+(w?' inperiod':'')+(isToday?' today':'')+(rec?' has':'')+(ST.calDay===ds?' sel':'');
-    var wtag=w?'<span class="wtag">'+w+'주</span>':'';
-    var dots=rec?('<div class="dots">'+(rec.c?'<span class="dot" style="background:var(--cardio)"></span>':'')+(rec.s?'<span class="dot" style="background:var(--strength)"></span>':'')+'</div>'):'';
-    var click=rec?' onclick="toggleCalDay(&quot;'+ds+'&quot;)"':'';
-    html+='<div class="'+cls+'"'+click+'>'+wtag+'<span class="num">'+day+'</span>'+dots+'</div>';
+  var box=document.getElementById('cal'); if(!box)return;
+  var hdr=document.getElementById('cal-month');
+  var cfg=h.config||{}, start=cfg['기간_시작일'], totalW=Number(cfg['총_주차수'])||4;
+  var map=h['운동일자']||{}, nowW=Number(h['현재주차'])||1;
+  var goal=Number(cfg['주간_목표일수'])||3, needC=Number(cfg['유산소_최소일수'])||2;
+
+  if(!start){
+    box.innerHTML='<p class="cap" style="text-align:center;padding:18px 0">평가 기간이 아직 설정되지 않았어요.</p>';
+    if(hdr)hdr.textContent=''; return;
   }
-  document.getElementById('cal').innerHTML=html;
-  var hdr=document.getElementById('cal-month');if(hdr)hdr.textContent=y+'년 '+(m+1)+'월';
+  var ws={}; (h['주차현황']||[]).forEach(function(r){ ws[Number(r['주차'])]=r; });
+  var today=new Date(); today.setHours(0,0,0,0); var tds=fmtLocal(today);
+  var DOW=['일','월','화','수','목','금','토'], html='';
+
+  for(var w=1; w<=totalW; w++){
+    var info=ws[w]||{'완료일수':0,'유산소일수':0,'근력일수':0,'충족':false};
+    var s=parseYmd(start); s.setDate(s.getDate()+7*(w-1));
+    var e=new Date(s); e.setDate(s.getDate()+6);
+    var future=(w>nowW), isNow=(w===nowW), met=!!info['충족'];
+
+    var bc,bt;
+    if(met){ bc='ok'; bt='✓ 달성'; }
+    else if(future){ bc='wait'; bt='아직'; }
+    else if(isNow){
+      var nc=Math.max(0,needC-(Number(info['유산소일수'])||0));
+      var nd=Math.max(0,goal-(Number(info['완료일수'])||0));
+      bc='go'; bt = nc>0 ? ('🔥 유산소 '+nc+'번 더') : ('🔥 '+nd+'일 더');
+    }
+    else { bc='miss'; bt='아쉬워요 · '+(Number(info['완료일수'])||0)+'일'; }
+
+    var left='';
+    if(isNow){
+      var dl=Math.round((e.getTime()-today.getTime())/86400000);
+      if(dl>0) left=' · '+dl+'일 남음'; else if(dl===0) left=' · 오늘까지';
+    }
+
+    var cells='';
+    for(var i=0;i<7;i++){
+      var d=new Date(s); d.setDate(s.getDate()+i);
+      var ds=fmtLocal(d), rec=map[ds];
+      var cls='wcell'+(rec?' on':'')+(ds===tds?' today':'')+(ST.calDay===ds?' sel':'');
+      var dots = rec ? ('<span class="dd">'
+        +(rec.c?'<i style="background:var(--cardio)"></i>':'')
+        +(rec.s?'<i style="background:var(--strength)"></i>':'')+'</span>') : '';
+      var clk = rec ? ' onclick="toggleCalDay(&quot;'+ds+'&quot;)"' : '';
+      cells+='<div class="'+cls+'"'+clk+'><span class="w">'+DOW[d.getDay()]+'</span>'
+        +'<span class="n">'+d.getDate()+'</span>'+dots+'</div>';
+    }
+    html+='<div class="wrow'+(met?' met':'')+(isNow?' now':'')+(future?' future':'')+'">'
+      +'<div class="wh"><span><span class="wt">'+w+'주차</span> '
+      +'<span class="wd">'+fmtMd(s)+'~'+fmtMd(e)+left+'</span></span>'
+      +'<span class="wb '+bc+'">'+bt+'</span></div>'
+      +'<div class="wcells">'+cells+'</div></div>';
+  }
+  box.innerHTML=html;
+
+  var last=parseYmd(start); last.setDate(last.getDate()+7*totalW-1);
+  if(hdr)hdr.textContent=fmtMd(parseYmd(start))+' ~ '+fmtMd(last);
+
+  /* 도장판 */
+  var st='';
+  for(var k=1;k<=totalW;k++){
+    var okk=!!(ws[k]&&ws[k]['충족']);
+    var scls = okk ? 'ok' : (k===nowW ? 'now' : (k<nowW ? 'miss' : ''));
+    st+='<div class="stamp '+scls+'">'+(okk?'✓':k)+'</div>';
+  }
+  var se=document.getElementById('wk-stamps'); if(se)se.innerHTML=st;
+
+  /* 연속 달성 */
+  var streak=0;
+  for(var k2=Math.min(nowW,totalW);k2>=1;k2--){ if(ws[k2]&&ws[k2]['충족'])streak++; else break; }
+  var sx=document.getElementById('wk-streak');
+  if(sx)sx.innerHTML = streak>=2 ? ('🔥 '+streak+'주 연속 달성 중!') : '';
+
+  /* 지난주 결과 */
+  var bn=document.getElementById('wk-banner');
+  if(bn){
+    var p = (nowW>1) ? ws[nowW-1] : null;
+    if(p) bn.innerHTML = p['충족']
+      ? '<div class="lastwk ok">🎉 지난주 목표 달성! 이번 주도 이어가요.</div>'
+      : '<div class="lastwk no">지난주는 '+(Number(p['완료일수'])||0)+'일이었어요. 이번 주 다시 도전!</div>';
+    else bn.innerHTML='';
+  }
 }
 /* 캘린더 날짜 탭 → 그날 운동기록 아코디언 */
 function toggleCalDay(ds){
