@@ -1,5 +1,8 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.51.0 -->
-<!-- 수정요약: [0.51.0] «선생님» → «김진호 선생님». 관리자와 버전 번호 통일(0.51.0). -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.52.1 -->
+<!-- 수정요약: [0.52.1] 로고 모서리 깨짐·흰 테두리 수정 — 로고 소스를 theme{n}.png(테두리·둥근모서리가 그림에 박힌 파일)에서 icon{n}-mask-512.png(꽉 찬 정사각형)로 바꾸고 CSS 둥근모서리(22%)로 깔끔하게. 로그인·홈·테마 선택 모두 적용. -->
+<!--   [0.52.0] 선생님 코멘트를 «캐릭터가 말풍선으로 말하는» 만화 형태로 — 관리자에서 말하는 캐릭터를 고르면(토글) 학생 앱에 캐릭터 그림 + 꼬리 달린 말풍선으로 보인다. -->
+<!--   [0.51.1] 로그인 전·로그아웃 후에 공지 팝업이 로그인 화면 위에 남던 것 수정 — showPop/popConfirm 에 로그인 확인을 넣고, 로그인 화면 진입·로그아웃 때 popClose() 로 강제 종료. -->
+<!--   [0.51.0] «선생님» → «김진호 선생님». 관리자와 버전 번호 통일(0.51.0). -->
 <!--   [0.50.1] 성찰 화면 정리 — «내 기록 넣고 쓰기» 버튼 삭제, 이번주 기록의 날짜·운동량을 진하게(거리/시간 굵게, 11.57분 → 11분 34초). -->
 <!--   [0.50.0] 제출할 때 진행 게이지 표시 — 유산소·근력·성찰. 사진이 올라가는 만큼 실제 진행률(XHR upload)로 채우고, 서버 저장 중에는 95%까지 천천히, 끝나면 «완료». 캐릭터 스티커 배경 투명 처리. 공지 팝업을 다 확인하면 공지 목록을 갱신해 «읽음»으로 남게. -->
 <!--   [0.49.0] 앱 시작 스플래시 추가 — 로크 문구 액자(splash-locke.jpg, 1080x2160)를 전체화면으로 1.8초 보여주고 스르르 사라진다. 탭하면 바로 넘어감. 체력 화면의 «유연성·신체조성» 이모지를 그림 아이콘(ic-flex/ic-body)으로 교체. -->
@@ -69,7 +72,7 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 /* 테마 스와치 (설치 전 색 고르기) */
 .swrow{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .swrow button{width:52px;height:52px;padding:0;border-radius:14px;border:2.5px solid transparent;background:none;cursor:pointer;overflow:hidden;position:relative}
-.swrow button img{width:100%;height:100%;display:block;border-radius:11px}
+.swrow button img{width:100%;height:100%;display:block;border-radius:22%}
 .swrow button.on{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-tint)}
 .swrow button.on::after{content:'✓';position:absolute;right:2px;bottom:0;font-size:12px;font-weight:800;color:#fff;
   text-shadow:0 1px 3px rgba(0,0,0,.7)}
@@ -161,6 +164,16 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .ic-t{width:30px;height:30px;flex:none;display:block}
 .ic-s{width:24px;height:24px;vertical-align:-5px}
 .chip img{width:15px;height:15px;vertical-align:-3px;margin-right:2px}
+/* [0.52.0] 만화 말풍선 — 캐릭터가 왼쪽에서 말한다 */
+.cmc{display:flex;align-items:flex-start;gap:9px;margin-top:12px}
+.cmc-ch{width:72px;height:72px;flex:none;object-fit:contain}
+.cmc-say{position:relative;flex:1;background:#fff;border:1.5px solid var(--primary);
+  border-radius:16px;padding:11px 13px;font-size:13.5px;line-height:1.7;color:var(--ink2)}
+.cmc:not(.nochar) .cmc-say:before{content:'';position:absolute;left:-11px;top:22px;
+  border:6px solid transparent;border-right-color:var(--primary);border-left:0}
+.cmc:not(.nochar) .cmc-say:after{content:'';position:absolute;left:-8px;top:22px;
+  border:6px solid transparent;border-right-color:#fff;border-left:0}
+.cmc-who{display:block;margin-top:6px;font-size:11.5px;font-weight:700;color:var(--primary-dark)}
 /* 선생님 코멘트 말풍선 (캐릭터 스티커) */
 .tbub{display:flex;align-items:flex-start;gap:10px}
 .tbub-st{width:76px;height:76px;flex:none;object-fit:contain}
@@ -258,10 +271,10 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .hm-sub{font-size:11.5px;color:var(--muted2);margin:3px 0 0;line-height:1.35}
 .hm-row{display:flex;align-items:center;gap:6px;margin-top:7px;flex-wrap:wrap}
 /* 우측 여백을 최대한 채우는 로고 */
-.hm-logo{width:min(92px,26vw);height:min(92px,26vw);border-radius:20px;flex:none;display:block;
+.hm-logo{width:min(92px,26vw);height:min(92px,26vw);border-radius:22%;flex:none;display:block;
   box-shadow:0 5px 16px rgba(0,0,0,.14)}
 /* 로그인 로고 — 모바일에서 시원하게(화면폭 비례, 최대 190px) */
-#lg-logo{width:min(190px,46vw);height:min(190px,46vw);border-radius:24px;display:block;margin:0 auto 16px;box-shadow:0 8px 22px rgba(0,0,0,.13)}
+#lg-logo{width:min(190px,46vw);height:min(190px,46vw);border-radius:22%;display:block;margin:0 auto 16px;box-shadow:0 10px 26px rgba(0,0,0,.16)}
 #s-login #ver{position:absolute;left:0;right:0;bottom:14px;margin:0}
 .hidden{display:none!important}
 h1{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0}
@@ -406,7 +419,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 
   <!-- 1. 로그인 -->
   <section id="s-login" class="scr on" style="padding-top:4vh">
-    <img id="lg-logo" alt="혜원핏" src="theme5.png">
+    <img id="lg-logo" alt="혜원핏" src="icon5-mask-512.png">
     <h1 style="text-align:center" id="lg-title">혜원핏</h1>
     <p class="muted" style="text-align:center;margin:6px 0 26px" id="lg-sub">운동처방일지</p>
     <div class="card">
@@ -436,7 +449,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
           <span class="badge-dday" id="hi-dday">D-—</span>
         </div>
       </div>
-      <img id="hm-logo" class="hm-logo" alt="혜원핏" src="theme5.png">
+      <img id="hm-logo" class="hm-logo" alt="혜원핏" src="icon5-mask-512.png">
     </div>
     <div class="card">
       <div class="gauge">
@@ -766,12 +779,12 @@ function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
 var THEMES={
-  1:{p:'#FD1843',d:'#D6113B',t:'#FFE1E8',logo:'theme1.png'},
-  2:{p:'#FD1843',d:'#D6113B',t:'#FFE1E8',logo:'theme2.png'},
-  3:{p:'#27187E',d:'#1B1258',t:'#E6E3F5',logo:'theme3.png'},
-  4:{p:'#27187E',d:'#1B1258',t:'#E6E3F5',logo:'theme4.png'},
-  5:{p:'#5FAE00',d:'#4A8A00',t:'#EDFAD6',logo:'theme5.png'},
-  6:{p:'#5FAE00',d:'#4A8A00',t:'#EDFAD6',logo:'theme6.png'}
+  1:{p:'#FD1843',d:'#D6113B',t:'#FFE1E8',logo:'icon1-mask-512.png'},
+  2:{p:'#FD1843',d:'#D6113B',t:'#FFE1E8',logo:'icon2-mask-512.png'},
+  3:{p:'#27187E',d:'#1B1258',t:'#E6E3F5',logo:'icon3-mask-512.png'},
+  4:{p:'#27187E',d:'#1B1258',t:'#E6E3F5',logo:'icon4-mask-512.png'},
+  5:{p:'#5FAE00',d:'#4A8A00',t:'#EDFAD6',logo:'icon5-mask-512.png'},
+  6:{p:'#5FAE00',d:'#4A8A00',t:'#EDFAD6',logo:'icon6-mask-512.png'}
 };
 var THEME_P='#19c37d';
 function applyTheme(n){
@@ -838,7 +851,7 @@ function go(name){
   document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on')});
   var el = document.getElementById('s-'+name); if(el) el.classList.add('on');
   var tb = document.getElementById('tabbar');
-  if(name==='login'){ tb.classList.add('hidden'); } else { tb.classList.remove('hidden'); }
+  if(name==='login'){ tb.classList.add('hidden'); popClose(); } else { tb.classList.remove('hidden'); }
   document.querySelectorAll('.tabbar button').forEach(function(b){
     b.classList.toggle('on', b.dataset.t===name);
   });
@@ -873,6 +886,7 @@ function logout(){
   /* 토큰·학생정보만 지우고 고른 테마(grofit_theme)는 그대로 둔다 */
   localStorage.removeItem('grofit_token');localStorage.removeItem('grofit_student');
   ST.student=null;ST.home=null;ST.myRecords=null;ST.fitness=null;ST.calDay=null;
+  popClose();
   go('login');toast('로그아웃했습니다');
 }
 
@@ -1838,9 +1852,7 @@ function loadReflect(){
     var html='';(list||[]).forEach(function(r){
       html+='<div class="card"><div class="row" style="justify-content:space-between"><b>'+r.주차+'주차</b><span class="cap">'+r.작성일+'</span></div>'
         +'<p style="margin:8px 0 0">'+esc(r.내용)+'</p>'
-        +(r.교사코멘트?'<div class="bubble tbub">'
-            +(r.스티커?'<img class="tbub-st" src="st-'+esc(r.스티커)+'.png" alt="">':'')
-            +'<div><b>김진호 선생님</b><br>'+emoHtml(r.교사코멘트)+'</div></div>':'')+'</div>';
+        +(r.교사코멘트?comicHTML(r.교사코멘트,r.스티커||''):'')+'</div>';
     });
     document.getElementById('rf-list').innerHTML=html||'<p class="muted" style="padding:0 4px">아직 작성한 성찰이 없습니다.</p>';
   });
@@ -1932,6 +1944,11 @@ function readOne(id){
 
 /* ---------- 안 읽은 공지 팝업 (접속할 때마다, 다 읽을 때까지) ---------- */
 var POP=[], POPi=0;
+/* [0.51.1] 공지 팝업 강제 종료 — 로그아웃·로그인 화면 진입 때 부른다 */
+function popClose(){
+  POP=[];POPi=0;
+  var b=document.getElementById('nt-pop'); if(b)b.classList.add('hidden');
+}
 function checkNotices(){
   if(!ST.student)return;
   call('getNotices',[ST.student.학번],function(list){
@@ -1941,6 +1958,9 @@ function checkNotices(){
 }
 function showPop(){
   var box=document.getElementById('nt-pop');
+  /* [0.51.1] 로그인 안 했거나 로그인 화면이면 띄우지 않는다 */
+  var lg=document.getElementById('s-login');
+  if(!ST.student || (lg&&lg.classList.contains('on'))){box.classList.add('hidden');return;}
   if(POPi>=POP.length){box.classList.add('hidden');return;}
   var n=POP[POPi];
   document.getElementById('pop-cnt').textContent='새 공지 '+(POPi+1)+'/'+POP.length;
@@ -1952,6 +1972,7 @@ function showPop(){
 }
 /* [0.50.0] 확인한 공지는 공지 탭에 «읽음»으로 남는다 — 팝업이 끝나면 목록 갱신 */
 function popConfirm(){
+  if(!ST.student){popClose();return;}
   var n=POP[POPi];
   if(!n){document.getElementById('nt-pop').classList.add('hidden');return;}
   document.getElementById('pop-btn').disabled=true;
@@ -1979,6 +2000,14 @@ function dday(deadline){if(!deadline)return'D-—';var d=Math.ceil((new Date(dea
 function readImg(inp,cb){var f=inp.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(e){cb(e.target.result)};rd.readAsDataURL(f);}
 function val(id){return document.getElementById(id).value.trim();}
 function setv(id,v){if(v!=null&&v!=='')document.getElementById(id).value=v;}
+/* [0.52.0] 선생님 코멘트 = 캐릭터가 말풍선으로 말하는 만화 형태 */
+function comicHTML(txt,stk){
+  var ch=stk?('<img class="cmc-ch" src="st-'+esc(stk)+'.png" alt="">'):'';
+  return '<div class="cmc'+(stk?'':' nochar')+'">'+ch
+    +'<div class="cmc-say">'+emoHtml(txt)
+    +'<span class="cmc-who">김진호 선생님</span></div></div>';
+}
+
 /* 선생님 코멘트 속 :키: 를 캐릭터 이모티콘 그림으로 */
 function emoHtml(s){
   return esc(s).replace(/:(verygood|good|nice|peace|regret|frustration):/g,function(m,k){
