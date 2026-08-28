@@ -1,5 +1,7 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.47.0 -->
-<!-- 수정요약: [0.47.0] 달력을 «4주 도장판» 그리드로 교체 — 한 행이 한 주차. 주차별 달성/미달 배지, 진행 중인 주는 «유산소 N번 더» 남은 조건과 남은 날짜, 상단에 4주 도장판·연속 달성·지난주 결과 배너. 미달은 회색으로 담담하게. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.47.2 -->
+<!-- 수정요약: [0.47.2] 홈 부제에 «2026학년도 3학년 2학기»가 두 번 나오던 것 수정 — 평가명에 이미 학년도·학기가 들어 있으면 앞머리를 붙이지 않는다. 성찰 탭 제목은 앞머리를 뗀 짧은 평가명(evalShort) 사용. -->
+<!--   [0.47.1] 로그인 화면 안내를 «계정은 담당 선생님이 배부합니다» → «학생코드는 [다했어요]에서 쓰던 코드를 그대로 사용합니다»로 수정. -->
+<!--   [0.47.0] 달력을 «4주 도장판» 그리드로 교체 — 한 행이 한 주차. 주차별 달성/미달 배지, 진행 중인 주는 «유산소 N번 더» 남은 조건과 남은 날짜, 상단에 4주 도장판·연속 달성·지난주 결과 배너. 미달은 회색으로 담담하게. -->
 <!--   [0.46.3] 새 파트너 이름 입력칸이 버튼(.btn width:100%)에 밀려 찌그러지던 것 수정 — 입력칸을 넓히고(46px) 예시문구 'New 파트너'. 안내문구를 '함께한 파트너를 1명 이상 고르거나, 새로운 파트너를 추가하세요'로. -->
 <!--   [0.46.2] 근력 입력을 횟수/시간 선택으로 — 시간을 고르면 분·초 두 칸으로 바뀌고 '3세트×1분 30초'로 저장(초 60 이상은 분으로 올림). -->
 <!--   [0.46.1] 근력 횟수 단위를 회/분 토글로(플랭크처럼 버티는 운동 대응). 저장 문구에 단위 포함 — '3세트×12회'. -->
@@ -356,7 +358,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       <div class="field"><label>학번</label><input id="in-sid" inputmode="numeric" placeholder="예: 3277"></div>
       <div class="field"><label>학생코드</label><input id="in-pin" placeholder="예: A001"></div>
       <button class="btn" onclick="doLogin()">로그인</button>
-      <p class="cap" style="text-align:center;margin:14px 0 0">계정은 담당 선생님이 배부합니다.</p>
+      <p class="cap" style="text-align:center;margin:14px 0 0">학생코드는 <b>[다했어요]에서 쓰던 코드</b>를 그대로 사용합니다.</p>
       <div id="theme-pick" class="hidden" style="margin-top:16px;border-top:1px solid var(--divider);padding-top:14px">
         <p class="cap" style="margin:0 0 8px;text-align:center">🎨 색을 골라보세요 <b>· 설치 전에 고르면 홈 아이콘도 그 색</b></p>
         <div class="swrow" id="theme-sw"></div>
@@ -812,7 +814,10 @@ function loadHome(){
     var who=document.getElementById('who');if(who)who.textContent=ST.student.학번+' '+ST.student.이름;
     // 부제(작게) = 학년도·학기·평가명 / 아래 줄 = N주차 · D-N
     var c=h.config||{};
-    var sub=[(c.학년도?c.학년도+'학년도':''),'3학년 2학기',(c.평가명||'')].filter(Boolean).join(' ');
+    var nm=String(c.평가명||'').trim();
+    // [0.47.2] 평가명에 이미 '2026학년도 3학년 2학기'가 들어 있으면 그대로 쓴다(중복 방지)
+    var sub=/학년도|학기/.test(nm) ? nm
+          : [(c.학년도?c.학년도+'학년도':''),'3학년 2학기',nm].filter(Boolean).join(' ');
     document.getElementById('hi-sub').textContent=sub;
     document.getElementById('hi-week').textContent=(h.현재주차||1)+'주차';
     document.getElementById('hi-dday').textContent=dday(c.제출_마감일);
@@ -1648,7 +1653,7 @@ function insertGuide(){
 }
 
 function loadReflect(){
-  document.getElementById('rf-week').textContent=(ST.config?ST.config.평가명:'')+' 성찰';
+  document.getElementById('rf-week').textContent=evalShort()+' 성찰';
   call('getWeekSummary',[ST.student.학번],function(w){
     if(w&&w.기록&&w.기록.length)renderWeek(w,false);
     else renderWeek(WK_SAMPLE,true);        // 기록 없으면 예시로 보여주기
@@ -1708,6 +1713,13 @@ function loadMyRecords(){
     });
     document.getElementById('my-records').innerHTML=html||'<p class="muted" style="padding:6px 0">아직 인증한 기록이 없습니다.</p>';
   });
+}
+
+/* [0.47.2] 평가명에서 앞머리(2026학년도 3학년 2학기)를 떼어낸 짧은 이름 */
+function evalShort(){
+  var n=String((ST.config&&ST.config.평가명)||'운동처방일지').trim();
+  var s=n.replace(/^\s*\d{4}\s*학년도\s*/,'').replace(/^\s*\d\s*학년\s*\d\s*학기\s*/,'').trim();
+  return s||n;
 }
 
 /* ---------- 공지사항 ---------- */
