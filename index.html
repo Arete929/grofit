@@ -1,5 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.47.3 -->
-<!-- 수정요약: [0.47.3] 체력 변화 그래프를 눌러 «크게 보기» — 세로 전체화면으로 띄우고 320x520 비율로 다시 그려 등급 띠와 값을 크게 본다. 카드 우하단에 ⤢ 표시. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.47.4 -->
+<!-- 수정요약: [0.47.4] 손가락으로 화면 확대 허용(viewport maximum-scale 제거, 입력 글자 16px로 올려 아이폰 자동확대 방지). 오늘의 성찰을 «필수»로 — 비어 있으면 저장 안 됨(유산소·근력 모두). 혼자/같이를 이모지 대신 선으로 그린 아이콘으로. -->
+<!--   [0.47.3] 체력 변화 그래프를 눌러 «크게 보기» — 세로 전체화면으로 띄우고 320x520 비율로 다시 그려 등급 띠와 값을 크게 본다. 카드 우하단에 ⤢ 표시. -->
 <!--   [0.47.2] 홈 부제에 «2026학년도 3학년 2학기»가 두 번 나오던 것 수정 — 평가명에 이미 학년도·학기가 들어 있으면 앞머리를 붙이지 않는다. 성찰 탭 제목은 앞머리를 뗀 짧은 평가명(evalShort) 사용. -->
 <!--   [0.47.1] 로그인 화면 안내를 «계정은 담당 선생님이 배부합니다» → «학생코드는 [다했어요]에서 쓰던 코드를 그대로 사용합니다»로 수정. -->
 <!--   [0.47.0] 달력을 «4주 도장판» 그리드로 교체 — 한 행이 한 주차. 주차별 달성/미달 배지, 진행 중인 주는 «유산소 N번 더» 남은 조건과 남은 날짜, 상단에 4주 도장판·연속 달성·지난주 결과 배너. 미달은 회색으로 담담하게. -->
@@ -16,7 +17,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#5FAE00" id="mt-theme">
 <link rel="manifest" href="manifest5.webmanifest" id="lk-manifest">
 <link rel="icon" href="icon-192.png" id="lk-favicon">
@@ -148,7 +149,8 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .pnmode{display:flex;gap:8px}
 .pnmode button{flex:1;border:1.5px solid var(--line2);background:#fff;border-radius:13px;padding:13px 6px 11px;
   font-family:inherit;font-size:13.5px;font-weight:800;color:var(--muted);cursor:pointer;line-height:1.3}
-.pnmode button b{display:block;font-size:24px;margin-bottom:4px;line-height:1}
+.pnmode button b{display:block;margin-bottom:5px;line-height:1}
+.pnmode button b svg{width:27px;height:27px;display:block;margin:0 auto}
 .pnmode button.on{border-color:var(--primary);background:var(--primary-tint);color:var(--primary-dark)}
 .pntags{display:flex;flex-wrap:wrap;gap:6px}
 .pntag{border:1.5px solid var(--line2);background:#fff;border-radius:999px;padding:7px 13px;
@@ -158,7 +160,7 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .pntag.on i{color:rgba(255,255,255,.85)}
 /* .btn 이 width:100% 라 그대로 두면 버튼이 줄을 다 먹고 입력칸이 찌그러진다 */
 .pnrow{display:flex;gap:7px;margin-top:10px;align-items:stretch}
-.pnrow input{flex:1 1 auto;min-width:0;height:46px;font-size:15px;padding:0 14px}
+.pnrow input{flex:1 1 auto;min-width:0;height:46px;font-size:16px;padding:0 14px}
 .pnrow .btn{flex:0 0 auto;width:auto;height:46px;padding:0 16px;white-space:nowrap}
 .pnsel{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .pnsel span{background:var(--primary-tint);color:var(--primary-dark);border-radius:999px;
@@ -245,7 +247,7 @@ h2{font-size:15px;font-weight:700;margin:0 0 10px}
 .chip.warn{background:var(--warning-tint);color:var(--warning)}
 .chip.bad{background:var(--danger-tint);color:var(--danger)}
 .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
-input,textarea,select{width:100%;font-family:inherit;font-size:15px;border:1.5px solid var(--line2);border-radius:12px;
+input,textarea,select{width:100%;font-family:inherit;font-size:16px;border:1.5px solid var(--line2);border-radius:12px;
   padding:13px 14px;background:#fff;color:var(--ink);outline:none}
 input:focus,textarea:focus{border-color:var(--primary)}
 label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0 6px}
@@ -484,7 +486,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       <div class="sat" id="c-sat"></div>
     </div>
     <div class="card">
-      <h2>오늘의 성찰 <span class="cap">선택</span></h2>
+      <h2>오늘의 성찰 <span class="chip bad">필수</span></h2>
       <textarea id="c-reflect" rows="3" maxlength="300" placeholder="오늘 운동은 어땠나요? (예: 초반엔 힘들었는데 20분 넘으니 리듬이 잡혔다)"></textarea>
       <p class="cap" style="text-align:right;margin:6px 0 0"><span id="c-reflect-n">0</span>/300자</p>
     </div>
@@ -535,7 +537,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       <div class="sat" id="s-sat"></div>
     </div>
     <div class="card">
-      <h2>오늘의 성찰 <span class="cap">선택</span></h2>
+      <h2>오늘의 성찰 <span class="chip bad">필수</span></h2>
       <textarea id="st-reflect" rows="3" maxlength="300" placeholder="오늘 운동은 어땠나요? (예: 스쿼트 자세를 신경 쓰니 허벅지에 자극이 확실했다)"></textarea>
       <p class="cap" style="text-align:right;margin:6px 0 0"><span id="st-reflect-n">0</span>/300자</p>
     </div>
@@ -1042,11 +1044,23 @@ function resetCardio(){cardioB64=null;['c-dist','c-dur','c-pace','c-kcal','c-ref
   document.getElementById('cardio-analyze').classList.add('hidden');}
 function saveCardio(){
   if(!pnCheck('c'))return;
+  if(!reflectCheck('c-reflect'))return;
   call('submitCardio',[ST.student.학번,{imageBase64:cardioB64,date:ST.cardioDate,
     distanceKm:val('c-dist'),durationMin:val('c-dur'),summary:'페이스 '+val('c-pace')+' · '+val('c-kcal')+'kcal',source:'앱',
     reflect:val('c-reflect'),rpe:PICK.c.rpe,sat:PICK.c.sat,partner:pnValue('c')}],
     function(r){toast('✅ 유산소 인증 저장'+savedMsg(r));resetCardio();resetPick('c');pnReset('c');loadPartners();go('home');});
 }
+/* [0.47.4] 오늘의 성찰은 필수 — 비어 있으면 저장 안 됨 */
+function reflectCheck(id){
+  var t=document.getElementById(id);
+  if(t&&!String(t.value||'').trim()){
+    toast('오늘의 성찰을 한 줄이라도 적어주세요');
+    t.focus(); t.scrollIntoView({block:'center',behavior:'smooth'});
+    return false;
+  }
+  return true;
+}
+
 /* 성찰 글자수 카운터 */
 function countReflect(id,nid){var t=document.getElementById(id),n=document.getElementById(nid);
   if(t&&n)n.textContent=t.value.length;}
@@ -1196,6 +1210,7 @@ function saveStrength(){
     alert('운동명 · 세트 · 횟수(또는 시간)를 모두 채워 주세요.'+N+N+'빠진 칸: '+미완.join(' · '));
     focusEmptyStr(); return;
   }
+  if(!reflectCheck('st-reflect'))return;
   if(!strB64){
     var N2=String.fromCharCode(10);
     if(!confirm('사진 없이 제출할까요?'+N2+N2
@@ -1476,11 +1491,17 @@ function loadPartners(){
     renderPn('c'); renderPn('s');
   });
 }
+/* [0.47.4] 혼자·같이 — 선으로 그린 아이콘 (버튼 색을 그대로 따라감) */
+var IC_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">';
+var IC_SOLO=IC_SVG+'<circle cx="12" cy="7.4" r="3.3"/><path d="M5.6 19.6c0-3.5 2.9-6 6.4-6s6.4 2.5 6.4 6"/></svg>';
+var IC_WITH=IC_SVG+'<circle cx="9.2" cy="7.6" r="3"/><path d="M2.7 19.6c0-3.2 2.9-5.5 6.5-5.5 1.3 0 2.5.3 3.5.8"/>'
+  +'<circle cx="17.3" cy="9.8" r="2.5"/><path d="M12.9 19.6c0-2.6 2-4.5 4.4-4.5s4.4 1.9 4.4 4.5"/></svg>';
+
 function renderPn(k){
   var m=document.getElementById(k+'-pnmode'); if(!m)return;
   var st=PN[k];
-  m.innerHTML='<button type="button" class="'+(st.mode==='solo'?'on':'')+'" onclick="pnMode(&quot;'+k+'&quot;,&quot;solo&quot;)"><b>🧍</b>혼자 했어요</button>'
-    +'<button type="button" class="'+(st.mode==='with'?'on':'')+'" onclick="pnMode(&quot;'+k+'&quot;,&quot;with&quot;)"><b>👥</b>같이 했어요</button>';
+  m.innerHTML='<button type="button" class="'+(st.mode==='solo'?'on':'')+'" onclick="pnMode(&quot;'+k+'&quot;,&quot;solo&quot;)"><b>'+IC_SOLO+'</b>혼자 했어요</button>'
+    +'<button type="button" class="'+(st.mode==='with'?'on':'')+'" onclick="pnMode(&quot;'+k+'&quot;,&quot;with&quot;)"><b>'+IC_WITH+'</b>같이 했어요</button>';
   var box=document.getElementById(k+'-pnbox'); if(!box)return;
   if(st.mode!=='with'){box.classList.add('hidden');box.innerHTML='';return;}
   box.classList.remove('hidden');
@@ -1522,8 +1543,8 @@ function pnReset(k){PN[k]={mode:'',names:[]};renderPn(k);}
 /* 기록 줄에 붙는 파트너 칩 */
 function pnChip(v){
   var s=String(v||'').trim(); if(!s)return '';
-  if(s==='혼자')return ' <span class="chip">🧍 혼자</span>';
-  return ' <span class="chip pn">👥 '+esc(s)+'</span>';
+  if(s==='혼자')return ' <span class="chip">혼자</span>';
+  return ' <span class="chip pn">같이 · '+esc(s)+'</span>';
 }
 
 /* 유산소·근력 칩 (아이콘 포함) */
