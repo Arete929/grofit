@@ -1,5 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.47.2 -->
-<!-- 수정요약: [0.47.2] 홈 부제에 «2026학년도 3학년 2학기»가 두 번 나오던 것 수정 — 평가명에 이미 학년도·학기가 들어 있으면 앞머리를 붙이지 않는다. 성찰 탭 제목은 앞머리를 뗀 짧은 평가명(evalShort) 사용. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.47.3 -->
+<!-- 수정요약: [0.47.3] 체력 변화 그래프를 눌러 «크게 보기» — 세로 전체화면으로 띄우고 320x520 비율로 다시 그려 등급 띠와 값을 크게 본다. 카드 우하단에 ⤢ 표시. -->
+<!--   [0.47.2] 홈 부제에 «2026학년도 3학년 2학기»가 두 번 나오던 것 수정 — 평가명에 이미 학년도·학기가 들어 있으면 앞머리를 붙이지 않는다. 성찰 탭 제목은 앞머리를 뗀 짧은 평가명(evalShort) 사용. -->
 <!--   [0.47.1] 로그인 화면 안내를 «계정은 담당 선생님이 배부합니다» → «학생코드는 [다했어요]에서 쓰던 코드를 그대로 사용합니다»로 수정. -->
 <!--   [0.47.0] 달력을 «4주 도장판» 그리드로 교체 — 한 행이 한 주차. 주차별 달성/미달 배지, 진행 중인 주는 «유산소 N번 더» 남은 조건과 남은 날짜, 상단에 4주 도장판·연속 달성·지난주 결과 배너. 미달은 회색으로 담담하게. -->
 <!--   [0.46.3] 새 파트너 이름 입력칸이 버튼(.btn width:100%)에 밀려 찌그러지던 것 수정 — 입력칸을 넓히고(46px) 예시문구 'New 파트너'. 안내문구를 '함께한 파트너를 1명 이상 고르거나, 새로운 파트너를 추가하세요'로. -->
@@ -98,6 +99,23 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .guidebox b{color:var(--primary-dark)}
 .guidebox p{margin:5px 0 0;font-size:12.5px}
 .guidebox ol{margin:6px 0 0;padding-left:18px;font-size:12.5px;line-height:1.75}
+/* [0.47.3] 체력 그래프 카드 — 눌러서 확대 */
+.fitcard{position:relative;cursor:pointer}
+.fitzoom-b{position:absolute;right:12px;bottom:10px;font-size:10.5px;font-weight:700;
+  color:var(--primary-dark);background:var(--primary-tint);border-radius:99px;padding:3px 9px}
+/* 가로 확대 화면 — 세로 고정 앱이라 내용을 90도 돌려 넓게 쓴다 */
+.fzoom{position:fixed;inset:0;background:var(--bg);z-index:80;display:flex}
+.fzoom.hidden{display:none}
+.fz-in{background:var(--bg);width:100%;height:100%;box-sizing:border-box;
+  padding:16px 16px calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column}
+.fz-hd{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.fz-hd h2{margin:0;font-size:20px;white-space:nowrap}
+.fz-x{width:auto;height:30px;padding:0 15px;font-size:12.5px;flex:none;margin-left:auto}
+#fz-svg{flex:1;min-height:0;background:var(--surface);border:1px solid var(--line);
+  border-radius:14px;padding:14px 14px 10px;display:flex;align-items:center}
+#fz-svg svg{width:100%;height:auto;max-height:100%;display:block}
+.fz-ft{margin-top:10px}
+.fz-tip{color:var(--ph);font-size:11.5px;margin:4px 0 0}
 /* 안 읽은 공지 팝업 */
 .pop{position:fixed;inset:0;background:rgba(10,20,12,.55);z-index:60;display:flex;align-items:center;justify-content:center;padding:22px}
 .pop.hidden{display:none}
@@ -657,6 +675,22 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       <h2 id="pop-title" style="font-size:19px;margin:8px 0 6px"></h2>
       <div id="pop-body" style="white-space:pre-wrap;font-size:14px;color:var(--ink2);max-height:46vh;overflow:auto"></div>
       <button class="btn" style="margin-top:16px" onclick="popConfirm()" id="pop-btn">확인했어요</button>
+    </div>
+  </div>
+
+  <!-- [0.47.3] 체력 그래프 가로 확대 -->
+  <div id="fit-zoom" class="fzoom hidden" onclick="closeZoom()">
+    <div class="fz-in" onclick="event.stopPropagation()">
+      <div class="fz-hd">
+        <h2 id="fz-title"></h2>
+        <span id="fz-badge" style="flex:1"></span>
+        <button class="btn sec fz-x" style="width:auto;height:30px;padding:0 15px;font-size:12.5px" onclick="closeZoom()">닫기</button>
+      </div>
+      <div id="fz-svg"></div>
+      <div class="fz-ft">
+        <p class="cap" id="fz-cap" style="margin:0"></p>
+        <p class="fz-tip">배경 색 띠는 PAPS 5등급 구간입니다. 점 위 숫자가 그 회차 기록이에요.</p>
+      </div>
     </div>
   </div>
 
@@ -1326,7 +1360,7 @@ function renderAllCharts(){
   FIT_METRICS.forEach(function(m){html+=chartCard(m,recs);});
   box.innerHTML=html;
 }
-function chartCard(m,recs){
+function chartCard(m,recs,raw,CW,CH){
   var vals=FIT_ROUNDS.map(function(rd){var f=null;recs.forEach(function(x){if(x.회차===rd)f=x;});return fitVal(f,m.k);});
   var got=vals.filter(function(v){return v!==null;});
   if(!got.length)return '';                     // 아직 한 번도 입력 안 한 항목은 숨김
@@ -1341,7 +1375,7 @@ function chartCard(m,recs){
   }else if(d!==0){tone='wait';word=(d>0?'증가':'감소');}
   var badge='<span class="chip '+tone+'">'+(d>0?'+':'')+d+(m.u?m.u:'')+' '+word+'</span>';
 
-  var W=320,H=150,padL=30,padR=10,padT=18,padB=28;
+  var W=CW||320,H=CH||150,padL=30,padR=22,padT=18,padB=28;
   var lo=Math.min.apply(null,got),hi=Math.max.apply(null,got);
   var bands=m.std?FIT_STD[m.std]:null;
   if(bands){var fin=[];bands.forEach(function(b){if(b[0]>-999)fin.push(b[0]);if(b[1]<999)fin.push(b[1]);});
@@ -1372,12 +1406,17 @@ function chartCard(m,recs){
     svg+='<text x="'+X(i).toFixed(1)+'" y="'+(H-7)+'" font-size="8" fill="#8a978c" text-anchor="middle">'+rd.replace('주차','주').replace(' ','')+'</text>';});
   svg+='</svg>';
 
-  return '<div class="card" style="padding:14px 16px">'
+  var cap='처음 <b>'+first+'</b> → 최근 <b>'+last+'</b>'
+    +(bands?' <span class="muted">· 배경은 PAPS 5등급 구간</span>':' <span class="muted">· 등급 기준 없는 항목</span>');
+  /* [0.47.3] 확대 화면에서 쓰려고 조각만 돌려준다 */
+  if(raw)return {svg:svg,title:m.n+(m.u?' ('+m.u+')':''),badge:badge,cap:cap};
+
+  return '<div class="card fitcard" style="padding:14px 16px" onclick="zoomChart(\''+m.k+'\')">'
     +'<div class="row" style="justify-content:space-between;align-items:center;margin-bottom:2px">'
     +'<h2 style="margin:0">'+m.n+(m.u?' <span class="cap">('+m.u+')</span>':'')+'</h2>'+badge+'</div>'
     +svg
-    +'<p class="cap" style="margin:4px 0 0">처음 <b>'+first+'</b> → 최근 <b>'+last+'</b>'
-    +(bands?' <span class="muted">· 배경은 PAPS 5등급 구간</span>':' <span class="muted">· 등급 기준 없는 항목</span>')+'</p>'
+    +'<p class="cap" style="margin:4px 0 0">'+cap+'</p>'
+    +'<span class="fitzoom-b">⤢ 크게 보기</span>'
     +'</div>';
 }
 function renderFitTable(){
@@ -1721,6 +1760,20 @@ function evalShort(){
   var s=n.replace(/^\s*\d{4}\s*학년도\s*/,'').replace(/^\s*\d\s*학년\s*\d\s*학기\s*/,'').trim();
   return s||n;
 }
+
+/* [0.47.3] 그래프 확대 — 가로 비율(560x250)로 다시 그려 크게 보여준다 */
+function zoomChart(k){
+  var m=null; FIT_METRICS.forEach(function(x){if(x.k===k)m=x;});
+  if(!m)return;
+  var d=chartCard(m,ST.fitness||[],true,320,520);   // 세로로 길게 → 값·등급 띠가 잘 보인다
+  if(!d)return;
+  document.getElementById('fz-title').textContent=d.title;
+  document.getElementById('fz-badge').innerHTML=d.badge;
+  document.getElementById('fz-svg').innerHTML=d.svg;
+  document.getElementById('fz-cap').innerHTML=d.cap;
+  document.getElementById('fit-zoom').classList.remove('hidden');
+}
+function closeZoom(){document.getElementById('fit-zoom').classList.add('hidden');}
 
 /* ---------- 공지사항 ---------- */
 function loadNoticesStudent(){
