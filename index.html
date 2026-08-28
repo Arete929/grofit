@@ -1,5 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.47.4 -->
-<!-- 수정요약: [0.47.4] 손가락으로 화면 확대 허용(viewport maximum-scale 제거, 입력 글자 16px로 올려 아이폰 자동확대 방지). 오늘의 성찰을 «필수»로 — 비어 있으면 저장 안 됨(유산소·근력 모두). 혼자/같이를 이모지 대신 선으로 그린 아이콘으로. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.48.0 -->
+<!-- 수정요약: [0.48.0] 유산소 사진 AI 분석 원본값(거리·시간)을 따로 기억했다가 제출 시 함께 전송 — 관리자 화면에서 «학생이 적은 값 vs 사진에서 읽은 값»과 차이를 볼 수 있게. -->
+<!--   [0.47.4] 손가락으로 화면 확대 허용(viewport maximum-scale 제거, 입력 글자 16px로 올려 아이폰 자동확대 방지). 오늘의 성찰을 «필수»로 — 비어 있으면 저장 안 됨(유산소·근력 모두). 혼자/같이를 이모지 대신 선으로 그린 아이콘으로. -->
 <!--   [0.47.3] 체력 변화 그래프를 눌러 «크게 보기» — 세로 전체화면으로 띄우고 320x520 비율로 다시 그려 등급 띠와 값을 크게 본다. 카드 우하단에 ⤢ 표시. -->
 <!--   [0.47.2] 홈 부제에 «2026학년도 3학년 2학기»가 두 번 나오던 것 수정 — 평가명에 이미 학년도·학기가 들어 있으면 앞머리를 붙이지 않는다. 성찰 탭 제목은 앞머리를 뗀 짧은 평가명(evalShort) 사용. -->
 <!--   [0.47.1] 로그인 화면 안내를 «계정은 담당 선생님이 배부합니다» → «학생코드는 [다했어요]에서 쓰던 코드를 그대로 사용합니다»로 수정. -->
@@ -1025,11 +1026,13 @@ function onCardioImg(inp){readImg(inp,function(b64){cardioB64=b64;
   document.getElementById('cardio-result').classList.remove('hidden');
   document.getElementById('cardio-ai').textContent='· 분석 버튼을 누르거나 직접 입력하세요';
 });}
+var cardioAI=null;   /* [0.48.0] AI 가 사진에서 읽은 원본값 — 학생이 고쳐도 이건 그대로 남는다 */
 function analyzeCardioNow(){
   if(!cardioB64){toast('사진을 먼저 첨부하세요');return;}
   document.getElementById('cardio-ai').textContent='· AI 분석 중…';
   call('analyzeCardio',[cardioB64],function(r){
     if(r&&r.ok&&r.data){var d=r.data;
+      cardioAI={km:(d.distanceKm!=null?d.distanceKm:''),min:(d.durationMin!=null?d.durationMin:'')};
       if(d.distanceKm!=null)document.getElementById('c-dist').value=d.distanceKm;
       if(d.durationMin!=null)document.getElementById('c-dur').value=d.durationMin;
       if(d.paceMinPerKm)document.getElementById('c-pace').value=d.paceMinPerKm;
@@ -1038,7 +1041,7 @@ function analyzeCardioNow(){
     } else {document.getElementById('cardio-ai').textContent='· 인식 실패 · 직접 입력';toast((r&&r.msg)||'분석 실패');}
   });
 }
-function resetCardio(){cardioB64=null;['c-dist','c-dur','c-pace','c-kcal','c-reflect'].forEach(function(id){document.getElementById(id).value=''});
+function resetCardio(){cardioB64=null;cardioAI=null;['c-dist','c-dur','c-pace','c-kcal','c-reflect'].forEach(function(id){document.getElementById(id).value=''});
   countReflect('c-reflect','c-reflect-n');
   document.getElementById('cardio-prev').classList.add('hidden');document.getElementById('cardio-result').classList.add('hidden');
   document.getElementById('cardio-analyze').classList.add('hidden');}
@@ -1047,7 +1050,8 @@ function saveCardio(){
   if(!reflectCheck('c-reflect'))return;
   call('submitCardio',[ST.student.학번,{imageBase64:cardioB64,date:ST.cardioDate,
     distanceKm:val('c-dist'),durationMin:val('c-dur'),summary:'페이스 '+val('c-pace')+' · '+val('c-kcal')+'kcal',source:'앱',
-    reflect:val('c-reflect'),rpe:PICK.c.rpe,sat:PICK.c.sat,partner:pnValue('c')}],
+    reflect:val('c-reflect'),rpe:PICK.c.rpe,sat:PICK.c.sat,partner:pnValue('c'),
+    aiDistanceKm:(cardioAI?cardioAI.km:''),aiDurationMin:(cardioAI?cardioAI.min:'')}],
     function(r){toast('✅ 유산소 인증 저장'+savedMsg(r));resetCardio();resetPick('c');pnReset('c');loadPartners();go('home');});
 }
 /* [0.47.4] 오늘의 성찰은 필수 — 비어 있으면 저장 안 됨 */
