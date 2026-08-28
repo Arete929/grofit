@@ -1,5 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.48.1 -->
-<!-- 수정요약: [0.48.1] 유연성 칸 아래 작성 안내문 추가 — «스트레칭»이라고만 쓰지 말고 동작 이름을, 유튜브를 따라 했으면 영상 제목·채널명을 정확히 적도록. 상체 예시도 «무릎대고 팔굽혀펴기»로 통일. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.48.2 -->
+<!-- 수정요약: [0.48.2] 체력 변화 화면이 [object Object] 로 깨지던 것 수정 — 0.47.3에서 추가한 chartCard 매개변수 raw 가 기존 지역변수 raw(변화량)와 이름이 겹쳐 덮어써졌다. asData/delta 로 분리. -->
+<!--   [0.48.1] 유연성 칸 아래 작성 안내문 추가 — «스트레칭»이라고만 쓰지 말고 동작 이름을, 유튜브를 따라 했으면 영상 제목·채널명을 정확히 적도록. 상체 예시도 «무릎대고 팔굽혀펴기»로 통일. -->
 <!--   [0.48.0] 유산소 사진 AI 분석 원본값(거리·시간)을 따로 기억했다가 제출 시 함께 전송 — 관리자 화면에서 «학생이 적은 값 vs 사진에서 읽은 값»과 차이를 볼 수 있게. -->
 <!--   [0.47.4] 손가락으로 화면 확대 허용(viewport maximum-scale 제거, 입력 글자 16px로 올려 아이폰 자동확대 방지). 오늘의 성찰을 «필수»로 — 비어 있으면 저장 안 됨(유산소·근력 모두). 혼자/같이를 이모지 대신 선으로 그린 아이콘으로. -->
 <!--   [0.47.3] 체력 변화 그래프를 눌러 «크게 보기» — 세로 전체화면으로 띄우고 320x520 비율로 다시 그려 등급 띠와 값을 크게 본다. 카드 우하단에 ⤢ 표시. -->
@@ -1388,13 +1389,13 @@ function renderAllCharts(){
   FIT_METRICS.forEach(function(m){html+=chartCard(m,recs);});
   box.innerHTML=html;
 }
-function chartCard(m,recs,raw,CW,CH){
+function chartCard(m,recs,asData,CW,CH){   /* asData=true 면 그리기 조각만 돌려준다 */
   var vals=FIT_ROUNDS.map(function(rd){var f=null;recs.forEach(function(x){if(x.회차===rd)f=x;});return fitVal(f,m.k);});
   var got=vals.filter(function(v){return v!==null;});
   if(!got.length)return '';                     // 아직 한 번도 입력 안 한 항목은 숨김
-  var first=got[0],last=got[got.length-1],raw=last-first;
+  var first=got[0],last=got[got.length-1],delta=last-first;
   /* WHR처럼 변화폭이 작은 항목은 소수 둘째자리까지 살린다 */
-  var d=(Math.abs(raw)<1)?Math.round(raw*100)/100:Math.round(raw*10)/10;
+  var d=(Math.abs(delta)<1)?Math.round(delta*100)/100:Math.round(delta*10)/10;
   /* 향상 판정 */
   var tone='wait',word='변화 없음';
   if(d!==0&&m.dir!=='none'){
@@ -1437,7 +1438,7 @@ function chartCard(m,recs,raw,CW,CH){
   var cap='처음 <b>'+first+'</b> → 최근 <b>'+last+'</b>'
     +(bands?' <span class="muted">· 배경은 PAPS 5등급 구간</span>':' <span class="muted">· 등급 기준 없는 항목</span>');
   /* [0.47.3] 확대 화면에서 쓰려고 조각만 돌려준다 */
-  if(raw)return {svg:svg,title:m.n+(m.u?' ('+m.u+')':''),badge:badge,cap:cap};
+  if(asData)return {svg:svg,title:m.n+(m.u?' ('+m.u+')':''),badge:badge,cap:cap};
 
   return '<div class="card fitcard" style="padding:14px 16px" onclick="zoomChart(\''+m.k+'\')">'
     +'<div class="row" style="justify-content:space-between;align-items:center;margin-bottom:2px">'
