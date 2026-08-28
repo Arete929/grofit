@@ -1,5 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.48.2 -->
-<!-- 수정요약: [0.48.2] 체력 변화 화면이 [object Object] 로 깨지던 것 수정 — 0.47.3에서 추가한 chartCard 매개변수 raw 가 기존 지역변수 raw(변화량)와 이름이 겹쳐 덮어써졌다. asData/delta 로 분리. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.48.3 -->
+<!-- 수정요약: [0.48.3] 운동 이름을 구체적으로 쓰도록 ✗/✓ 예시 안내 — 세 부위 공통 안내에 «근력운동·스트레칭» 같은 뭉뚱그린 표현 금지와 좋은 예시, 상체·하체·유연성 칸마다 예시 목록. 유연성은 유튜브 영상 제목·채널명까지. -->
+<!--   [0.48.2] 체력 변화 화면이 [object Object] 로 깨지던 것 수정 — 0.47.3에서 추가한 chartCard 매개변수 raw 가 기존 지역변수 raw(변화량)와 이름이 겹쳐 덮어써졌다. asData/delta 로 분리. -->
 <!--   [0.48.1] 유연성 칸 아래 작성 안내문 추가 — «스트레칭»이라고만 쓰지 말고 동작 이름을, 유튜브를 따라 했으면 영상 제목·채널명을 정확히 적도록. 상체 예시도 «무릎대고 팔굽혀펴기»로 통일. -->
 <!--   [0.48.0] 유산소 사진 AI 분석 원본값(거리·시간)을 따로 기억했다가 제출 시 함께 전송 — 관리자 화면에서 «학생이 적은 값 vs 사진에서 읽은 값»과 차이를 볼 수 있게. -->
 <!--   [0.47.4] 손가락으로 화면 확대 허용(viewport maximum-scale 제거, 입력 글자 16px로 올려 아이폰 자동확대 방지). 오늘의 성찰을 «필수»로 — 비어 있으면 저장 안 됨(유산소·근력 모두). 혼자/같이를 이모지 대신 선으로 그린 아이콘으로. -->
@@ -71,8 +72,12 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 /* 근력 운동 입력 — 운동명 한 줄 + 무게·세트·횟수 한 줄 */
 .exrow{border:1px solid var(--line);border-radius:12px;padding:10px 11px;margin-bottom:9px;background:#fbfcfa}
 .exnote{margin:7px 0 2px;background:var(--warning-tint);border-radius:9px;padding:8px 10px;
-  font-size:11.5px;line-height:1.65;color:var(--ink2)}
+  font-size:11.5px;line-height:1.7;color:var(--ink2)}
 .exnote b{color:var(--warning)}
+.exnote .bad,.exex .bad{color:var(--danger);font-weight:700}
+.exnote .good,.exex .good{color:var(--primary-dark);font-weight:700}
+.exex{margin:6px 0 0;font-size:11.5px;line-height:1.75}
+.exex span{display:block}
 .exname{display:flex;align-items:center;gap:8px}
 .exname input{flex:1}
 .exnum{display:flex;gap:7px;margin-top:8px}
@@ -528,6 +533,9 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
         <ol><li><b>상체</b> 운동 — 예) 무릎대고 팔굽혀펴기</li>
             <li><b>하체</b> 운동 — 예) 스쿼트</li>
             <li><b>유연성</b> 운동 — 예) 앉아 앞으로 굽히기</li></ol>
+        <p><b>운동 이름은 «어떤 동작을 했는지» 알 수 있게 구체적으로</b> 적어주세요.</p>
+        <p class="exex"><span class="bad">✗ 근력운동, 상체운동, 스트레칭, 유연성, 운동함</span>
+        <span class="good">✓ 무릎대고 팔굽혀펴기 · 덤벨 숄더프레스 · 스쿼트 · 런지 · 플랭크 · 앉아 앞으로 굽히기</span></p>
         <p>세 칸을 모두 채워야 저장됩니다. 더 했으면 ＋로 추가하세요.</p>
       </div>
       <p class="cap" style="margin:-2px 0 10px">운동명 · 세트 · <b>횟수</b>는 필수, 무게는 기구 운동일 때만 적으면 돼요.<br>
@@ -1117,13 +1125,17 @@ function askException(){
 }
 /* 근력은 상체·하체·유연성 3종목 필수 → 개수 상수 대신 STR_PARTS 로 관리 */
 /* 근력 3종목은 부위가 고정 — 상체 · 하체 · 유연성 각 1개씩 필수 */
-var STR_PARTS=[{k:'상체',c:'p1',ph:'상체 운동 (예: 무릎대고 팔굽혀펴기)'},
-               {k:'하체',c:'p2',ph:'하체 운동 (예: 스쿼트)'},
+var STR_PARTS=[{k:'상체',c:'p1',ph:'상체 운동 (예: 무릎대고 팔굽혀펴기)',
+                note:'<span class="good">✓ 무릎대고 팔굽혀펴기 · 벽 팔굽혀펴기 · 플랭크 · 덤벨 숄더프레스 · 수건 당기기</span>'},
+               {k:'하체',c:'p2',ph:'하체 운동 (예: 스쿼트)',
+                note:'<span class="good">✓ 스쿼트 · 런지 · 브릿지 · 발뒤꿈치 들기 · 벽에 기대 앉기</span>'},
                {k:'유연성',c:'p3',ph:'유연성 운동 (예: 앉아 앞으로 굽히기)',
-                note:'<b>«스트레칭»이라고만 쓰지 마세요.</b> 어떤 동작을 했는지 이름을 적어주세요.'
-                    +'<br>예) 앉아 앞으로 굽히기 · 햄스트링 늘리기 · 어깨 늘리기 · 고양이 자세'
-                    +'<br><b>유튜브 영상을 따라 했다면 영상 제목과 채널 이름</b>을 정확히 적어주세요.'
-                    +'<br>예) 「10분 전신 스트레칭」 · 채널 ○○○'}];
+                note:'<b>동작 이름을 구체적으로 적어주세요.</b>'
+                    +'<br><span class="bad">✗ 스트레칭 · 유연성 운동 · 몸 풀기</span>'
+                    +'<br><span class="good">✓ 앉아 앞으로 굽히기 · 엎드려 뒤로 젖히기 · 햄스트링 늘리기'
+                    +' · 어깨·가슴 늘리기 · 고양이-소 자세 · 나비 자세 · 옆구리 늘리기</span>'
+                    +'<br><b>유튜브를 따라 했다면 영상 제목과 채널 이름</b>을 정확히 적어주세요.'
+                    +'<br><span class="good">✓ 「10분 전신 스트레칭」 · 채널 ○○○</span>'}];
 function addStrRow(part){
   var list=document.getElementById('str-list');
   var d=document.createElement('div');d.className='exrow'+(part?' fixed':'');
