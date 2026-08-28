@@ -1,5 +1,7 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.50.0 -->
-<!-- 수정요약: [0.50.0] 제출할 때 진행 게이지 표시 — 유산소·근력·성찰. 사진이 올라가는 만큼 실제 진행률(XHR upload)로 채우고, 서버 저장 중에는 95%까지 천천히, 끝나면 «완료». 캐릭터 스티커 배경 투명 처리. 공지 팝업을 다 확인하면 공지 목록을 갱신해 «읽음»으로 남게. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.51.0 -->
+<!-- 수정요약: [0.51.0] «선생님» → «김진호 선생님». 관리자와 버전 번호 통일(0.51.0). -->
+<!--   [0.50.1] 성찰 화면 정리 — «내 기록 넣고 쓰기» 버튼 삭제, 이번주 기록의 날짜·운동량을 진하게(거리/시간 굵게, 11.57분 → 11분 34초). -->
+<!--   [0.50.0] 제출할 때 진행 게이지 표시 — 유산소·근력·성찰. 사진이 올라가는 만큼 실제 진행률(XHR upload)로 채우고, 서버 저장 중에는 95%까지 천천히, 끝나면 «완료». 캐릭터 스티커 배경 투명 처리. 공지 팝업을 다 확인하면 공지 목록을 갱신해 «읽음»으로 남게. -->
 <!--   [0.49.0] 앱 시작 스플래시 추가 — 로크 문구 액자(splash-locke.jpg, 1080x2160)를 전체화면으로 1.8초 보여주고 스르르 사라진다. 탭하면 바로 넘어감. 체력 화면의 «유연성·신체조성» 이모지를 그림 아이콘(ic-flex/ic-body)으로 교체. -->
 <!--   [0.48.3] 운동 이름을 구체적으로 쓰도록 ✗/✓ 예시 안내 — 세 부위 공통 안내에 «근력운동·스트레칭» 같은 뭉뚱그린 표현 금지와 좋은 예시, 상체·하체·유연성 칸마다 예시 목록. 유연성은 유튜브 영상 제목·채널명까지. -->
 <!--   [0.48.2] 체력 변화 화면이 [object Object] 로 깨지던 것 수정 — 0.47.3에서 추가한 chartCard 매개변수 raw 가 기존 지역변수 raw(변화량)와 이름이 겹쳐 덮어써졌다. asData/delta 로 분리. -->
@@ -210,6 +212,7 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .wk .st b{display:block;font-size:17px} .wk .st span{font-size:11px;color:var(--muted)}
 .wk .dl{border-top:1px solid var(--divider);padding:9px 0 0;margin-top:2px}
 .wk .di{display:flex;gap:9px;padding:6px 0;align-items:flex-start;font-size:13px}
+.wk .di .amt{font-size:13.5px;color:var(--ink);font-weight:600}
 .wk .di .dd{width:44px;flex:none;font-weight:700;color:var(--ink2)}
 .badge-demo{background:var(--warning-tint);color:var(--warning);font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px}
 /* 이번 주 카드 — 요일 스트립 / 진행바 / 증감 / 누적 */
@@ -656,7 +659,6 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
     <div class="card">
       <h2>이번 주 성찰</h2>
       <div class="row" style="gap:6px;margin-bottom:8px;flex-wrap:wrap">
-        <button class="btn sec sm" style="width:auto;padding:0 12px" onclick="insertSummary()">📋 내 기록 넣고 쓰기</button>
         <button class="btn sec sm" style="width:auto;padding:0 12px" onclick="insertGuide()">💡 질문 보기</button>
       </div>
       <textarea id="rf-text" rows="7" placeholder="위 기록을 보면서, 이번 주 운동하며 느낀 점·몸의 변화·다음 주 목표를 적어보세요."></textarea>
@@ -1122,7 +1124,7 @@ function progSet(pct,sub){
 }
 /* 서버가 처리하는 동안엔 진행률을 알 수 없다 → 95%까지 천천히 */
 function progWait(sub){
-  progSet(PG.pct,sub||'선생님 시트에 저장하는 중…');
+  progSet(PG.pct,sub||'김진호 선생님 시트에 저장하는 중…');
   if(PG.timer)clearInterval(PG.timer);
   PG.timer=setInterval(function(){ if(PG.pct<95)progSet(PG.pct+1); },260);
 }
@@ -1191,7 +1193,7 @@ function onStrImg(inp){readImg(inp,function(b64){
 /* 타임마크 검사 — 통과해야 저장 가능. 실패하면 '선생님께 확인 요청'으로 예외 제출 */
 var strCheck=null, strException=null;
 function setChk(cls,html){document.getElementById('str-check').innerHTML='<div class="chk '+cls+'">'+html+'</div>';}
-function exBtn(){return '<button class="btn sec sm" style="margin-top:10px" onclick="askException()">🙋 선생님께 확인 요청</button>';}
+function exBtn(){return '<button class="btn sec sm" style="margin-top:10px" onclick="askException()">🙋 김진호 선생님께 확인 요청</button>';}
 function checkStrPhoto(){
   strCheck=null; strException=null;
   if(!strB64){document.getElementById('str-check').innerHTML='';return;}
@@ -1199,7 +1201,7 @@ function checkStrPhoto(){
   call('verifyStrengthPhoto',[ST.student.학번,strB64,ST.strDate],function(r){
     if(!r||r.ok===false){
       strCheck={pass:false,요약:'검사 실패'};
-      setChk('no','⚠️ 지금은 자동 확인을 할 수 없어요.<br><span class="cap">아래 <b>선생님께 확인 요청</b>으로 제출해 주세요.</span>'+exBtn());
+      setChk('no','⚠️ 지금은 자동 확인을 할 수 없어요.<br><span class="cap">아래 <b>김진호 선생님께 확인 요청</b>으로 제출해 주세요.</span>'+exBtn());
       return;
     }
     strCheck=r;
@@ -1214,13 +1216,13 @@ function checkStrPhoto(){
   });
 }
 function askException(){
-  var why=prompt('선생님께 전할 사유를 적어주세요. (예: 타임마크로 찍었는데 날짜가 잘렸어요)');
+  var why=prompt('김진호 선생님께 전할 사유를 적어주세요. (예: 타임마크로 찍었는데 날짜가 잘렸어요)');
   if(why===null)return;
   why=String(why).trim();
   if(!why){toast('사유를 적어주세요');return;}
   strException=why;
-  setChk('wait','🙋 <b>선생님 확인 요청으로 제출합니다</b><br><span class="cap">사유: '+esc(why)
-    +'<br>선생님이 확인한 뒤 인정 여부가 정해집니다.</span>');
+  setChk('wait','🙋 <b>김진호 선생님 확인 요청으로 제출합니다</b><br><span class="cap">사유: '+esc(why)
+    +'<br>김진호 선생님이 확인한 뒤 인정 여부가 정해집니다.</span>');
 }
 /* 근력은 상체·하체·유연성 3종목 필수 → 개수 상수 대신 STR_PARTS 로 관리 */
 /* 근력 3종목은 부위가 고정 — 상체 · 하체 · 유연성 각 1개씩 필수 */
@@ -1345,7 +1347,7 @@ function saveStrength(){
   }
   if(strB64 && !strCheck){toast('사진 확인이 끝날 때까지 잠시만 기다려주세요');return;}
   if(strB64 && strCheck && !strCheck.pass && !strCheck.skipped && !strException){
-    toast('타임마크 사진이 아니에요. 다시 찍거나 선생님께 확인 요청을 눌러주세요');return;
+    toast('타임마크 사진이 아니에요. 다시 찍거나 김진호 선생님께 확인 요청을 눌러주세요');return;
   }
   if(!pnCheck('s'))return;
   progOpen('근력 인증 제출');
@@ -1748,14 +1750,27 @@ function cmpMsg(w){
   return '💪 지난주보다 <b>'+Math.abs(dd)+'일</b> 적어요. 남은 날에 한 번 더 채워볼까요?';
 }
 
+/* [0.50.0] 11.57분 → 11분 34초 처럼 읽기 쉽게 */
+function minTxt(v){
+  var n=Number(v); if(!isFinite(n)||n<=0)return '';
+  var m=Math.floor(n), s=Math.round((n-m)*60);
+  if(s>=60){m++;s=0;}
+  return m+'분'+(s?' '+s+'초':'');
+}
 function renderWeek(w,demo){
   WK=w; WK_DEMO=!!demo;
   var box=document.getElementById('rf-summary');
   var 일=w.기록.map(function(r){
-    var sub=(r.종류==='유산소'&&(r.거리||r.시간))?((r.거리?r.거리+'km ':'')+(r.시간?r.시간+'분':'')):(r.내용||'');
-    return '<div class="di"><span class="dd">'+md(r.날짜)+'('+r.요일+')</span>'
+    var amt='';
+    if(r.종류==='유산소'){
+      var ps=[];
+      if(r.거리)ps.push('<b>'+r.거리+'km</b>');
+      if(r.시간)ps.push('<b>'+minTxt(r.시간)+'</b>');
+      amt=ps.join(' · ');
+    } else amt=esc(r.내용||'');
+    return '<div class="di"><span class="dd">'+md(r.날짜)+' ('+r.요일+')</span>'
       +'<div style="flex:1">'+kindChip(r.종류)+' '
-      +'<span class="cap">'+esc(sub)+'</span>'
+      +'<span class="amt">'+amt+'</span>'
       +(r.자각도?' <span class="chip" style="background:'+rpeColor(r.자각도)+'22;color:'+rpeColor(r.자각도)+'">'+esc(rpeName(r.자각도))+'</span>':'')
       +(r.만족도?' <span class="chip ok">'+satEmoji(r.만족도)+'</span>':'')
       +pnChip(r.파트너)
@@ -1805,32 +1820,6 @@ function renderWeek(w,demo){
     +'</div>';
 }
 /* 요약을 문장으로 만들어 성찰 입력창에 넣어준다 */
-function insertSummary(){
-  if(!WK){toast('기록을 불러오는 중이에요');return;}
-  var w=WK, lines=[];
-  lines.push('[이번 주 내 운동] '+w.운동일수+'일 운동(유산소 '+w.유산소일수+'일, 근력 '+w.근력일수+'일)'
-    +(w.총거리?' · 총 '+w.총거리+'km':'')+(w.총시간?' · '+w.총시간+'분':''));
-  w.기록.forEach(function(r){
-    var sub=(r.종류==='유산소'&&(r.거리||r.시간))?((r.거리?r.거리+'km ':'')+(r.시간?r.시간+'분':'')):(r.내용||'');
-    lines.push('· '+md(r.날짜)+'('+r.요일+') '+r.종류+' '+sub);
-  });
-  if(w.지난주){
-    var p=w.지난주, dd=w.운동일수-p.운동일수, dk=Math.round((w.총거리-p.총거리)*10)/10;
-    lines.push('');
-    lines.push('[지난주 대비] 운동 '+p.운동일수+'일 → '+w.운동일수+'일('+(dd>0?'+':'')+dd+'일)'
-      +' · 거리 '+(p.총거리||0)+'km → '+(w.총거리||0)+'km('+(dk>0?'+':'')+dk+'km)');
-    if(w.누적)lines.push('[누적 1~'+w.주차+'주차] 총 '+w.누적.운동일수+'일 운동 · '
-      +(w.누적.총거리||0)+'km · '+(w.누적.총시간||0)+'분 · 목표 달성 '+w.누적.달성주차+'/'+w.누적.주차수+'주');
-  }
-  lines.push('');
-  lines.push('[느낀 점] ');
-  lines.push('[몸의 변화] ');
-  lines.push('[다음 주 목표] ');
-  var el=document.getElementById('rf-text');
-  el.value=lines.join(String.fromCharCode(10)); el.focus();
-  el.setSelectionRange(el.value.length,el.value.length);
-  toast(WK_DEMO?'예시 기록으로 넣었어요':'내 기록을 넣었어요. 아래에 이어서 쓰세요');
-}
 function insertGuide(){
   var el=document.getElementById('rf-text');
   var N=String.fromCharCode(10);
@@ -1851,7 +1840,7 @@ function loadReflect(){
         +'<p style="margin:8px 0 0">'+esc(r.내용)+'</p>'
         +(r.교사코멘트?'<div class="bubble tbub">'
             +(r.스티커?'<img class="tbub-st" src="st-'+esc(r.스티커)+'.png" alt="">':'')
-            +'<div><b>선생님</b><br>'+emoHtml(r.교사코멘트)+'</div></div>':'')+'</div>';
+            +'<div><b>김진호 선생님</b><br>'+emoHtml(r.교사코멘트)+'</div></div>':'')+'</div>';
     });
     document.getElementById('rf-list').innerHTML=html||'<p class="muted" style="padding:0 4px">아직 작성한 성찰이 없습니다.</p>';
   });
