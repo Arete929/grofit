@@ -1,5 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.48.0 -->
-<!-- 수정요약: [0.48.0] 유산소 사진 AI 분석 원본값(거리·시간)을 따로 기억했다가 제출 시 함께 전송 — 관리자 화면에서 «학생이 적은 값 vs 사진에서 읽은 값»과 차이를 볼 수 있게. -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.48.1 -->
+<!-- 수정요약: [0.48.1] 유연성 칸 아래 작성 안내문 추가 — «스트레칭»이라고만 쓰지 말고 동작 이름을, 유튜브를 따라 했으면 영상 제목·채널명을 정확히 적도록. 상체 예시도 «무릎대고 팔굽혀펴기»로 통일. -->
+<!--   [0.48.0] 유산소 사진 AI 분석 원본값(거리·시간)을 따로 기억했다가 제출 시 함께 전송 — 관리자 화면에서 «학생이 적은 값 vs 사진에서 읽은 값»과 차이를 볼 수 있게. -->
 <!--   [0.47.4] 손가락으로 화면 확대 허용(viewport maximum-scale 제거, 입력 글자 16px로 올려 아이폰 자동확대 방지). 오늘의 성찰을 «필수»로 — 비어 있으면 저장 안 됨(유산소·근력 모두). 혼자/같이를 이모지 대신 선으로 그린 아이콘으로. -->
 <!--   [0.47.3] 체력 변화 그래프를 눌러 «크게 보기» — 세로 전체화면으로 띄우고 320x520 비율로 다시 그려 등급 띠와 값을 크게 본다. 카드 우하단에 ⤢ 표시. -->
 <!--   [0.47.2] 홈 부제에 «2026학년도 3학년 2학기»가 두 번 나오던 것 수정 — 평가명에 이미 학년도·학기가 들어 있으면 앞머리를 붙이지 않는다. 성찰 탭 제목은 앞머리를 뗀 짧은 평가명(evalShort) 사용. -->
@@ -68,6 +69,9 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
   text-shadow:0 1px 3px rgba(0,0,0,.7)}
 /* 근력 운동 입력 — 운동명 한 줄 + 무게·세트·횟수 한 줄 */
 .exrow{border:1px solid var(--line);border-radius:12px;padding:10px 11px;margin-bottom:9px;background:#fbfcfa}
+.exnote{margin:7px 0 2px;background:var(--warning-tint);border-radius:9px;padding:8px 10px;
+  font-size:11.5px;line-height:1.65;color:var(--ink2)}
+.exnote b{color:var(--warning)}
 .exname{display:flex;align-items:center;gap:8px}
 .exname input{flex:1}
 .exnum{display:flex;gap:7px;margin-top:8px}
@@ -520,9 +524,9 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       <h2>운동 내용 <span class="cap">· 상체 · 하체 · 유연성 필수</span></h2>
       <div class="guidebox">
         <b>💪 3가지는 이렇게 구성하세요</b>
-        <ol><li><b>상체</b> 운동 — 예) 푸시업</li>
+        <ol><li><b>상체</b> 운동 — 예) 무릎대고 팔굽혀펴기</li>
             <li><b>하체</b> 운동 — 예) 스쿼트</li>
-            <li><b>유연성</b> 운동 — 예) 앞으로 굽히기</li></ol>
+            <li><b>유연성</b> 운동 — 예) 앉아 앞으로 굽히기</li></ol>
         <p>세 칸을 모두 채워야 저장됩니다. 더 했으면 ＋로 추가하세요.</p>
       </div>
       <p class="cap" style="margin:-2px 0 10px">운동명 · 세트 · <b>횟수</b>는 필수, 무게는 기구 운동일 때만 적으면 돼요.<br>
@@ -1112,9 +1116,13 @@ function askException(){
 }
 /* 근력은 상체·하체·유연성 3종목 필수 → 개수 상수 대신 STR_PARTS 로 관리 */
 /* 근력 3종목은 부위가 고정 — 상체 · 하체 · 유연성 각 1개씩 필수 */
-var STR_PARTS=[{k:'상체',c:'p1',ph:'상체 운동 (예: 푸시업)'},
+var STR_PARTS=[{k:'상체',c:'p1',ph:'상체 운동 (예: 무릎대고 팔굽혀펴기)'},
                {k:'하체',c:'p2',ph:'하체 운동 (예: 스쿼트)'},
-               {k:'유연성',c:'p3',ph:'유연성 운동 (예: 앞으로 굽히기)'}];
+               {k:'유연성',c:'p3',ph:'유연성 운동 (예: 앉아 앞으로 굽히기)',
+                note:'<b>«스트레칭»이라고만 쓰지 마세요.</b> 어떤 동작을 했는지 이름을 적어주세요.'
+                    +'<br>예) 앉아 앞으로 굽히기 · 햄스트링 늘리기 · 어깨 늘리기 · 고양이 자세'
+                    +'<br><b>유튜브 영상을 따라 했다면 영상 제목과 채널 이름</b>을 정확히 적어주세요.'
+                    +'<br>예) 「10분 전신 스트레칭」 · 채널 ○○○'}];
 function addStrRow(part){
   var list=document.getElementById('str-list');
   var d=document.createElement('div');d.className='exrow'+(part?' fixed':'');
@@ -1124,6 +1132,7 @@ function addStrRow(part){
   else { head='<span class="strno">＋</span>'; }
   d.innerHTML='<div class="exname">'+head
       +'<input class="s-name" placeholder="'+(part?part.ph:'운동명 (예: 플랭크)')+'"></div>'
+    +((part&&part.note)?'<p class="exnote">'+part.note+'</p>':'')
     +'<div class="exnum">'
       +'<label>무게<input class="s-wt" inputmode="decimal" placeholder="kg"><span class="unit">kg</span></label>'
       +'<label>세트<input class="s-set" inputmode="numeric" placeholder="0"><span class="unit">세트</span></label>'
