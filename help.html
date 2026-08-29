@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<!-- 코드명: 혜원핏 학생 웹 설명서 | help.html | @version 1.0.0
+     수정요약: [1.0.0] 휴대폰으로 보는 최신 설명서 — 수행평가 일정·배점, 설치(크롬/사파리), 인증, 성찰, 체력, 감상문, FAQ -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>혜원핏 사용설명서 · 3학년 2학기 운동처방일지</title>
+<meta name="description" content="혜원핏 앱 설치부터 운동 인증·성찰·체력측정까지 한 번에 보는 학생 설명서">
+<style>
+:root{
+  --p:#5FAE00; --pd:#4A8A00; --pt:#EDFAD6;
+  --ink:#17211b; --ink2:#2b3a30; --mut:#5b6b60; --mut2:#8a978c;
+  --line:#e6ebe6; --div:#f0f3f0; --bg:#f6f8f5; --sf:#fff;
+  --red:#e0483d; --redt:#fdecec; --amb:#b56a00; --ambt:#fff4e0;
+  --cardio:#2f8cf0; --strength:#f28034;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
+  font-size:16px;line-height:1.75;-webkit-text-size-adjust:100%}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px 64px}
+
+/* 머리 */
+header{background:linear-gradient(160deg,#1d2a16,#0E120C);color:#fff;padding:30px 16px 26px;margin-bottom:18px}
+.hin{max-width:720px;margin:0 auto;display:flex;gap:16px;align-items:center}
+.hin img{width:76px;height:76px;border-radius:22%;flex:none;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+header .t1{font-size:13px;color:#9CB58A;margin:0 0 4px}
+header h1{margin:0;font-size:26px;font-weight:800;color:#89E900;letter-spacing:-.5px}
+header .t2{font-size:14px;color:#d8e6cc;margin:6px 0 0}
+
+/* 목차 */
+nav.toc{background:var(--sf);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:20px}
+nav.toc b{display:block;font-size:13px;color:var(--mut);margin-bottom:9px}
+nav.toc ol{margin:0;padding-left:20px}
+nav.toc li{margin:3px 0}
+nav.toc a{color:var(--ink2);text-decoration:none;font-size:14.5px}
+nav.toc a:hover{color:var(--pd)}
+
+section{background:var(--sf);border:1px solid var(--line);border-radius:16px;padding:18px 17px;margin-bottom:16px}
+h2{font-size:20px;margin:0 0 4px;color:var(--pd);letter-spacing:-.3px}
+h2 .n{display:inline-block;min-width:26px;height:26px;line-height:26px;text-align:center;
+  background:var(--p);color:#fff;border-radius:8px;font-size:13px;margin-right:8px;vertical-align:2px}
+.sub{color:var(--mut);font-size:14px;margin:0 0 14px}
+p{margin:10px 0}
+b{font-weight:700}
+ul,ol{margin:10px 0;padding-left:22px}
+li{margin:5px 0}
+
+.box{border-radius:12px;padding:12px 14px;margin:12px 0;font-size:14.5px;line-height:1.7}
+.warn{background:var(--redt);border:1.5px solid var(--red)}
+.warn b{color:var(--red)}
+.tip{background:var(--ambt);border:1px solid #f0d5a8}
+.tip b{color:var(--amb)}
+.ok{background:var(--pt);border:1px solid #cfe8ad}
+.ok b{color:var(--pd)}
+
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12.5px;font-weight:700}
+.pill.g{background:var(--pt);color:var(--pd)}
+.pill.r{background:var(--redt);color:var(--red)}
+.pill.a{background:var(--ambt);color:var(--amb)}
+
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left}
+th{background:var(--div);font-weight:700;color:var(--ink2)}
+td.c,th.c{text-align:center}
+
+.steps{counter-reset:s;padding:0;list-style:none;margin:12px 0}
+.steps li{counter-increment:s;position:relative;padding-left:38px;margin:11px 0}
+.steps li:before{content:counter(s);position:absolute;left:0;top:1px;width:26px;height:26px;
+  background:var(--p);color:#fff;border-radius:50%;text-align:center;line-height:26px;font-size:13px;font-weight:700}
+.steps b{display:block;font-size:15.5px}
+.steps span{color:var(--mut);font-size:13.5px}
+
+.qr{text-align:center;margin:14px 0}
+.qr img{width:190px;height:190px;border:1px solid var(--line);border-radius:12px;padding:8px;background:#fff}
+.url{display:inline-block;background:var(--p);color:#fff;font-weight:800;
+  padding:10px 18px;border-radius:99px;text-decoration:none;font-size:15px;margin-top:10px}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.grid2{grid-template-columns:1fr}}
+.mini{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:11px 12px}
+.mini b{display:block;color:var(--pd);font-size:14.5px;margin-bottom:3px}
+.mini span{font-size:13px;color:var(--mut);line-height:1.6}
+
+.bad{color:var(--red);font-weight:700}
+.good{color:var(--pd);font-weight:700}
+
+.tabs{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+.tabs div{flex:1 1 30%;background:var(--bg);border:1px solid var(--line);border-radius:11px;
+  padding:9px 6px;text-align:center;font-size:13px}
+.tabs div b{display:block;color:var(--pd);font-size:14px}
+
+.faq dt{font-weight:700;margin-top:14px;color:var(--ink)}
+.faq dd{margin:5px 0 0;color:var(--ink2);font-size:14.5px}
+
+footer{text-align:center;color:var(--mut2);font-size:12.5px;padding:24px 0 8px}
+.top{position:fixed;right:14px;bottom:14px;background:var(--p);color:#fff;text-decoration:none;
+  width:44px;height:44px;border-radius:50%;text-align:center;line-height:44px;font-size:18px;
+  box-shadow:0 6px 18px rgba(0,0,0,.22)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hin">
+    <img src="icon5-mask-512.png" alt="혜원핏">
+    <div>
+      <p class="t1">2026학년도 3학년 2학기 · 체육 수행평가</p>
+      <h1>혜원핏 사용설명서</h1>
+      <p class="t2">설치부터 인증 · 성찰까지, 이것만 보면 됩니다</p>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<nav class="toc">
+  <b>목차</b>
+  <ol>
+    <li><a href="#why">왜 이걸 하나요?</a></li>
+    <li><a href="#score">수행평가 일정과 배점</a></li>
+    <li><a href="#install">앱 설치하기</a></li>
+    <li><a href="#login">로그인</a></li>
+    <li><a href="#screen">화면 둘러보기</a></li>
+    <li><a href="#goal">주간 목표와 4주 도장판</a></li>
+    <li><a href="#cardio">유산소 인증</a></li>
+    <li><a href="#strength">근력 인증</a></li>
+    <li><a href="#reflect">성찰 쓰기</a></li>
+    <li><a href="#fit">체력측정</a></li>
+    <li><a href="#essay">감상문</a></li>
+    <li><a href="#faq">자주 묻는 질문</a></li>
+  </ol>
+</nav>
+
+<section id="why">
+  <h2><span class="n">1</span>왜 이걸 하나요?</h2>
+  <p class="sub">재는 것으로 끝나면, 아무것도 달라지지 않습니다</p>
+  <div class="box ok"><b>성취기준 [9체01-09]</b><br>
+    신체적 여가 활동과 운동처방을 위한 전 과정(계획·실행·평가)을 스스로 선택하고 실천한다.</div>
+  <div class="grid2">
+    <div class="mini"><b>① 측정</b><span>내 체력을 숫자로 안다</span></div>
+    <div class="mini"><b>② 처방</b><span>부족한 걸 정해 계획한다</span></div>
+    <div class="mini"><b>③ 실천</b><span>4주 동안 직접 해본다</span></div>
+    <div class="mini"><b>④ 재측정</b><span>달라진 걸 확인한다</span></div>
+  </div>
+  <p>1학기에 <b>운동처방 원리와 SMART 목표</b>를 이론으로 배웠습니다. 2학기에는 그 원리로
+     내 몸에 맞는 운동을 스스로 처방하고 4주간 실천해 봅니다.
+     시험을 위한 지식이 아니라 <b>평생 쓰는 방법</b>을 익히는 것입니다.</p>
+  <div class="box tip"><b>“건전한 신체에 건전한 정신이 깃든다”</b><br>
+    몸과 마음의 건강은 저절로 오지 않고 애써 구해야 한다는 뜻입니다. — 유베날리스 · 존 로크</div>
+</section>
+
+<section id="score">
+  <h2><span class="n">2</span>수행평가 일정과 배점</h2>
+  <p class="sub">2학기 수행평가는 100점 — 운동처방일지 40점 + 빅발리볼 60점</p>
+
+  <table>
+    <tr><th>영역</th><th class="c">배점</th><th>내용</th></tr>
+    <tr><td><b>운동처방일지</b></td><td class="c"><b>40점</b></td><td>혜원핏 앱으로 4주간 인증 · 측정 · 성찰</td></tr>
+    <tr><td>빅발리볼</td><td class="c">60점</td><td>실기 30 · 노트 15 · 리그전 15</td></tr>
+  </table>
+
+  <h3 style="font-size:16px;margin:18px 0 6px">마감이 두 가지입니다</h3>
+  <div class="box ok"><b>최종 마감 · 10월 15일 (목)</b><br>2학기 수행평가 전체 마감일입니다.</div>
+  <div class="box tip"><b>주간 마감 · 매주 일요일 22:00</b><br>
+    그 주에 한 운동은 <b>일요일 밤 10시까지</b> 올려야 그 주 기록으로 들어갑니다.</div>
+
+  <h3 style="font-size:16px;margin:18px 0 6px">40점은 이렇게 정해집니다</h3>
+  <p>수업시간에 제시된 제출 조건을 지켜 작성한 <b>비율</b>로 점수가 나옵니다. <b>5%마다 2점</b> 차이입니다.</p>
+  <table>
+    <tr><th class="c">작성률</th><th class="c">점수</th><th class="c">작성률</th><th class="c">점수</th></tr>
+    <tr><td class="c">100%</td><td class="c"><b>40점</b></td><td class="c">60%</td><td class="c">24점</td></tr>
+    <tr><td class="c">90%</td><td class="c">36점</td><td class="c">50%</td><td class="c">20점</td></tr>
+    <tr><td class="c">80%</td><td class="c">32점</td><td class="c">25%</td><td class="c">10점</td></tr>
+    <tr><td class="c">70%</td><td class="c">28점</td><td class="c">미제출</td><td class="c">8점</td></tr>
+  </table>
+  <p class="sub" style="margin-top:8px">내 작성률과 예상 점수는 앱 <b>[기록]</b> 탭에서 언제든 볼 수 있습니다.</p>
+</section>
+
+<section id="install">
+  <h2><span class="n">3</span>앱 설치하기</h2>
+  <p class="sub">스토어에서 받지 않습니다 — 주소로 들어가 설치합니다</p>
+
+  <div class="box warn"><b>⚠ 반드시 이 브라우저로 여세요</b><br>
+    <b>안드로이드 = 크롬</b> &nbsp;·&nbsp; <b>아이폰 = 사파리</b><br>
+    카톡·밴드에서 링크를 바로 누르면 설치가 안 됩니다. 주소를 복사해 브라우저에 붙여넣으세요.</div>
+
+  <div class="qr">
+    <img src="qr.png" alt="설치 QR" onerror="this.style.display='none'">
+    <br><a class="url" href="https://arete929.github.io/grofit/">arete929.github.io/grofit</a>
+  </div>
+
+  <ol class="steps">
+    <li><b>주소로 들어가기</b><span>QR을 찍거나 위 주소를 브라우저에 입력합니다.</span></li>
+    <li><b>색 먼저 고르기</b><span>로그인 화면 아래 🎨 에서 6가지 중 고르세요. 고른 색이 홈 화면 아이콘 색이 됩니다.</span></li>
+    <li><b>홈 화면에 추가</b><span>안드로이드 : 위쪽 «설치» 버튼<br>아이폰 : 사파리 아래 공유(↥) → «홈 화면에 추가»</span></li>
+  </ol>
+
+  <div class="box tip"><b>설치한 뒤 색을 바꾸면?</b><br>
+    앱 안 색만 바뀌고 홈 화면 아이콘은 그대로입니다. 아이콘 색까지 바꾸려면 아이콘을 지우고 다시 설치하세요.</div>
+</section>
+
+<section id="login">
+  <h2><span class="n">4</span>로그인</h2>
+  <p class="sub">학번 4자리 + 학생코드</p>
+  <div class="box ok"><b>학생코드는 새로 받는 게 아닙니다</b><br>
+    <b>[다했어요]에서 쓰던 학생코드</b>를 그대로 입력하세요. 생년월일이 아닙니다.</div>
+  <ul>
+    <li>한 번 로그인하면 다음부터 자동으로 열립니다.</li>
+    <li>코드가 기억나지 않으면 <b>김진호 선생님</b>께 물어보세요.</li>
+    <li>안내는 <b>다했어요 알림장</b>과 <b>학급 밴드톡</b>에도 올라갑니다.</li>
+  </ul>
+</section>
+
+<section id="screen">
+  <h2><span class="n">5</span>화면 둘러보기</h2>
+  <p class="sub">아래쪽 여섯 개 버튼으로 이동합니다</p>
+  <div class="tabs">
+    <div><b>홈</b>이번 주 현황<br>4주 도장판</div>
+    <div><b>인증</b>유산소 · 근력<br>올리는 곳</div>
+    <div><b>체력</b>측정 입력<br>변화 그래프</div>
+    <div><b>성찰</b>주간 성찰<br>선생님 코멘트</div>
+    <div><b>기록</b>날짜별 기록<br>점수 확인</div>
+    <div><b>공지</b>선생님 공지<br>확인 표시</div>
+  </div>
+  <p class="sub">앱을 켜면 로크 문구가 잠깐 뜨고 사라집니다. 기다리기 싫으면 화면을 누르면 바로 넘어갑니다.</p>
+</section>
+
+<section id="goal">
+  <h2><span class="n">6</span>주간 목표와 4주 도장판</h2>
+  <p class="sub">주 3일 이상 · 그중 유산소는 2일 이상</p>
+  <table>
+    <tr><th>그 주에 한 것</th><th class="c">판정</th></tr>
+    <tr><td>월 유산소 · 수 유산소 · 금 근력</td><td class="c"><span class="pill g">✓ 달성</span></td></tr>
+    <tr><td>월 · 수 · 금 모두 유산소</td><td class="c"><span class="pill g">✓ 달성</span></td></tr>
+    <tr><td>금 · 토 · 일 몰아서 3일</td><td class="c"><span class="pill a">△ 권장 안 함</span></td></tr>
+    <tr><td>근력만 3일</td><td class="c"><span class="pill r">✗ 미달</span></td></tr>
+  </table>
+  <div class="box warn"><b>같은 날 유산소와 근력을 둘 다 해도 «하루»로 셉니다.</b><br>
+    서로 다른 날에 나눠서 하세요. 근육은 쉬는 동안 자랍니다 — 몰아서 3일보다
+    <b>운동 → 휴식 → 운동</b>이 훨씬 효과적입니다.</div>
+  <p><b>홈 화면의 4주 도장판</b>에서 주차별로 달성했는지, 이번 주에 무엇을 더 하면 되는지 바로 보입니다.
+     진행 중인 주에는 «유산소 1번 더» 처럼 남은 조건이 나옵니다.</p>
+</section>
+
+<section id="cardio">
+  <h2><span class="n">7</span>유산소 인증</h2>
+  <p class="sub">운동 앱 기록 화면을 캡처해서 올립니다</p>
+  <p><b>쓸 수 있는 앱</b> — 삼성헬스 · 애플 피트니스 · 나이키 런클럽(NRC).
+     «아침시간 함께걷기 챌린지»와 같은 방식입니다.</p>
+  <ol class="steps">
+    <li><b>운동한 요일 고르기</b></li>
+    <li><b>캡처한 사진 올리기</b><span>기록을 눌러 들어가 <b>날짜가 보이는 화면</b>을 캡처하세요.</span></li>
+    <li><b>[🔍 사진 분석하기]</b><span>거리와 시간이 자동으로 채워집니다.</span></li>
+    <li><b>틀리면 직접 고치기</b></li>
+    <li><b>오늘의 성찰 쓰고 제출</b></li>
+  </ol>
+  <div class="box tip"><b>날짜가 보이는 화면으로 캡처하세요.</b><br>
+    운동이 끝난 직후 화면에는 날짜가 없을 수 있습니다. 기록 목록에서 그 운동을 눌러 들어가면 날짜·요일이 나옵니다.</div>
+</section>
+
+<section id="strength">
+  <h2><span class="n">8</span>근력 인증</h2>
+  <p class="sub">사진은 반드시 타임마크 앱으로</p>
+  <ol class="steps">
+    <li><b>타임마크(Timemark) 앱 설치</b><span>무료 · 스토어에서 검색</span></li>
+    <li><b>템플릿 → «사진 코드» 선택</b><span>한 번만 골라두면 계속 그 형식으로 찍힙니다.</span></li>
+    <li><b>운동하는 중에 촬영</b><span>사진에 날짜와 사진 코드가 함께 새겨집니다.</span></li>
+  </ol>
+  <div class="box warn"><b>이런 사진은 인정되지 않아요</b>
+    <ul style="margin:6px 0 0">
+      <li>일반 카메라로 찍은 사진</li>
+      <li>사진 코드가 없는 템플릿</li>
+      <li><b>코드가 안 보이게 잘라낸 사진</b></li>
+      <li>다른 날짜가 찍힌 사진</li>
+      <li>전에 냈던 사진 다시 내기</li>
+      <li>친구가 보내준 사진</li>
+    </ul>
+  </div>
+  <p>사진을 올리면 <b>2~3초 만에 자동 확인</b>되고 ✅ 표시가 뜹니다.
+     확인이 안 되면 <b>🙋 김진호 선생님께 확인 요청</b>으로 제출할 수 있습니다.</p>
+  <p class="sub">사진 없이 제출하면 기록은 남지만 «운동한 것»으로 인정되지 않습니다.</p>
+
+  <h3 style="font-size:16px;margin:18px 0 6px">운동 이름은 구체적으로</h3>
+  <p><span class="bad">✗ 근력운동 · 상체운동 · 스트레칭 · 유연성 · 운동함</span><br>
+     이렇게 쓰면 무엇을 했는지 알 수 없어 인정이 어렵습니다.</p>
+  <div class="grid2">
+    <div class="mini"><b>상체</b><span class="good">무릎대고 팔굽혀펴기 · 벽 팔굽혀펴기 · 플랭크 · 덤벨 숄더프레스 · 수건 당기기</span></div>
+    <div class="mini"><b>하체</b><span class="good">스쿼트 · 런지 · 브릿지 · 발뒤꿈치 들기 · 벽에 기대 앉기</span></div>
+    <div class="mini"><b>유연성</b><span class="good">앉아 앞으로 굽히기 · 엎드려 뒤로 젖히기 · 햄스트링 늘리기 · 어깨·가슴 늘리기 · 고양이-소 자세</span></div>
+    <div class="mini"><b>세 칸 모두 필수</b><span>상체 · 하체 · 유연성을 각각 1가지씩 채워야 저장됩니다. 더 했으면 ＋로 추가하세요.</span></div>
+  </div>
+  <div class="box tip"><b>유튜브를 따라 했다면</b><br>
+    <b>영상 제목과 채널 이름</b>을 정확히 적어주세요. 예)「10분 전신 스트레칭」· 채널 ○○○</div>
+</section>
+
+<section id="reflect">
+  <h2><span class="n">9</span>성찰 쓰기</h2>
+  <p class="sub">기록보다 중요한 것 — 스스로 돌아보기</p>
+  <p><b>오늘의 성찰</b> <span class="pill r">필수</span><br>
+     인증할 때마다 한두 줄 씁니다. <b>비우면 저장되지 않습니다.</b></p>
+  <p class="sub">예) “초반엔 힘들었는데 20분 넘으니 리듬이 잡혔다.”</p>
+  <p><b>운동자각도와 만족도</b>도 함께 고릅니다 — 매우 쉬움 / 쉬움 / 보통 / 힘듦 / 매우 힘듦</p>
+  <p><b>주간 성찰</b>은 매주 1번, 4주 동안 4번 씁니다. 그 주에 며칠 운동했는지 요약이 위에 나오니 보고 쓰면 됩니다.</p>
+  <div class="box ok"><b>김진호 선생님이 코멘트를 달아줍니다</b><br>
+    캐릭터가 말풍선으로 말해주는 형태로 내 앱 화면에 바로 보입니다.</div>
+</section>
+
+<section id="fit">
+  <h2><span class="n">10</span>체력측정</h2>
+  <p class="sub">매주 첫 번째 체육시간에 재고, 앱에 입력합니다</p>
+  <div class="grid2">
+    <div class="mini"><b>인바디</b><span>체성분검사</span></div>
+    <div class="mini"><b>근력</b><span>무릎대고 팔굽혀펴기 · 악력</span></div>
+    <div class="mini"><b>유연성</b><span>앉아 앞으로 굽히기</span></div>
+    <div class="mini"><b>총 6회</b><span>방학 전 · 개학 후 · 1~4주차</span></div>
+  </div>
+  <p>숫자를 넣으면 <b>등급이 바로 나옵니다</b> (PAPS 학생건강체력평가 기준 · 중3 여학생).</p>
+  <p><b>[체력] 탭 → 체력 변화</b>에서 항목별 꺾은선 그래프를 볼 수 있고,
+     그래프를 누르면 <b>크게</b> 볼 수 있습니다. 배경의 색 띠가 5등급 구간입니다.</p>
+  <div class="box tip"><b>올라가야 좋은 것과 내려가야 좋은 것</b><br>
+    악력·근육량은 올라가야 향상, 체지방률·내장비만은 내려가야 향상입니다.</div>
+</section>
+
+<section id="essay">
+  <h2><span class="n">11</span>감상문</h2>
+  <p class="sub">4주 동안 쌓인 기록이 그대로 자료가 됩니다</p>
+  <p>4주를 마치면 감상문을 제출합니다. 이런 내용을 씁니다.</p>
+  <ul>
+    <li>4주간 운동을 돌아보며</li>
+    <li>체력측정 결과가 어떻게 변했는지</li>
+    <li>매주 쓴 성찰에서 내 생각이 어떻게 달라졌는지</li>
+    <li>가장 힘들었던 순간과 이겨낸 방법</li>
+    <li>앞으로 어떻게 운동을 이어갈 것인지</li>
+  </ul>
+  <div class="box ok"><b>앱을 열어두고 쓰세요</b><br>
+    <b>성찰</b> 탭에 주차별 성찰과 선생님 코멘트, <b>체력</b> 탭에 6회차 변화 그래프,
+    <b>기록</b> 탭에 날짜별 운동 내역이 그대로 남아 있습니다.</div>
+  <p class="sub">제출 시기와 분량은 수업시간에 따로 안내합니다.</p>
+</section>
+
+<section id="faq" class="faq">
+  <h2><span class="n">12</span>자주 묻는 질문</h2>
+  <dl>
+    <dt>Q. 카톡으로 링크를 열었더니 설치 버튼이 없어요.</dt>
+    <dd>카톡 안에서 열면 설치가 안 됩니다. 주소를 복사해서 <b>크롬(안드로이드) · 사파리(아이폰)</b>에 붙여넣어 여세요.</dd>
+
+    <dt>Q. 지난 요일 운동을 지금 올려도 되나요?</dt>
+    <dd>됩니다. 같은 주 안이라면 지난 요일을 골라 올릴 수 있습니다. 다만 <b>일요일 22시</b>가 지나면 그 주 기록으로 안 들어갑니다.</dd>
+
+    <dt>Q. 하루에 유산소랑 근력을 다 하면 2일로 쳐지나요?</dt>
+    <dd>아니요. <b>하루</b>로 셉니다. 서로 다른 날에 나눠서 하세요.</dd>
+
+    <dt>Q. 사진 확인이 자꾸 실패해요.</dt>
+    <dd>타임마크 앱에서 <b>템플릿 → 사진 코드</b>를 골랐는지 확인하세요. 그래도 안 되면
+        <b>🙋 김진호 선생님께 확인 요청</b>으로 제출하면 선생님이 직접 확인합니다.</dd>
+
+    <dt>Q. 성찰을 안 쓰면 저장이 안 돼요.</dt>
+    <dd>맞습니다. <b>오늘의 성찰은 필수</b>입니다. 한 줄이라도 적어야 저장됩니다.</dd>
+
+    <dt>Q. 앱을 지웠다 다시 깔면 기록이 사라지나요?</dt>
+    <dd>아니요. 기록은 선생님 시트에 저장되므로 다시 로그인하면 그대로 있습니다.</dd>
+
+    <dt>Q. 선생님이 앱을 고치면 저도 다시 깔아야 하나요?</dt>
+    <dd>아니요. <b>앱을 껐다 켜면</b> 자동으로 최신 상태가 됩니다. 다만 홈 화면 <b>아이콘 모양·색</b>을 바꾸는 경우에만 다시 설치가 필요합니다.</dd>
+
+    <dt>Q. 학생코드를 잊어버렸어요.</dt>
+    <dd>[다했어요]에서 쓰던 코드와 같습니다. 그래도 모르겠으면 김진호 선생님께 물어보세요.</dd>
+  </dl>
+</section>
+
+<footer>
+  혜원여자중학교 체육과 · 김진호 선생님<br>
+  혜원핏 사용설명서 v1.0
+</footer>
+
+</div>
+
+<a class="top" href="#" aria-label="맨 위로">↑</a>
+</body>
+</html>
