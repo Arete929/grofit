@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.52.2 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.54.0 -->
+<!-- 수정요약: [0.54.0] ★검수 방식 전환 — 유산소 «사진 분석하기» 삭제. 거리·시간을 학생이 직접 적는다(비어 있으면 저장 안 됨).
+     근력 사진 자동검사도 뺐다(김진호 선생님이 «검토»에서 확인). 제출은 '검토' 상태로 쌓이고, 도장판에 회색 «선생님 확인 중»으로 보인다. -->
 <!-- 수정요약: [0.52.2] 로고 아트를 정사각형 정중앙으로 정렬(테마 6종 mask 아이콘 512·192). 테마1 좌상단 얼룩 제거. -->
 <!--   [0.52.1] 로고 모서리 깨짐·흰 테두리 수정 — 로고 소스를 theme{n}.png(테두리·둥근모서리가 그림에 박힌 파일)에서 icon{n}-mask-512.png(꽉 찬 정사각형)로 바꾸고 CSS 둥근모서리(22%)로 깔끔하게. 로그인·홈·테마 선택 모두 적용. -->
 <!--   [0.52.0] 선생님 코멘트를 «캐릭터가 말풍선으로 말하는» 만화 형태로 — 관리자에서 말하는 캐릭터를 고르면(토글) 학생 앱에 캐릭터 그림 + 꼬리 달린 말풍선으로 보인다. -->
@@ -345,6 +347,10 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 .wb.miss{background:#eef1ec;color:var(--muted)}
 .wb.go{background:#fff2df;color:#b56a00}
 .wb.wait{background:#f3f5f2;color:var(--ph)}
+.wb.pend{background:#eaf0f7;color:#3d6aa2}
+.wcell.pend{background:#f2f6fa;border-color:#d6e2ee}
+.wcell.pend .n{color:#5b7fa8}
+.wcell .dd i.p{background:#9db9d4}
 .wcells{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .wcell{aspect-ratio:1;border-radius:9px;background:#fafbfa;border:1px solid transparent;
   display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted2)}
@@ -516,10 +522,10 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       <div class="drop" id="cardio-drop" onclick="pick('cardio-file')">📷 운동 앱 스크린샷 업로드<br><span class="cap">탭하여 사진 선택</span></div>
       <input type="file" id="cardio-file" accept="image/*" class="hidden" onchange="onCardioImg(this)">
       <img id="cardio-prev" class="hidden" style="width:100%;border-radius:12px;margin-top:12px">
-      <button class="btn hidden" id="cardio-analyze" onclick="analyzeCardioNow()" style="margin-top:12px">🔍 사진 분석하기</button>
     </div>
     <div class="card hidden" id="cardio-result">
-      <h2>분석 결과 <span class="cap" id="cardio-ai"></span></h2>
+      <h2>내 기록 적기 <span class="cap" id="cardio-ai"></span></h2>
+      <p class="cap" style="margin:-4px 0 10px">사진을 보면서 <b>직접 적어 주세요.</b> 적어 보는 것도 수행평가의 일부예요</p>
       <div class="grid2">
         <div class="field"><label>거리 (km)</label><input id="c-dist" inputmode="decimal"></div>
         <div class="field"><label>시간 (분)</label><input id="c-dur" inputmode="decimal"></div>
@@ -973,6 +979,9 @@ function renderCal(h){
       bc='go'; bt = nc>0 ? ('🔥 유산소 '+nc+'번 더') : ('🔥 '+nd+'일 더');
     }
     else { bc='miss'; bt='아쉬워요 · '+(Number(info['완료일수'])||0)+'일'; }
+    // 냈지만 아직 확인 전인 날이 있으면 그걸 먼저 알려준다
+    var pd=Number(info['검토중'])||0;
+    if(pd>0&&!met){ bc='pend'; bt='선생님 확인 중 · '+pd+'일'; }
 
     var left='';
     if(isNow){
@@ -984,10 +993,11 @@ function renderCal(h){
     for(var i=0;i<7;i++){
       var d=new Date(s); d.setDate(s.getDate()+i);
       var ds=fmtLocal(d), rec=map[ds];
-      var cls='wcell'+(rec?' on':'')+(ds===tds?' today':'')+(ST.calDay===ds?' sel':'');
+      var pend = !!(rec&&rec.p);
+      var cls='wcell'+(rec?' on':'')+(pend?' pend':'')+(ds===tds?' today':'')+(ST.calDay===ds?' sel':'');
       var dots = rec ? ('<span class="dd">'
-        +(rec.c?'<i style="background:var(--cardio)"></i>':'')
-        +(rec.s?'<i style="background:var(--strength)"></i>':'')+'</span>') : '';
+        +(rec.c?'<i class="'+(pend?'p':'')+'" style="'+(pend?'':'background:var(--cardio)')+'"></i>':'')
+        +(rec.s?'<i class="'+(pend?'p':'')+'" style="'+(pend?'':'background:var(--strength)')+'"></i>':'')+'</span>') : '';
       var clk = rec ? ' onclick="toggleCalDay(&quot;'+ds+'&quot;)"' : '';
       cells+='<div class="'+cls+'"'+clk+'><span class="w">'+DOW[d.getDay()]+'</span>'
         +'<span class="n">'+d.getDate()+'</span>'+dots+'</div>';
@@ -1086,41 +1096,40 @@ function selDay(prov,date,btn){ST[prov+'Date']=date;
 var cardioB64=null;
 function onCardioImg(inp){readImg(inp,function(b64){cardioB64=b64;
   var p=document.getElementById('cardio-prev');p.src=b64;p.classList.remove('hidden');
-  document.getElementById('cardio-analyze').classList.remove('hidden');
   document.getElementById('cardio-result').classList.remove('hidden');
-  document.getElementById('cardio-ai').textContent='· 분석 버튼을 누르거나 직접 입력하세요';
+  document.getElementById('cardio-ai').textContent='· 사진을 보고 적어 주세요';
+  var d=document.getElementById('c-dist'); if(d)d.focus();
 });}
-var cardioAI=null;   /* [0.48.0] AI 가 사진에서 읽은 원본값 — 학생이 고쳐도 이건 그대로 남는다 */
-function analyzeCardioNow(){
-  if(!cardioB64){toast('사진을 먼저 첨부하세요');return;}
-  document.getElementById('cardio-ai').textContent='· AI 분석 중…';
-  call('analyzeCardio',[cardioB64],function(r){
-    if(r&&r.ok&&r.data){var d=r.data;
-      cardioAI={km:(d.distanceKm!=null?d.distanceKm:''),min:(d.durationMin!=null?d.durationMin:'')};
-      if(d.distanceKm!=null)document.getElementById('c-dist').value=d.distanceKm;
-      if(d.durationMin!=null)document.getElementById('c-dur').value=d.durationMin;
-      if(d.paceMinPerKm)document.getElementById('c-pace').value=d.paceMinPerKm;
-      if(d.kcal!=null)document.getElementById('c-kcal').value=d.kcal;
-      document.getElementById('cardio-ai').textContent='· 자동 인식됨 (확인·수정)';
-    } else {document.getElementById('cardio-ai').textContent='· 인식 실패 · 직접 입력';toast((r&&r.msg)||'분석 실패');}
-  });
-}
+/* [0.54.0] 자동 분석을 뺐다 — 학생이 자기 손으로 적는 것에 뜻을 둔다.
+   대신 선생님이 사진을 보고 인정 여부를 정한다(관리자 «검토»).      */
+var cardioAI=null;
 function resetCardio(){cardioB64=null;cardioAI=null;['c-dist','c-dur','c-pace','c-kcal','c-reflect'].forEach(function(id){document.getElementById(id).value=''});
   countReflect('c-reflect','c-reflect-n');
-  document.getElementById('cardio-prev').classList.add('hidden');document.getElementById('cardio-result').classList.add('hidden');
-  document.getElementById('cardio-analyze').classList.add('hidden');}
+  document.getElementById('cardio-prev').classList.add('hidden');document.getElementById('cardio-result').classList.add('hidden');}
 function saveCardio(){
   if(!pnCheck('c'))return;
+  if(!cardioNumCheck())return;
   if(!reflectCheck('c-reflect'))return;
   progOpen('유산소 인증 제출');
   callP('submitCardio',[ST.student.학번,{imageBase64:cardioB64,date:ST.cardioDate,
     distanceKm:val('c-dist'),durationMin:val('c-dur'),summary:'페이스 '+val('c-pace')+' · '+val('c-kcal')+'kcal',source:'앱',
     reflect:val('c-reflect'),rpe:PICK.c.rpe,sat:PICK.c.sat,partner:pnValue('c'),
     aiDistanceKm:(cardioAI?cardioAI.km:''),aiDurationMin:(cardioAI?cardioAI.min:'')}],
-    function(r){progDone('유산소 인증 완료!',function(){
-      toast('✅ 유산소 인증 저장'+savedMsg(r));
+    function(r){progDone('제출했어요 · 선생님 확인을 기다려요',function(){
+      toast('✅ 제출 완료 · 김진호 선생님이 확인하면 도장이 찍혀요'+savedMsg(r));
       resetCardio();resetPick('c');pnReset('c');loadPartners();go('home');});});
 }
+/* [0.54.0] 거리·시간은 학생이 직접 적는다 — 비어 있으면 저장하지 않는다 */
+function cardioNumCheck(){
+  var km=parseFloat(val('c-dist')), min=parseFloat(val('c-dur'));
+  if(!(km>0)){ toast('사진을 보고 거리(km)를 적어 주세요'); focusEl('c-dist'); return false; }
+  if(!(min>0)){ toast('사진을 보고 시간(분)을 적어 주세요'); focusEl('c-dur'); return false; }
+  if(km>50||min>600){ toast('숫자를 다시 확인해 주세요'); focusEl('c-dist'); return false; }
+  return true;
+}
+function focusEl(id){ var e=document.getElementById(id); if(!e)return;
+  e.scrollIntoView({block:'center',behavior:'smooth'}); setTimeout(function(){e.focus();},220); }
+
 /* [0.50.0] 제출 진행 게이지 — 사진 올라가는 만큼 실제로 채워진다 */
 var PG={timer:null,pct:0};
 function progOpen(title){
@@ -1209,10 +1218,16 @@ function onStrImg(inp){readImg(inp,function(b64){
 var strCheck=null, strException=null;
 function setChk(cls,html){document.getElementById('str-check').innerHTML='<div class="chk '+cls+'">'+html+'</div>';}
 function exBtn(){return '<button class="btn sec sm" style="margin-top:10px" onclick="askException()">🙋 김진호 선생님께 확인 요청</button>';}
+/* [0.54.0] 자동 검사를 뺐다 — 사진 코드는 김진호 선생님이 «검토»에서 직접 확인한다.
+   학생 폰에서 AI를 부르지 않으니 마감 직전에 몰려도 느려지지 않는다.       */
 function checkStrPhoto(){
   strCheck=null; strException=null;
-  if(!strB64){document.getElementById('str-check').innerHTML='';return;}
-  setChk('wait','⏳ 사진을 확인하는 중이에요… (몇 초 걸립니다)');
+  var box=document.getElementById('str-check');
+  if(!strB64){ if(box)box.innerHTML=''; return; }
+  setChk('ok','✅ 사진을 받았어요.<br><span class="cap">타임마크 <b>사진 코드</b>와 날짜가 보이는지 다시 한 번 봐 주세요. '
+    +'김진호 선생님이 확인한 뒤 인정됩니다.</span>');
+}
+function checkStrPhotoAI_불용(){
   call('verifyStrengthPhoto',[ST.student.학번,strB64,ST.strDate],function(r){
     if(!r||r.ok===false){
       strCheck={pass:false,요약:'검사 실패'};
