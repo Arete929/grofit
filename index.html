@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.57.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.58.0 -->
+<!-- 수정요약: [0.58.0] 유산소·근력 인증 화면에 «마지막 업로드 · 날짜 시각» 표시. 저장 직후엔 «✅ 업로드됨»,
+     다시 들어오면 시트의 마지막 입력시각을 불러와 그대로 보인다. -->
 <!-- 수정요약: [0.57.0] ★문의하기 — 공지 탭에서 들어간다. 유형 고르고 내용 쓰고 사진 최대 5장(같은 사진은 자동 제외).
      보낸 문의와 선생님 답변을 아래에서 볼 수 있다. PWA_VER 이 0.46.3 으로 멈춰 있던 것도 함께 맞춤. -->
 <!-- 수정요약: [0.55.0] ★주간 기준 변경 — 주 4일(유산소 2일 + 근력 2일). 홈 목표 카드에 «근력 필수» 줄 추가,
@@ -565,6 +567,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       <p class="cap" style="text-align:right;margin:6px 0 0"><span id="c-reflect-n">0</span>/300자</p>
     </div>
     <div class="row"><button class="btn sec" onclick="resetCardio()">다시</button><button class="btn" onclick="saveCardio()">저장하기</button></div>
+    <p class="savedat" id="saved-cardio"></p>
   </section>
 
   <!-- 4. 근력 -->
@@ -619,6 +622,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       <p class="cap" style="text-align:right;margin:6px 0 0"><span id="st-reflect-n">0</span>/300자</p>
     </div>
     <div class="row"><button class="btn sec" onclick="go('cert')">취소</button><button class="btn" onclick="saveStrength()">저장하기</button></div>
+    <p class="savedat" id="saved-strength"></p>
   </section>
 
   <!-- 5. 체력측정 입력 -->
@@ -833,8 +837,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.57.0';
-var PWA_BUILD = '2026.08.30 23:10';
+var PWA_VER = '0.58.0';
+var PWA_BUILD = '2026.08.30 23:40';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -1019,7 +1023,18 @@ function showSaved(id,at,just){var el=document.getElementById(id);if(!el||!at)re
 /* 로그인/화면 진입 시 내 마지막 저장시각 복원 */
 function loadMyStamps(){ if(!ST.student)return;
   call('getMySaveStamps',[ST.student.학번],function(s){ if(!s)return;
-    showSaved('saved-reflect',s.reflect,false); showSaved('saved-inbody',s.inbody,false); });}
+    showSaved('saved-reflect',s.reflect,false); showSaved('saved-inbody',s.inbody,false);
+    // [0.58.0] 유산소·근력은 «마지막 업로드»로 따로 보여준다
+    var L=s.최근||{};
+    showUp('saved-cardio',   s.cardio   || L['유산소'] || '', false);
+    showUp('saved-strength', s.strength || L['근력']   || '', false);
+  });}
+/* 업로드 시각 표시 — 저장 직후엔 초록, 다시 들어왔을 때는 회색 */
+function showUp(id,at,just){
+  var el=document.getElementById(id); if(!el)return;
+  el.textContent = at ? ((just?'✅ 업로드됨 · ':'마지막 업로드 · ')+at) : '';
+  el.className='savedat'+(just?' just':'');
+}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(function(){t.classList.remove('on')},1900);}
 function pick(id){document.getElementById(id).click();}
 function call(fn,args,cb){
@@ -1265,6 +1280,7 @@ function saveCardio(){
     reflect:val('c-reflect'),rpe:PICK.c.rpe,sat:PICK.c.sat,partner:pnValue('c'),
     aiDistanceKm:(cardioAI?cardioAI.km:''),aiDurationMin:(cardioAI?cardioAI.min:'')}],
     function(r){progDone('제출했어요 · 선생님 확인을 기다려요',function(){
+      showUp('saved-cardio',r&&r.savedAt,true);
       toast('✅ 제출 완료 · 김진호 선생님이 확인하면 도장이 찍혀요'+savedMsg(r));
       resetCardio();resetPick('c');pnReset('c');loadPartners();go('home');});});
 }
@@ -1532,8 +1548,9 @@ function saveStrength(){
   progOpen('근력 인증 제출');
   callP('submitStrength',[ST.student.학번,{imageBase64:strB64,date:ST.strDate,summary:rows.join(', '),reflect:val('st-reflect'),
     rpe:PICK.s.rpe,sat:PICK.s.sat,check:strCheck,exception:strException,partner:pnValue('s')}],
-    function(r){progDone(strB64?'근력 인증 완료!':'기록만 저장했어요',function(){
-      toast(strB64?('✅ 근력 인증 저장'+savedMsg(r)):'📝 기록만 저장됨 · 사진이 없어 인정되지 않아요');
+    function(r){progDone(strB64?'제출했어요 · 선생님 확인을 기다려요':'기록만 저장했어요',function(){
+      showUp('saved-strength',r&&r.savedAt,true);
+      toast(strB64?('✅ 제출 완료 · 김진호 선생님이 확인하면 도장이 찍혀요'+savedMsg(r)):'📝 기록만 저장됨 · 사진이 없어 인정되지 않아요');
       strB64=null;strCheck=null;strException=null;
       document.getElementById('str-check').innerHTML='';resetStrRows();resetPick('s');pnReset('s');loadPartners();
       document.getElementById('st-reflect').value='';countReflect('st-reflect','st-reflect-n');
