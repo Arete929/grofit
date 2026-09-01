@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.54.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.55.0 -->
+<!-- 수정요약: [0.55.0] ★주간 기준 변경 — 주 4일(유산소 2일 + 근력 2일). 홈 목표 카드에 «근력 필수» 줄 추가,
+     도장판 남은 조건에 근력 반영(유산소 → 근력 → 남은 일수 순으로 하나만 안내). -->
 <!-- 수정요약: [0.54.0] ★검수 방식 전환 — 유산소 «사진 분석하기» 삭제. 거리·시간을 학생이 직접 적는다(비어 있으면 저장 안 됨).
      근력 사진 자동검사도 뺐다(김진호 선생님이 «검토»에서 확인). 제출은 '검토' 상태로 쌓이고, 도장판에 회색 «선생님 확인 중»으로 보인다. -->
 <!-- 수정요약: [0.52.2] 로고 아트를 정사각형 정중앙으로 정렬(테마 6종 mask 아이콘 512·192). 테마1 좌상단 얼룩 제거. -->
@@ -292,6 +294,7 @@ h2{font-size:15px;font-weight:700;margin:0 0 10px}
 .btn.sm{height:44px;font-size:14px;border-radius:12px}
 .row{display:flex;gap:10px}
 .chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600}
+.chip.strength{background:var(--strength-tint,#FFEADF);color:var(--strength,#B1542A)}
 .chip.cardio{background:var(--cardio-tint);color:var(--cardio)}
 .chip.strength{background:var(--strength-tint);color:var(--strength-dark)}
 .chip.ok{background:var(--primary-tint);color:var(--primary-dark)}
@@ -464,6 +467,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
         <div style="flex:1">
           <div class="list-item" style="padding:6px 0"><span id="g-total-l">주 3일 목표</span><span class="chip ok" id="g-total-c">0/3</span></div>
           <div class="list-item" style="padding:6px 0"><span>유산소 필수</span><span class="chip cardio" id="g-cardio-c">0/2</span></div>
+          <div class="list-item" style="padding:6px 0" id="g-str-row"><span>근력 필수</span><span class="chip strength" id="g-str-c">0/2</span></div>
         </div>
       </div>
     </div>
@@ -932,6 +936,10 @@ function loadHome(){
     document.getElementById('g-total-l').textContent='주 '+wk.목표일수+'일 목표';
     document.getElementById('g-total-c').textContent=wk.완료일수+'/'+wk.목표일수;
     document.getElementById('g-cardio-c').textContent=wk.유산소일수+'/'+wk.유산소필수;
+    // [0.55.0] 근력도 최소 일수가 생겼다 — 0이면 줄을 감춘다
+    var 근필=Number(wk.근력필수)||0, 근일=Number(wk.근력일수)||0;
+    document.getElementById('g-str-row').style.display = 근필>0 ? '' : 'none';
+    document.getElementById('g-str-c').textContent=근일+'/'+근필;
     var pct=Math.min(100,Math.round(wk.완료일수/wk.목표일수*100));
     document.getElementById('g-week').innerHTML=ring(pct,wk.완료일수+'/'+wk.목표일수,'이번 주');
     ST.home=h; ST.myRecords=null; ST.calDay=null;
@@ -954,7 +962,8 @@ function renderCal(h){
   var hdr=document.getElementById('cal-month');
   var cfg=h.config||{}, start=cfg['기간_시작일'], totalW=Number(cfg['총_주차수'])||4;
   var map=h['운동일자']||{}, nowW=Number(h['현재주차'])||1;
-  var goal=Number(cfg['주간_목표일수'])||3, needC=Number(cfg['유산소_최소일수'])||2;
+  var goal=Number(cfg['주간_목표일수'])||4, needC=Number(cfg['유산소_최소일수'])||2,
+      needS=Number(cfg['근력_최소일수'])||0;
 
   if(!start){
     box.innerHTML='<p class="cap" style="text-align:center;padding:18px 0">평가 기간이 아직 설정되지 않았어요.</p>';
@@ -975,8 +984,11 @@ function renderCal(h){
     else if(future){ bc='wait'; bt='아직'; }
     else if(isNow){
       var nc=Math.max(0,needC-(Number(info['유산소일수'])||0));
+      var ns=Math.max(0,needS-(Number(info['근력일수'])||0));
       var nd=Math.max(0,goal-(Number(info['완료일수'])||0));
-      bc='go'; bt = nc>0 ? ('🔥 유산소 '+nc+'번 더') : ('🔥 '+nd+'일 더');
+      // 가장 급한 것 하나만 보여준다 — 유산소 → 근력 → 남은 일수
+      bc='go'; bt = nc>0 ? ('🔥 유산소 '+nc+'번 더')
+                : (ns>0 ? ('🔥 근력 '+ns+'번 더') : ('🔥 '+nd+'일 더'));
     }
     else { bc='miss'; bt='아쉬워요 · '+(Number(info['완료일수'])||0)+'일'; }
     // 냈지만 아직 확인 전인 날이 있으면 그걸 먼저 알려준다
@@ -1372,7 +1384,7 @@ function saveStrength(){
     var N2=String.fromCharCode(10);
     if(!confirm('사진 없이 제출할까요?'+N2+N2
       +'기록은 남지만 운동한 것으로 인정되지 않습니다.'+N2
-      +'(주 3일 달성 일수에 들어가지 않아요)'+N2+N2
+      +'(그 주 달성 일수에 들어가지 않아요)'+N2+N2
       +'타임마크로 찍은 사진을 넣으면 인정됩니다.'))return;
   }
   if(strB64 && !strCheck){toast('사진 확인이 끝날 때까지 잠시만 기다려주세요');return;}
@@ -1841,7 +1853,7 @@ function renderWeek(w,demo){
     +'<div class="bar'+(w.달성?' done':'')+'"><b style="width:'+pct+'%"></b></div>'
     +weekStrip(w)
     +'<div class="st"><div><b>'+w.유산소일수+'/'+w.유산소필수+'</b><span>유산소</span>'+(p?dvBadge(w.유산소일수,p.유산소일수,'일',0,true):'')+'</div>'
-    +'<div><b>'+w.근력일수+'</b><span>근력</span>'+(p?dvBadge(w.근력일수,p.근력일수,'일',0,true):'')+'</div>'
+    +'<div><b>'+w.근력일수+(w.근력필수?'/'+w.근력필수:'')+'</b><span>근력</span>'+(p?dvBadge(w.근력일수,p.근력일수,'일',0,true):'')+'</div>'
     +'<div><b>'+(w.총거리||0)+'km</b><span>달린 거리</span>'+(p?dvBadge(w.총거리,p.총거리,'km',1,true):'')+'</div>'
     +'<div><b>'+(w.총시간||0)+'분</b><span>운동 시간</span>'+(p?dvBadge(w.총시간,p.총시간,'분',0,true):'')+'</div></div>'
     +(일?'<div class="dl">'+일+'</div>':'<p class="muted" style="margin:0">이번 주 기록이 아직 없어요.</p>')
