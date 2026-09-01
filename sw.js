@@ -1,5 +1,5 @@
 /* 그로핏 PWA 서비스워커 | 버전 올리면 캐시 갱신·자동 새로고침 */
-var CACHE = 'grofit-v0.55.0';
+var CACHE = 'grofit-v0.57.0';
 var ASSETS = ['./', './index.html',
   './tab-home.png', './tab-cert.png', './tab-fit.png', './tab-reflect.png', './tab-score.png', './tab-notice.png', './ic-cardio.png', './ic-strength.png',
   './st-verygood.png','./st-good.png','./st-nice.png','./st-peace.png','./st-regret.png','./st-frustration.png',

@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.55.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.57.0 -->
+<!-- 수정요약: [0.57.0] ★문의하기 — 공지 탭에서 들어간다. 유형 고르고 내용 쓰고 사진 최대 5장(같은 사진은 자동 제외).
+     보낸 문의와 선생님 답변을 아래에서 볼 수 있다. PWA_VER 이 0.46.3 으로 멈춰 있던 것도 함께 맞춤. -->
 <!-- 수정요약: [0.55.0] ★주간 기준 변경 — 주 4일(유산소 2일 + 근력 2일). 홈 목표 카드에 «근력 필수» 줄 추가,
      도장판 남은 조건에 근력 반영(유산소 → 근력 → 남은 일수 순으로 하나만 안내). -->
 <!-- 수정요약: [0.54.0] ★검수 방식 전환 — 유산소 «사진 분석하기» 삭제. 거리·시간을 학생이 직접 적는다(비어 있으면 저장 안 됨).
@@ -306,6 +308,19 @@ input,textarea,select{width:100%;font-family:inherit;font-size:16px;border:1.5px
 input:focus,textarea:focus{border-color:var(--primary)}
 label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0 6px}
 .field{margin-bottom:14px}
+.iqgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.iqgrid figure{position:relative;margin:0}
+.iqgrid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;display:block;background:#eef1ec}
+.iqgrid button{position:absolute;top:5px;right:5px;width:26px;height:26px;border:none;border-radius:50%;
+  background:rgba(0,0,0,.62);color:#fff;font-size:15px;font-weight:700;line-height:1;cursor:pointer}
+.iqcard{border:1px solid var(--line);border-radius:12px;padding:12px 13px;margin-bottom:10px;background:var(--surface)}
+.iqcard .top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.iqcard .ty{font-size:11.5px;font-weight:800;padding:2px 9px;border-radius:999px;background:var(--primary-tint);color:var(--primary-dark)}
+.iqcard .dt{font-size:11px;color:var(--muted2)}
+.iqcard .msg{font-size:13.5px;line-height:1.6;white-space:pre-wrap;color:var(--ink)}
+.iqcard .ans{margin-top:10px;padding:10px 11px;border-radius:10px;background:var(--primary-tint)}
+.iqcard .ans b{display:block;font-size:11.5px;color:var(--primary-dark);margin-bottom:4px}
+.iqcard .wait{margin-top:8px;font-size:12px;color:var(--muted)}
 .tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;
   border-top:1px solid var(--line);display:flex;padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:20}
 .tabbar button{flex:1;background:none;border:none;font-family:inherit;font-size:11px;color:var(--muted2);
@@ -724,7 +739,41 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
   <!-- 공지사항 -->
   <section id="s-notice" class="scr">
     <h1 style="margin-bottom:14px">공지사항</h1>
+    <button class="btn sec" style="margin-bottom:14px" onclick="go('inquiry')">🙋 김진호 선생님께 문의하기</button>
     <div id="nt-list"></div>
+  </section>
+
+  <!-- 문의하기 -->
+  <section id="s-inquiry" class="scr">
+    <h1 style="margin-bottom:4px">문의하기</h1>
+    <p class="cap" style="margin:0 0 14px">궁금한 것 · 잘못된 기록 · 안 되는 것을 적어 주세요. 사진도 같이 보낼 수 있어요</p>
+
+    <div class="card">
+      <h2>무엇에 대한 문의인가요?</h2>
+      <div class="pal" id="iq-type"></div>
+    </div>
+
+    <div class="card">
+      <h2>내용</h2>
+      <textarea id="iq-text" rows="6" maxlength="2000" placeholder="예) 9월 8일 유산소를 올렸는데 도장판에 안 보여요. 사진 같이 보냅니다." oninput="countReflect('iq-text','iq-n')"></textarea>
+      <p class="cap" style="text-align:right;margin:6px 0 0"><span id="iq-n">0</span> / 2000</p>
+    </div>
+
+    <div class="card">
+      <h2>사진 <span class="cap" id="iq-cnt">0 / 5</span></h2>
+      <p class="cap" style="margin:-4px 0 10px">화면을 캡처해서 붙이면 훨씬 빨리 해결돼요. 같은 사진은 한 번만 들어갑니다</p>
+      <div class="drop" id="iq-drop" onclick="pick('iq-file')">📷 사진 추가<br><span class="cap">한 번에 여러 장 고를 수 있어요</span></div>
+      <input type="file" id="iq-file" accept="image/*" multiple class="hidden" onchange="onInqImg(this)">
+      <div id="iq-prev" class="iqgrid"></div>
+    </div>
+
+    <button class="btn" onclick="sendInquiry()">보내기</button>
+    <button class="btn sec" style="margin-top:8px" onclick="go('notice')">돌아가기</button>
+
+    <div class="card" style="margin-top:18px">
+      <h2>내가 보낸 문의</h2>
+      <div id="iq-list"><p class="cap">아직 보낸 문의가 없어요.</p></div>
+    </div>
   </section>
 
   <!-- 하단 탭바 -->
@@ -784,8 +833,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.46.3';
-var PWA_BUILD = '2026.08.14 20:45';
+var PWA_VER = '0.57.0';
+var PWA_BUILD = '2026.08.30 23:10';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -874,9 +923,97 @@ function go(name){
   if(name==='reflect'){loadReflect();loadMyStamps();}
   if(name==='score') loadScore();
   if(name==='notice') loadNoticesStudent();
+  if(name==='inquiry'){ renderIqType(); renderIqPrev(); loadMyInq(); }
   window.scrollTo(0,0);
 }
 function savedMsg(r){return (r&&r.savedAt)?(' · '+r.savedAt):'';}
+
+/* ═══════ 문의하기 ═══════ */
+var IQ_TYPES=['인증이 안 돼요','기록이 잘못됐어요','앱이 이상해요','평가·점수','기타'];
+var IQ={type:IQ_TYPES[0],shots:[]};   /* shots = [{b64,hash}] */
+function renderIqType(){
+  var box=document.getElementById('iq-type'); if(!box)return;
+  box.innerHTML=IQ_TYPES.map(function(t){
+    return '<button class="'+(IQ.type===t?'on':'')+'" onclick="IQ.type=&quot;'+t+'&quot;;renderIqType()">'+t+'</button>';
+  }).join('');
+}
+/* 같은 사진을 두 번 붙이지 못하게 — base64 를 훑어 값 하나로 줄인다 */
+function iqHash(s){
+  var h=2166136261;
+  for(var i=0;i<s.length;i+=7){ h^=s.charCodeAt(i); h=(h*16777619)>>>0; }
+  return h.toString(36)+'_'+s.length;
+}
+function onInqImg(inp){
+  var files=[].slice.call(inp.files||[]);
+  if(!files.length)return;
+  var dup=0, over=0;
+  var step=function(k){
+    if(k>=files.length){
+      inp.value='';
+      renderIqPrev();
+      if(dup)toast('같은 사진 '+dup+'장은 빼고 넣었어요');
+      else if(over)toast('사진은 5장까지예요');
+      return;
+    }
+    if(IQ.shots.length>=5){ over++; step(k+1); return; }
+    var fr=new FileReader();
+    fr.onload=function(){
+      var b64=String(fr.result);
+      var hx=iqHash(b64);
+      if(IQ.shots.some(function(x){return x.hash===hx})) dup++;
+      else IQ.shots.push({b64:b64,hash:hx});
+      step(k+1);
+    };
+    fr.onerror=function(){ step(k+1); };
+    fr.readAsDataURL(files[k]);
+  };
+  step(0);
+}
+function iqDel(i){ IQ.shots.splice(i,1); renderIqPrev(); }
+function renderIqPrev(){
+  var box=document.getElementById('iq-prev'); if(!box)return;
+  box.innerHTML=IQ.shots.map(function(x,i){
+    return '<figure><img src="'+x.b64+'" alt=""><button onclick="iqDel('+i+')" aria-label="사진 빼기">×</button></figure>';
+  }).join('');
+  document.getElementById('iq-cnt').textContent=IQ.shots.length+' / 5';
+}
+function sendInquiry(){
+  var t=document.getElementById('iq-text').value.trim();
+  if(!t){ toast('문의 내용을 적어 주세요'); document.getElementById('iq-text').focus(); return; }
+  progOpen('문의 보내는 중');
+  callP('submitInquiry',[ST.student.학번,{
+    유형:IQ.type, 주차:(ST.home&&ST.home.현재주차)||'', 내용:t,
+    photos:IQ.shots.map(function(x){return {base64:x.b64,mime:'image/jpeg'}})
+  }],function(r){
+    if(!r||!r.ok){ progFail((r&&r.msg)||'보내지 못했어요'); return; }
+    progDone('보냈어요',function(){
+      var m='✅ 문의를 보냈어요'+savedMsg(r);
+      if(r.중복)m+=' (같은 사진 '+r.중복+'장 제외)';
+      toast(m);
+      document.getElementById('iq-text').value='';
+      document.getElementById('iq-n').textContent='0';
+      IQ.shots=[]; renderIqPrev(); loadMyInq();
+    });
+  });
+}
+function loadMyInq(){
+  if(!ST.student)return;
+  call('getMyInquiries',[ST.student.학번],function(r){
+    var box=document.getElementById('iq-list'); if(!box)return;
+    var rows=(r&&r.rows)||[];
+    if(!rows.length){ box.innerHTML='<p class="cap">아직 보낸 문의가 없어요.</p>'; return; }
+    box.innerHTML=rows.map(function(x){
+      return '<div class="iqcard"><div class="top"><span class="ty">'+esc(x.유형)+'</span>'
+        +'<span class="dt">'+esc(x.접수일시)+'</span></div>'
+        +'<div class="msg">'+esc(x.내용)+'</div>'
+        +(x.사진&&x.사진.length?'<p class="cap" style="margin:8px 0 0">📷 사진 '+x.사진.length+'장 보냄</p>':'')
+        +(x.답변
+          ? '<div class="ans"><b>김진호 선생님 · '+esc(x.답변일시)+'</b>'+esc(x.답변)+'</div>'
+          : '<p class="wait">답변을 기다리는 중이에요</p>')
+        +'</div>';
+    }).join('');
+  });
+}
 function showSaved(id,at,just){var el=document.getElementById(id);if(!el||!at)return;
   el.textContent=(just?'✅ 저장됨 · ':'마지막 저장 · ')+at;el.className='savedat'+(just?' just':'');}
 /* 로그인/화면 진입 시 내 마지막 저장시각 복원 */
