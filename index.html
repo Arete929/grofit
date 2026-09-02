@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.62.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.63.0 -->
+<!-- 수정요약: [0.63.0] 2주차 읽을거리 «밥심이 근육이 됩니다» — 탄수화물·단백질. 그림 3장(세 영양소 · 굶었을 때 · 하루 채우기) 추가. -->
 <!-- 수정요약: [0.62.0] ★주차별 읽을거리 — 홈에 «이번 주 읽을거리» 카드, 누르면 전문. 3주차 «근육통은 왜 생길까» 1편 시범.
      글·그림 모두 이 앱을 위해 새로 만든 것(책 본문을 옮긴 것이 아님). 그림은 SVG 라 테마 색을 따라간다. -->
 <!-- 수정요약: [0.58.0] 유산소·근력 인증 화면에 «마지막 업로드 · 날짜 시각» 표시. 저장 직후엔 «✅ 업로드됨»,
@@ -887,8 +888,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.62.0';
-var PWA_BUILD = '2026.09.02 01:20';
+var PWA_VER = '0.63.0';
+var PWA_BUILD = '2026.09.02 01:55';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -1045,7 +1046,108 @@ function figFuel(){
     +'</svg>';
 }
 
+
+/* ── 그림 4. 세 영양소가 하는 일 ── */
+function figMacro(){
+  var rows=[
+    ['탄수화물','몸을 움직이는 연료','밥 · 빵 · 면 · 감자 · 과일','var(--cardio)','var(--cardio-tint)',62],
+    ['단백질','몸을 짓는 재료','고기 · 생선 · 계란 · 두부 · 우유','var(--strength)','var(--strength-tint)',22],
+    ['지방','오래 쓰는 저장 연료','견과 · 기름 · 유제품','var(--muted)','var(--sunk,#eef1ec)',16]
+  ];
+  var h='';
+  rows.forEach(function(r,i){
+    var y=8+i*44;
+    h+='<rect x="0" y="'+y+'" width="300" height="38" rx="9" fill="'+r[4]+'"/>'
+      +'<rect x="0" y="'+y+'" width="'+(r[5]*2.6)+'" height="38" rx="9" fill="'+r[3]+'" opacity=".26"/>'
+      +'<text x="11" y="'+(y+16)+'" font-size="11.5" font-weight="800" fill="'+r[3]+'">'+r[0]+'</text>'
+      +'<text x="11" y="'+(y+29)+'" font-size="8.8" fill="var(--muted2)">'+r[2]+'</text>'
+      +'<text x="289" y="'+(y+17)+'" text-anchor="end" font-size="10" font-weight="700" fill="'+r[3]+'">'+r[1]+'</text>'
+      +'<text x="289" y="'+(y+30)+'" text-anchor="end" font-size="8.5" fill="var(--muted2)">하루 열량의 '+r[5]+'% 쯤</text>';
+  });
+  return '<svg viewBox="0 0 300 140" width="100%" role="img" aria-label="세 영양소가 하는 일">'+h+'</svg>';
+}
+
+/* ── 그림 5. 탄수화물이 모자라면 ── */
+function figSpare(){
+  function lane(y,label,c,ok){
+    return '<text x="0" y="'+(y-8)+'" font-size="9.5" font-weight="800" fill="'+c+'">'+label+'</text>'
+      +'<rect x="0" y="'+y+'" width="300" height="34" rx="9" fill="'+(ok?'var(--primary-tint)':'#fdeee0')+'"/>';
+  }
+  function chip(x,y,t,c,tc){
+    return '<rect x="'+x+'" y="'+(y+6)+'" width="58" height="22" rx="7" fill="'+c+'"/>'
+      +'<text x="'+(x+29)+'" y="'+(y+21)+'" text-anchor="middle" font-size="9.5" font-weight="800" fill="'+tc+'">'+t+'</text>';
+  }
+  function arr(x,y){ return '<text x="'+x+'" y="'+(y+22)+'" font-size="12" fill="var(--muted2)">→</text>'; }
+  var a=26,b=112;
+  return '<svg viewBox="0 0 300 156" width="100%" role="img" aria-label="탄수화물이 단백질을 지켜준다">'
+    + lane(a,'밥을 잘 먹었을 때','var(--primary-dark)',true)
+    + chip(4,a,'탄수화물','var(--cardio)','#fff') + arr(66,a)
+    + chip(84,a,'에너지로','var(--cardio-tint)','var(--cardio)') + arr(146,a)
+    + chip(164,a,'단백질','var(--strength)','#fff') + arr(226,a)
+    + chip(240,a,'근육','var(--primary)','#fff')
+    + lane(b,'밥을 굶었을 때','#c4522f',false)
+    + chip(4,b,'탄수화물 ✗','#e3e7df','var(--muted)') + arr(66,b)
+    + chip(84,b,'단백질','var(--strength)','#fff') + arr(146,b)
+    + chip(164,b,'에너지로','#f3d3c0','#c4522f') + arr(226,b)
+    + chip(240,b,'근육 ↓','#e3e7df','var(--muted)')
+    + '</svg>';
+}
+
+/* ── 그림 6. 하루 단백질 채우기 ── */
+function figPlate(){
+  var it=[['우유 200mL',6],['계란 1개',6],['급식 고기 반찬',18],['두부 반 모',8],['그릭요거트',10]];
+  var sum=0, h='', y=16;
+  it.forEach(function(x,i){
+    var w=x[1]*7.2;
+    h+='<rect x="86" y="'+y+'" width="'+w+'" height="17" rx="5" fill="var(--strength)" opacity="'+(0.42+i*0.12)+'"/>'
+      +'<text x="80" y="'+(y+13)+'" text-anchor="end" font-size="9.5" fill="var(--ink2,#3d4636)">'+x[0]+'</text>'
+      +'<text x="'+(90+w)+'" y="'+(y+13)+'" font-size="9" font-weight="700" fill="var(--strength)">'+x[1]+'g</text>';
+    sum+=x[1]; y+=23;
+  });
+  h+='<line x1="86" y1="'+(y-2)+'" x2="290" y2="'+(y-2)+'" stroke="var(--line)" stroke-width="1"/>'
+    +'<text x="80" y="'+(y+14)+'" text-anchor="end" font-size="10.5" font-weight="800" fill="var(--ink)">하루 합계</text>'
+    +'<text x="90" y="'+(y+14)+'" font-size="11" font-weight="800" fill="var(--primary-dark)">'+sum+'g — 50kg 학생 기준 충분</text>';
+  return '<svg viewBox="0 0 300 '+(y+24)+'" width="100%" role="img" aria-label="하루 단백질 채우기">'+h+'</svg>';
+}
+
 var READINGS = {
+  2: {
+    주차: 2,
+    제목: '밥심이 근육이 됩니다',
+    부제: '운동만 열심히 하고 잘 안 먹으면, 근육은 늘지 않고 오히려 줄어듭니다.',
+    카드부제: '탄수화물과 단백질이 몸에서 각각 무슨 일을 하는지',
+    본문: [
+      {h:'몸은 공사장입니다',
+       p:['근육을 만드는 일은 건물을 짓는 일과 같습니다. <b>벽돌</b>도 있어야 하고, 그 벽돌을 나를 <b>기름</b>도 있어야 합니다.',
+          '<b>단백질이 벽돌</b>이고 <b>탄수화물이 기름</b>입니다. 벽돌만 잔뜩 쌓아둬도 나를 힘이 없으면 건물은 안 올라갑니다.'],
+       fig:figMacro(), cap:'셋 다 필요합니다. 하나를 아예 끊는 식단이 위험한 이유입니다.'},
+      {myth:'«탄수화물이 살찌게 한다»는 반쪽만 맞습니다',
+       p:['많이 먹으면 무엇이든 살이 됩니다. 단백질도 지방도 그렇습니다. '
+         +'문제는 탄수화물 자체가 아니라 <b>필요한 양보다 많이</b> 먹는 것입니다. '
+         +'운동을 하는 사람에게 탄수화물은 <b>줄여야 할 것이 아니라 챙겨야 할 것</b>입니다.']},
+      {h:'굶으면 근육부터 빠집니다',
+       p:['탄수화물을 너무 적게 먹으면 몸은 쓸 연료가 없어집니다. 그러면 <b>단백질을 끌어다 태웁니다</b>. '
+         +'벽돌을 장작으로 써버리는 것입니다.',
+          '그래서 밥을 굶고 운동하면 <b>체중은 줄어도 근육이 같이 빠집니다</b>. '
+         +'거울에 보이는 몸은 오히려 물렁해지고, 조금만 방심하면 금방 되돌아옵니다. '
+         +'<b>탄수화물이 단백질을 지켜 줍니다.</b>'],
+       fig:figSpare(), cap:'위가 밥을 잘 먹었을 때, 아래가 굶었을 때입니다.'},
+      {h:'특히 아침은 거르면 안 됩니다',
+       p:['자는 동안 몸은 계속 에너지를 씁니다. 아침에 일어나면 <b>연료통이 비어 있습니다</b>. '
+         +'그 상태로 등교해서 오전 내내 버티면, 몸은 근육을 태워 뇌에 쓸 포도당을 만듭니다.',
+          '<b>뇌는 탄수화물만 연료로 씁니다.</b> 아침을 거르면 1·2교시에 집중이 안 되는 게 기분 탓이 아닙니다.']},
+      {h:'하루에 얼마나 먹어야 할까',
+       p:['중학생은 <b>몸무게 1kg마다 단백질 1g쯤</b>이 기준입니다. 50kg이면 하루 50g입니다. '
+         +'어렵게 들리지만 <b>급식을 남기지 않으면 거의 채워집니다.</b>'],
+       fig:figPlate(), cap:'따로 단백질 보충제를 사 먹을 필요는 없습니다.'},
+      {h:'운동 앞뒤로는 무엇을 먹을까',
+       p:['<b>운동 전 1~2시간</b> — 밥이나 빵처럼 <b>탄수화물</b> 위주로 가볍게. 배부르게 먹으면 뛰기 힘듭니다.',
+          '<b>운동 후 1~2시간 안</b> — <b>탄수화물 + 단백질</b>을 같이. 우유 한 잔에 바나나 하나면 충분합니다. '
+         +'이때가 몸이 재료를 가장 잘 받아들이는 때입니다.',
+          '<b>물</b>은 운동 전·중·후에 나눠서. 목이 마르다고 느낄 때는 이미 늦은 것입니다.']}
+    ],
+    질문: '이번 주에 아침을 몇 번 먹었나요? 운동한 날과 아침을 먹은 날이 겹쳤을 때, 몸이 어떻게 달랐나요?'
+  },
   3: {
     주차: 3,
     제목: '근육통은 왜 생길까',
