@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.63.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.64.0 -->
+<!-- 수정요약: [0.64.0] 1주차 «준비 운동은 왜 해야 할까»(점성·동적/정적 스트레칭) · 4주차 «완벽하지 않아도 됩니다»
+     (성장의 선순환·체력의 두 갈래). 읽을거리마다 «단단 첵!» OX 퀴즈 3문항 — 누르면 정답과 까닭이 펼쳐진다. -->
 <!-- 수정요약: [0.63.0] 2주차 읽을거리 «밥심이 근육이 됩니다» — 탄수화물·단백질. 그림 3장(세 영양소 · 굶었을 때 · 하루 채우기) 추가. -->
 <!-- 수정요약: [0.62.0] ★주차별 읽을거리 — 홈에 «이번 주 읽을거리» 카드, 누르면 전문. 3주차 «근육통은 왜 생길까» 1편 시범.
      글·그림 모두 이 앱을 위해 새로 만든 것(책 본문을 옮긴 것이 아님). 그림은 SVG 라 테마 색을 따라간다. -->
@@ -339,6 +341,20 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 .rdq{background:var(--primary-tint);border:1px solid var(--primary);border-radius:14px;padding:15px 16px;margin-bottom:12px}
 .rdq b{display:block;font-size:12px;font-weight:800;color:var(--primary-dark);margin-bottom:6px}
 .rdq p{margin:0;font-size:15px;font-weight:700;line-height:1.65;color:var(--ink)}
+.rdox{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:15px 16px;margin-bottom:12px}
+.rdox>b{display:block;font-size:12px;font-weight:800;color:var(--primary-dark);margin-bottom:3px}
+.rdox>.sub{display:block;font-size:12px;color:var(--muted);margin-bottom:12px}
+.oxq{border-top:1px solid var(--line);padding:13px 0 0;margin-top:13px}
+.oxq:first-of-type{border-top:none;padding-top:0;margin-top:0}
+.oxq p{margin:0 0 10px;font-size:14px;line-height:1.65;color:var(--ink)}
+.oxbtns{display:flex;gap:9px}
+.oxbtns button{flex:1;padding:11px 0;border-radius:11px;border:1.5px solid var(--line);background:var(--surface);
+  font-family:inherit;font-size:19px;font-weight:800;color:var(--muted);cursor:pointer}
+.oxbtns button.pick{border-color:var(--primary);background:var(--primary-tint);color:var(--primary-dark)}
+.oxbtns button.wrong{border-color:#e0574a;background:#fdecea;color:#c4522f}
+.oxwhy{margin:10px 0 0;padding:10px 12px;border-radius:10px;background:var(--primary-tint);
+  font-size:13px;line-height:1.65;color:var(--ink2,#3d4636)}
+.oxwhy b{color:var(--primary-dark)}
 .rdmyth{background:#fff4f1;border:1px solid #f0b6a4;border-radius:14px;padding:14px 16px;margin-bottom:12px}
 .rdmyth .x{font-size:12.5px;font-weight:800;color:#c4522f}
 .rdmyth p{margin:6px 0 0;font-size:14px;line-height:1.7;color:var(--ink2,#3d4636)}
@@ -888,8 +904,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.63.0';
-var PWA_BUILD = '2026.09.02 01:55';
+var PWA_VER = '0.64.0';
+var PWA_BUILD = '2026.09.02 02:40';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -1110,7 +1126,161 @@ function figPlate(){
   return '<svg viewBox="0 0 300 '+(y+24)+'" width="100%" role="img" aria-label="하루 단백질 채우기">'+h+'</svg>';
 }
 
+
+/* ── 그림 7. 점성 — 차가운 근육 vs 데운 근육 ── */
+function figVisc(){
+  function side(x,t,s,c,tint,gap){
+    var h='<rect x="'+x+'" y="20" width="132" height="86" rx="12" fill="'+tint+'"/>'
+      +'<text x="'+(x+66)+'" y="39" text-anchor="middle" font-size="11.5" font-weight="800" fill="'+c+'">'+t+'</text>';
+    for(var i=0;i<5;i++){
+      var yy=52+i*11;
+      h+='<line x1="'+(x+18)+'" y1="'+yy+'" x2="'+(x+114)+'" y2="'+yy+'" stroke="'+c+'" stroke-width="3.4" '
+        +'stroke-linecap="round" opacity="'+(gap?0.9:0.45)+'" stroke-dasharray="'+(gap?'96':'8 5')+'"/>';
+    }
+    h+='<text x="'+(x+66)+'" y="120" text-anchor="middle" font-size="9.5" fill="var(--muted2)">'+s+'</text>';
+    return h;
+  }
+  return '<svg viewBox="0 0 300 130" width="100%" role="img" aria-label="준비운동 전후 근육">'
+    + side(6,'준비 운동 전','뻑뻑해서 잘 안 늘어남','#8a7f6e','#efeae0',true)
+    + side(162,'준비 운동 후','부드럽게 잘 늘어남','var(--primary-dark)','var(--primary-tint)',false)
+    + '<text x="150" y="70" text-anchor="middle" font-size="15" fill="var(--muted2)">›</text>'
+    + '</svg>';
+}
+
+/* ── 그림 8. 동적 · 정적 스트레칭 ── */
+function figStretch(){
+  function b(x,t,e,d,f,c,tint){
+    return '<rect x="'+x+'" y="6" width="140" height="112" rx="12" fill="'+tint+'"/>'
+      +'<text x="'+(x+14)+'" y="27" font-size="12.5" font-weight="800" fill="'+c+'">'+t+'</text>'
+      +'<text x="'+(x+14)+'" y="41" font-size="8.5" fill="var(--muted2)">'+e+'</text>'
+      +'<text x="'+(x+14)+'" y="62" font-size="10" fill="var(--ink2,#3d4636)">'+d+'</text>'
+      +'<rect x="'+(x+12)+'" y="76" width="116" height="30" rx="8" fill="'+c+'" opacity=".14"/>'
+      +'<text x="'+(x+70)+'" y="88" text-anchor="middle" font-size="10.5" font-weight="800" fill="'+c+'">'+f+'</text>'
+      +'<text x="'+(x+70)+'" y="100" text-anchor="middle" font-size="8.5" fill="var(--muted2)">모드 전환</text>';
+  }
+  return '<svg viewBox="0 0 300 124" width="100%" role="img" aria-label="동적 스트레칭과 정적 스트레칭">'
+    + b(4,'동적 스트레칭','Dynamic','움직이면서 관절과 근육을','운동 전 · 운동 모드로','var(--cardio)','var(--cardio-tint)')
+    + b(156,'정적 스트레칭','Static','자세를 잡고 근육을 늘려','운동 후 · 회복 모드로','var(--strength)','var(--strength-tint)')
+    + '</svg>';
+}
+
+/* ── 그림 9. 성장의 선순환 ── */
+function figCycle(){
+  var S=[['결심 · 계획','목표를 세운다'],['실천','계획대로 한다'],['장애물 · 실패','부딪히고 넘어진다'],
+         ['수정 · 재도전','고쳐서 다시 한다'],['성장','겪은 만큼 자란다']];
+  var h='', y=8;
+  S.forEach(function(s,i){
+    var last=(i===4);
+    h+='<rect x="34" y="'+y+'" width="242" height="30" rx="9" fill="'+(last?'var(--primary)':'var(--primary-tint)')+'"/>'
+      +'<text x="46" y="'+(y+19)+'" font-size="11.5" font-weight="800" fill="'+(last?'#fff':'var(--primary-dark)')+'">'+s[0]+'</text>'
+      +'<text x="266" y="'+(y+19)+'" text-anchor="end" font-size="9" fill="'+(last?'#fff':'var(--muted2)')+'" opacity=".9">'+s[1]+'</text>';
+    if(!last) h+='<text x="155" y="'+(y+42)+'" text-anchor="middle" font-size="11" fill="var(--muted2)">↓</text>';
+    y+=48;
+  });
+  h+='<path d="M30 '+(y-26)+' L14 '+(y-26)+' L14 22 L30 22" fill="none" stroke="var(--primary)" '
+    +'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+    +'<text x="12" y="'+((y-4)/2)+'" text-anchor="middle" font-size="9" font-weight="700" fill="var(--primary)" '
+    +'transform="rotate(-90 12 '+((y-4)/2)+')">다시</text>';
+  return '<svg viewBox="0 0 300 '+(y-10)+'" width="100%" role="img" aria-label="성장의 선순환">'+h+'</svg>';
+}
+
+/* ── 그림 10. 체력의 두 갈래 ── */
+function figFitKind(){
+  function col(x,t,s,list,c,tint){
+    var h='<rect x="'+x+'" y="6" width="142" height="'+(38+list.length*17)+'" rx="12" fill="'+tint+'"/>'
+      +'<text x="'+(x+71)+'" y="26" text-anchor="middle" font-size="12.5" font-weight="800" fill="'+c+'">'+t+'</text>'
+      +'<text x="'+(x+71)+'" y="38" text-anchor="middle" font-size="8.5" fill="var(--muted2)">'+s+'</text>';
+    list.forEach(function(v,i){
+      h+='<text x="'+(x+71)+'" y="'+(56+i*17)+'" text-anchor="middle" font-size="10.5" fill="var(--ink2,#3d4636)">'+v+'</text>';
+    });
+    return h;
+  }
+  var A=['심폐지구력','근력','근지구력','신체조성','유연성'];
+  var B=['순발력','민첩성','스피드','반응시간','협응성','평형성'];
+  return '<svg viewBox="0 0 300 '+(38+B.length*17+14)+'" width="100%" role="img" aria-label="건강 체력과 운동 체력">'
+    + col(4,'건강 체력','건강하게 사는 데 필요',A,'var(--primary-dark)','var(--primary-tint)')
+    + col(154,'운동 체력','잘 움직이는 데 필요',B,'var(--cardio)','var(--cardio-tint)')
+    + '</svg>';
+}
+
 var READINGS = {
+  1: {
+    주차: 1,
+    제목: '준비 운동은 왜 해야 할까',
+    부제: '몸에는 «안정 모드»와 «운동 모드»가 있습니다. 준비 운동이 그 스위치입니다.',
+    카드부제: '바로 뛰면 왜 다치는지, 스트레칭은 언제 무엇을 하는지',
+    본문: [
+      {h:'몸에도 시동이 필요합니다',
+       p:['가만히 있을 때 우리 몸은 <b>안정 상태</b>입니다. 운동을 시작하면 <b>운동 모드</b>로 바뀌어야 합니다. '
+         +'준비 운동은 그 <b>모드를 바꿔 주는 과정</b>입니다.',
+          '준비가 안 된 몸에 갑자기 강한 자극이 오면 근육과 관절이 <b>버티지 못하고 다칩니다</b>. '
+         +'준비 운동은 몸이 적응할 시간을 벌어 줍니다.']},
+      {h:'근육에는 «끈적함»이 있습니다',
+       p:['근육 · 관절 · 인대 · 힘줄에는 <b>점성</b>이라는 끈적한 성질이 있습니다. '
+         +'차가울수록 뻑뻑해서, 그 상태로 세게 움직이면 <b>저항이 커지고 다칠 위험이 올라갑니다</b>.',
+          '준비 운동을 하면 <b>근육과 관절의 온도가 오르고 피가 잘 돌아</b> 이 끈적함이 줄어듭니다. '
+         +'그러면 근육이 더 쉽게 늘어나고 관절도 부드럽게 움직입니다.'],
+       fig:figVisc(), cap:'준비 운동은 유연성과 반응 속도를 올려 부상 위험을 크게 줄여 줍니다.'},
+      {h:'스트레칭은 두 가지입니다',
+       p:['<b>움직이면서</b> 하는 것과 <b>자세를 잡고 버티는</b> 것이 다릅니다. '
+         +'쓰는 때도 다릅니다 — <b>운동 전에는 동적, 운동 후에는 정적</b>입니다.'],
+       fig:figStretch(), cap:'운동 전에 오래 버티는 정적 스트레칭만 하면 오히려 힘이 덜 나옵니다.'},
+      {h:'스트레칭할 때 잊지 마세요',
+       p:['<b>천천히</b> — 급하게 하거나 반동을 주면 오히려 다칩니다.',
+          '<b>적당한 힘으로</b> — 너무 약해도, 너무 세게 당겨도 안 됩니다. 시원한 정도까지.',
+          '<b>숨을 쉬면서</b> — 참지 말고 내쉬면서 늘리세요. 근육에 산소가 가야 합니다.',
+          '<b>길고 여유롭게</b> — 한 자세를 <b>30초쯤</b> 유지합니다. 2~3초 하고 넘어가면 소용이 없습니다.']}
+    ],
+    퀴즈: [
+      {q:'준비 운동을 하면 근육과 관절의 점성이 줄어든다.', a:true,
+       why:'맞습니다. 온도가 오르고 피가 잘 돌면 끈적함이 줄어 근육이 잘 늘어납니다.'},
+      {q:'정적 스트레칭은 근육을 늘리는 과정이라 반동을 줘야 한다.', a:false,
+       why:'아닙니다. 반동을 주면 오히려 다칩니다. 자세를 잡고 <b>천천히</b> 30초쯤 유지하세요.'},
+      {q:'운동이 끝난 뒤에는 정적 스트레칭이 알맞다.', a:true,
+       why:'맞습니다. 정적 스트레칭은 몸을 <b>회복 모드</b>로 바꿔 줍니다. 운동 전에는 동적 스트레칭입니다.'}
+    ],
+    질문: '이번 주에 준비 운동을 하고 시작한 날과 그냥 시작한 날, 몸이 어떻게 달랐나요?'
+  },
+  4: {
+    주차: 4,
+    제목: '완벽하지 않아도 됩니다',
+    부제: '중요한 것은 완벽한 실천이 아니라 멈추지 않는 것입니다.',
+    카드부제: '작심삼일을 겪고도 계속하는 사람이 결국 달라집니다',
+    본문: [
+      {h:'작심삼일도 괜찮습니다',
+       p:['운동을 하겠다고 마음먹은 지 얼마 안 되어 책상 앞에만 앉아 있는 자신을 발견합니다. '
+         +'누구나 그렇습니다. <b>중요한 것은 멈추지 않는 것</b>입니다.',
+          '실패했다면 처음으로 돌아가 보세요. <b>강도가 너무 셌던 건 아닌지</b>, '
+         +'<b>무엇이 방해였는지</b> 확인하고, 쉬운 것부터 다시 시작하면 됩니다.']},
+      {h:'실패는 고리의 한 칸입니다',
+       p:['성장은 곧게 올라가지 않습니다. <b>계획 → 실천 → 실패 → 수정 → 성장</b>이 돌고 도는 고리입니다. '
+         +'실패가 빠지면 수정할 것도 없고, 수정이 없으면 성장도 없습니다.'],
+       fig:figCycle(), cap:'실패한 자리에서 멈추면 고리가 끊어집니다. 한 칸만 더 가면 됩니다.'},
+      {h:'4주 동안 무엇이 자랐을까',
+       p:['체력은 두 갈래입니다. 여러분이 4주 동안 키운 것은 대부분 <b>건강 체력</b>입니다. '
+         +'오래 뛰는 힘, 무게를 드는 힘, 몸의 구성, 몸이 접히는 정도.'],
+       fig:figFitKind(), cap:'체력측정에서 잰 악력 · 팔굽혀펴기 · 앞으로굽히기 · 인바디가 모두 왼쪽입니다.'},
+      {h:'몸만 자란 게 아닙니다',
+       p:['<b>몸으로는</b> — 체력이 늘고, 체중과 체성분이 달라지고, 잔병치레가 줄어듭니다.',
+          '<b>마음으로는</b> — 기분이 안정되고, 스트레스가 풀리고, <b>집중력과 자존감</b>이 올라갑니다.',
+          '<b>사람들 사이에서는</b> — 같이 운동하면 말이 트이고, 관계가 편해집니다. '
+         +'이번 4주에 친구와 함께 뛴 날이 있었다면 그것도 남은 것입니다.']},
+      {h:'4주가 끝이 아닙니다',
+       p:['이 4주는 <b>수행평가라서 한 것</b>이었을 수 있습니다. 그래도 괜찮습니다. '
+         +'중요한 건 <b>해 봤다는 것</b>입니다. 이제 여러분은 자기 몸이 어떻게 반응하는지 압니다.',
+          '<b>주 4일이 부담되면 주 2일로 줄여서라도 이어가세요.</b> '
+         +'완벽하게 하다 그만두는 것보다, 조금씩 오래 하는 편이 훨씬 낫습니다.']}
+    ],
+    퀴즈: [
+      {q:'순발력 · 민첩성 · 스피드 · 협응성은 건강 체력으로 분류한다.', a:false,
+       why:'아닙니다. 이것들은 <b>운동 체력</b>입니다. 건강 체력은 심폐지구력 · 근력 · 근지구력 · 신체조성 · 유연성입니다.'},
+      {q:'운동을 하면 스트레스가 줄고 집중력과 자존감이 올라간다.', a:true,
+       why:'맞습니다. 운동의 효과는 몸에만 오지 않습니다. <b>정신적 효과</b>도 분명합니다.'},
+      {q:'한 번 계획이 무너지면 그 계획은 실패한 것이므로 새로 세워야 한다.', a:false,
+       why:'아닙니다. 실패는 <b>수정하고 다시 도전하는 고리의 한 칸</b>입니다. 무엇이 어려웠는지 고쳐서 이어가면 됩니다.'}
+    ],
+    질문: '4주 동안 가장 하기 싫었던 날은 언제였나요? 그날 무엇이 나를 다시 움직이게 했나요?'
+  },
   2: {
     주차: 2,
     제목: '밥심이 근육이 됩니다',
@@ -1223,11 +1393,36 @@ function renderReading(){
        + (s.cap ? '<p class="figcap">' + esc(s.cap) + '</p>' : '')
        + '</div>';
   });
+  if(r.퀴즈 && r.퀴즈.length){
+    h += '<div class="rdox"><b>단단 첵!</b><span class="sub">○ 인지 × 인지 눌러 보세요</span>';
+    r.퀴즈.forEach(function(q,i){
+      h += '<div class="oxq"><p>' + esc(q.q) + '</p>'
+         + '<div class="oxbtns" id="ox-' + i + '">'
+         + '<button onclick="oxPick(' + i + ',true)">○</button>'
+         + '<button onclick="oxPick(' + i + ',false)">×</button></div>'
+         + '<div class="oxwhy" id="oxw-' + i + '" hidden></div></div>';
+    });
+    h += '</div>';
+  }
   h += '<div class="rdq"><b>이번 주 성찰에 써 보세요</b><p>' + esc(r.질문) + '</p></div>';
   document.getElementById('rv-body').innerHTML = h;
   var at = readDone(r);
   document.getElementById('rv-done').textContent = at ? '다 읽었어요 ✓' : '읽었어요';
   showUp('rv-stamp', at, false);
+}
+/* OX 퀴즈 — 누르면 정답과 까닭을 보여준다 */
+function oxPick(i, pick){
+  var r = curReading(), q = (r.퀴즈||[])[i];
+  if(!q) return;
+  var box = document.getElementById('ox-' + i);
+  var b = box.querySelectorAll('button');
+  var right = (pick === q.a);
+  b[0].className = ''; b[1].className = '';
+  b[pick ? 0 : 1].className = right ? 'pick' : 'wrong';
+  if(!right) b[q.a ? 0 : 1].className = 'pick';       // 정답도 같이 알려준다
+  var w = document.getElementById('oxw-' + i);
+  w.innerHTML = (right ? '<b>맞았어요.</b> ' : '<b>아쉬워요.</b> ') + q.why;
+  w.hidden = false;
 }
 function markRead(){
   var r = curReading();
