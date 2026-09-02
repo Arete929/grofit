@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.58.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.62.0 -->
+<!-- 수정요약: [0.62.0] ★주차별 읽을거리 — 홈에 «이번 주 읽을거리» 카드, 누르면 전문. 3주차 «근육통은 왜 생길까» 1편 시범.
+     글·그림 모두 이 앱을 위해 새로 만든 것(책 본문을 옮긴 것이 아님). 그림은 SVG 라 테마 색을 따라간다. -->
 <!-- 수정요약: [0.58.0] 유산소·근력 인증 화면에 «마지막 업로드 · 날짜 시각» 표시. 저장 직후엔 «✅ 업로드됨»,
      다시 들어오면 시트의 마지막 입력시각을 불러와 그대로 보인다. -->
 <!-- 수정요약: [0.57.0] ★문의하기 — 공지 탭에서 들어간다. 유형 고르고 내용 쓰고 사진 최대 5장(같은 사진은 자동 제외).
@@ -310,6 +312,35 @@ input,textarea,select{width:100%;font-family:inherit;font-size:16px;border:1.5px
 input:focus,textarea:focus{border-color:var(--primary)}
 label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0 6px}
 .field{margin-bottom:14px}
+.rdcard{display:block;width:100%;text-align:left;border:none;font-family:inherit;cursor:pointer;
+  background:linear-gradient(135deg,var(--primary-tint) 0%,var(--surface) 78%);
+  border:1px solid var(--primary);border-radius:16px;padding:15px 16px;margin-bottom:14px}
+.rdcard .rd-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.04em;
+  padding:3px 9px;border-radius:999px;background:var(--primary);color:#fff}
+.rdcard b{display:block;font-size:17px;font-weight:800;color:var(--ink);margin:9px 0 3px;line-height:1.35}
+.rdcard .rd-sub{display:block;font-size:12.5px;color:var(--muted);line-height:1.5}
+.rdcard .rd-go{display:block;margin-top:9px;font-size:12.5px;font-weight:800;color:var(--primary-dark)}
+.rdcard.done{background:var(--surface);border-color:var(--line)}
+.rdcard.done .rd-tag{background:var(--line2,#dfe4da);color:var(--muted)}
+
+.rd-head{margin:2px 4px 16px}
+.rd-w{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.05em;
+  padding:3px 10px;border-radius:999px;background:var(--primary);color:#fff}
+.rd-head h1{margin:10px 0 6px;font-size:24px;line-height:1.32;letter-spacing:-.02em}
+.rd-lead{margin:0;font-size:14px;line-height:1.7;color:var(--muted)}
+.rdsec{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:15px 16px;margin-bottom:12px}
+.rdsec h3{margin:0 0 8px;font-size:16px;font-weight:800;color:var(--ink);letter-spacing:-.01em}
+.rdsec p{margin:0 0 9px;font-size:14px;line-height:1.75;color:var(--ink2,#3d4636)}
+.rdsec p:last-child{margin-bottom:0}
+.rdsec b{color:var(--primary-dark);font-weight:800}
+.rdsec .fig{margin:12px -4px 4px}
+.rdsec .figcap{margin:6px 2px 0;font-size:11.5px;color:var(--muted2);line-height:1.5}
+.rdq{background:var(--primary-tint);border:1px solid var(--primary);border-radius:14px;padding:15px 16px;margin-bottom:12px}
+.rdq b{display:block;font-size:12px;font-weight:800;color:var(--primary-dark);margin-bottom:6px}
+.rdq p{margin:0;font-size:15px;font-weight:700;line-height:1.65;color:var(--ink)}
+.rdmyth{background:#fff4f1;border:1px solid #f0b6a4;border-radius:14px;padding:14px 16px;margin-bottom:12px}
+.rdmyth .x{font-size:12.5px;font-weight:800;color:#c4522f}
+.rdmyth p{margin:6px 0 0;font-size:14px;line-height:1.7;color:var(--ink2,#3d4636)}
 .iqgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
 .iqgrid figure{position:relative;margin:0}
 .iqgrid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;display:block;background:#eef1ec}
@@ -488,6 +519,12 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
         </div>
       </div>
     </div>
+    <button class="rdcard" id="rd-card" onclick="go('read')">
+      <span class="rd-tag" id="rd-tag">이번 주 읽을거리</span>
+      <b id="rd-title">—</b>
+      <span class="rd-sub" id="rd-sub"></span>
+      <span class="rd-go">읽어보기 ›</span>
+    </button>
     <div class="card">
       <h2>4주 도장판 <span id="cal-month" style="color:var(--muted);font-size:13px;font-weight:600"></span></h2>
       <div id="wk-banner"></div>
@@ -747,6 +784,19 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
     <div id="nt-list"></div>
   </section>
 
+  <!-- 주차별 읽을거리 -->
+  <section id="s-read" class="scr">
+    <div class="rd-head">
+      <span class="rd-w" id="rv-week">3주차 읽을거리</span>
+      <h1 id="rv-title">—</h1>
+      <p class="rd-lead" id="rv-lead"></p>
+    </div>
+    <div id="rv-body"></div>
+    <button class="btn" id="rv-done" onclick="markRead()">읽었어요</button>
+    <button class="btn sec" style="margin-top:8px" onclick="go('home')">홈으로</button>
+    <p class="savedat" id="rv-stamp"></p>
+  </section>
+
   <!-- 문의하기 -->
   <section id="s-inquiry" class="scr">
     <h1 style="margin-bottom:4px">문의하기</h1>
@@ -837,8 +887,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.58.0';
-var PWA_BUILD = '2026.08.30 23:40';
+var PWA_VER = '0.62.0';
+var PWA_BUILD = '2026.09.02 01:20';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -928,9 +978,169 @@ function go(name){
   if(name==='score') loadScore();
   if(name==='notice') loadNoticesStudent();
   if(name==='inquiry'){ renderIqType(); renderIqPrev(); loadMyInq(); }
+  if(name==='read') renderReading();
   window.scrollTo(0,0);
 }
 function savedMsg(r){return (r&&r.savedAt)?(' · '+r.savedAt):'';}
+
+
+/* ═══════ 주차별 읽을거리 ═══════
+   글과 그림은 이 앱을 위해 새로 썼습니다(책 본문을 옮긴 것이 아닙니다). */
+
+/* ── 그림 1. 근육통 타임라인 ── */
+function figTimeline(){
+  var S=['운동 직후','12시간','24~48시간','3~5일'];
+  var D=['아직 안 아픔','슬슬 뻐근','가장 아픔','거의 가라앉음'];
+  var H=[14,42,70,26];
+  var w=300,h=132,x0=22,gap=(w-x0-16)/4;
+  var bars='',labs='';
+  for(var i=0;i<4;i++){
+    var x=x0+i*gap+6, bw=gap-16, y=96-H[i];
+    var on=(i===2);
+    bars+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+H[i]+'" rx="4" '
+        +'fill="'+(on?'var(--strength)':'var(--primary)')+'" opacity="'+(on?1:0.42)+'"/>';
+    labs+='<text x="'+(x+bw/2)+'" y="110" text-anchor="middle" font-size="9.5" font-weight="700" '
+        +'fill="'+(on?'var(--strength)':'var(--muted)')+'">'+S[i]+'</text>'
+        +'<text x="'+(x+bw/2)+'" y="122" text-anchor="middle" font-size="8.5" fill="var(--muted2)">'+D[i]+'</text>';
+  }
+  return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" role="img" aria-label="근육통 타임라인">'
+    +'<line x1="'+x0+'" y1="96" x2="'+(w-10)+'" y2="96" stroke="var(--line)" stroke-width="1.2"/>'
+    +'<text x="4" y="30" font-size="9" fill="var(--muted2)">아픔</text>'
+    +bars+labs+'</svg>';
+}
+
+/* ── 그림 2. 초과회복 곡선 ── */
+function figSuper(){
+  return '<svg viewBox="0 0 300 140" width="100%" role="img" aria-label="쉬는 동안 더 강해진다">'
+    +'<line x1="16" y1="118" x2="292" y2="118" stroke="var(--line)" stroke-width="1.2"/>'
+    +'<line x1="16" y1="14" x2="16" y2="118" stroke="var(--line)" stroke-width="1.2"/>'
+    +'<line x1="16" y1="74" x2="292" y2="74" stroke="var(--line2,#dfe4da)" stroke-width="1" stroke-dasharray="3 4"/>'
+    +'<text x="20" y="70" font-size="8.5" fill="var(--muted2)">원래 수준</text>'
+    +'<path d="M16 74 L74 104 C120 104 138 60 196 52 C240 46 262 60 292 66" fill="none" '
+      +'stroke="var(--primary)" stroke-width="2.6" stroke-linecap="round"/>'
+    +'<circle cx="74" cy="104" r="4" fill="var(--strength)"/>'
+    +'<circle cx="196" cy="52" r="4.5" fill="var(--primary)"/>'
+    +'<text x="46" y="122" font-size="9" font-weight="700" fill="var(--strength)">운동</text>'
+    +'<text x="60" y="132" font-size="8.5" fill="var(--muted2)">근육이 살짝 상함</text>'
+    +'<text x="176" y="42" font-size="9" font-weight="700" fill="var(--primary)">쉬는 동안</text>'
+    +'<text x="150" y="32" font-size="8.5" fill="var(--muted2)">전보다 더 강해짐</text>'
+    +'</svg>';
+}
+
+/* ── 그림 3. 탄수화물이 단백질을 지킨다 ── */
+function figFuel(){
+  function box(x,t,s,c,tc){
+    return '<rect x="'+x+'" y="26" width="82" height="54" rx="10" fill="'+c+'"/>'
+      +'<text x="'+(x+41)+'" y="48" text-anchor="middle" font-size="11.5" font-weight="800" fill="'+tc+'">'+t+'</text>'
+      +'<text x="'+(x+41)+'" y="64" text-anchor="middle" font-size="8.5" fill="'+tc+'" opacity=".85">'+s+'</text>';
+  }
+  return '<svg viewBox="0 0 300 116" width="100%" role="img" aria-label="탄수화물과 단백질의 역할">'
+    +box(10,'탄수화물','몸을 움직이는 연료','var(--cardio-tint)','var(--cardio)')
+    +box(109,'단백질','근육을 다시 짓는 재료','var(--strength-tint)','var(--strength)')
+    +box(208,'쉬는 날','실제로 자라는 시간','var(--primary-tint)','var(--primary-dark)')
+    +'<text x="98" y="58" text-anchor="middle" font-size="15" fill="var(--muted2)">+</text>'
+    +'<text x="197" y="58" text-anchor="middle" font-size="15" fill="var(--muted2)">+</text>'
+    +'<text x="150" y="100" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--ink)">'
+    +'셋 중 하나만 빠져도 근육은 자라지 않습니다</text>'
+    +'</svg>';
+}
+
+var READINGS = {
+  3: {
+    주차: 3,
+    제목: '근육통은 왜 생길까',
+    부제: '아픈 건 망가진 게 아니라 자라는 중이라는 뜻입니다. 다만 그냥 두면 자라지 않습니다.',
+    카드부제: '운동 다음 날 뻐근한 이유와, 그때 무엇을 먹어야 하는지',
+    본문: [
+      {h:'왜 다음 날 더 아플까',
+       p:['운동한 날 저녁에는 멀쩡하다가, 다음 날 아침에 계단을 내려가면서 «아!» 하게 됩니다. '
+         +'이걸 <b>지연성 근육통</b>이라고 합니다. 운동하고 <b>12시간쯤 지나 시작</b>해서 '
+         +'<b>24~48시간에 가장 아프고</b>, 3~5일이면 대개 가라앉습니다.'],
+       fig:figTimeline(), cap:'그래서 «오늘 안 아프네?» 하고 다음 날 방심하면 안 됩니다.'},
+      {myth:'젖산 때문이 아닙니다',
+       p:['흔히 «젖산이 쌓여서 아프다»고 하는데, 젖산은 운동이 끝나고 <b>한 시간이면 거의 사라집니다</b>. '
+         +'하루 뒤에 아픈 건 젖산이 아니라 <b>근육 섬유에 생긴 아주 작은 상처</b> 때문입니다.']},
+      {h:'상처가 나야 자랍니다',
+       p:['근육은 운동할 때 미세하게 찢어집니다. 몸은 그 자리를 메우면서 <b>전보다 조금 더 굵고 강하게</b> 다시 붙입니다. '
+         +'중요한 건 <b>이 일이 운동하는 중에 일어나지 않는다</b>는 것입니다. '
+         +'<b>쉬는 동안</b>, 특히 <b>자는 동안</b> 일어납니다.'],
+       fig:figSuper(), cap:'매일 몰아서 하면 회복할 틈이 없어 이 곡선이 올라가지 못합니다. 하루 걸러 하라는 이유가 이것입니다.'},
+      {h:'그때 무엇을 먹어야 할까',
+       p:['근육을 다시 짓는 재료가 <b>단백질</b>입니다. 벽돌이라고 생각하면 됩니다. '
+         +'그런데 벽돌만 있으면 안 됩니다. <b>탄수화물</b>이 함께 있어야 합니다.',
+         '탄수화물을 너무 적게 먹으면 몸은 쓸 에너지가 없어서 <b>단백질을 태워 에너지로 씁니다</b>. '
+         +'벽돌을 장작으로 써버리는 셈입니다. 그래서 «살 빼려고 밥을 굶으면 근육부터 빠진다»는 말이 나옵니다. '
+         +'<b>탄수화물이 단백질을 지켜 줍니다.</b>'],
+       fig:figFuel(), cap:'운동 · 단백질 · 휴식 — 셋이 한 묶음입니다.'},
+      {h:'얼마나 먹어야 할까',
+       p:['중학생은 하루에 <b>몸무게 1kg마다 단백질 1g쯤</b>이 기준입니다. 50kg이면 하루 50g 정도입니다.',
+         '계란 1개 6g · 우유 200mL 6g · 두부 반 모 8g · 닭가슴살 100g 23g · 그릭요거트 하나 10g. '
+         + '<b>한 번에 몰아 먹는 것보다 끼니마다 나눠 먹는 편</b>이 몸이 더 잘 씁니다. '
+         + '급식을 남기지 않는 것이 사실 가장 쉬운 방법입니다.']},
+      {h:'아플 때는 쉬어야 할까',
+       p:['<b>완전히 눕는 것보다 가볍게 움직이는 편이 회복이 빠릅니다.</b> '
+         +'걷기나 가벼운 스트레칭처럼 숨이 차지 않을 정도면 됩니다. 피가 잘 돌면 회복도 빨라집니다.',
+         '다만 <b>한 곳이 콕콕 쑤시거나, 붓거나, 움직일 때 «뚝» 소리가 나면</b> 근육통이 아닐 수 있습니다. '
+         +'그럴 때는 참지 말고 김진호 선생님께 말해 주세요.']}
+    ],
+    질문: '이번 주에 근육통이 가장 심했던 날은 언제였나요? 그날 무엇을 먹었고, 다음 날 어떻게 회복했나요?'
+  }
+};
+
+function curReading(){
+  var w = (ST.home && ST.home.현재주차) || 1;
+  return READINGS[w] || READINGS[3];      /* 아직 안 만든 주차는 3주차 편을 보여준다 */
+}
+function readKey(r){ return 'grofit_read_' + r.주차; }
+function readDone(r){ try{ return localStorage.getItem(readKey(r)) || ''; }catch(e){ return ''; } }
+
+function renderReadCard(){
+  var r = curReading(), c = document.getElementById('rd-card');
+  if(!c) return;
+  var at = readDone(r);
+  document.getElementById('rd-tag').textContent = at ? '읽음 · ' + r.주차 + '주차' : r.주차 + '주차 읽을거리';
+  document.getElementById('rd-title').textContent = r.제목;
+  document.getElementById('rd-sub').textContent = r.카드부제;
+  c.classList.toggle('done', !!at);
+}
+function renderReading(){
+  var r = curReading();
+  document.getElementById('rv-week').textContent = r.주차 + '주차 읽을거리';
+  document.getElementById('rv-title').textContent = r.제목;
+  document.getElementById('rv-lead').textContent = r.부제;
+  var h = '';
+  r.본문.forEach(function(s){
+    if(s.myth){
+      h += '<div class="rdmyth"><span class="x">✗ ' + esc(s.myth) + '</span>'
+         + s.p.map(function(t){ return '<p>' + t + '</p>'; }).join('') + '</div>';
+      return;
+    }
+    h += '<div class="rdsec"><h3>' + esc(s.h) + '</h3>'
+       + s.p.map(function(t){ return '<p>' + t + '</p>'; }).join('')
+       + (s.fig ? '<div class="fig">' + s.fig + '</div>' : '')
+       + (s.cap ? '<p class="figcap">' + esc(s.cap) + '</p>' : '')
+       + '</div>';
+  });
+  h += '<div class="rdq"><b>이번 주 성찰에 써 보세요</b><p>' + esc(r.질문) + '</p></div>';
+  document.getElementById('rv-body').innerHTML = h;
+  var at = readDone(r);
+  document.getElementById('rv-done').textContent = at ? '다 읽었어요 ✓' : '읽었어요';
+  showUp('rv-stamp', at, false);
+}
+function markRead(){
+  var r = curReading();
+  var at = nowStamp();
+  try{ localStorage.setItem(readKey(r), at); }catch(e){}
+  showUp('rv-stamp', at, true);
+  document.getElementById('rv-done').textContent = '다 읽었어요 ✓';
+  renderReadCard();
+  toast('✅ 읽음 표시했어요 — 성찰 쓸 때 참고하세요');
+}
+function nowStamp(){
+  var d = new Date(), z = function(n){ return (n<10?'0':'') + n; };
+  return d.getFullYear() + '.' + z(d.getMonth()+1) + '.' + z(d.getDate())
+       + ' ' + z(d.getHours()) + ':' + z(d.getMinutes()) + ':' + z(d.getSeconds());
+}
 
 /* ═══════ 문의하기 ═══════ */
 var IQ_TYPES=['인증이 안 돼요','기록이 잘못됐어요','앱이 이상해요','평가·점수','기타'];
@@ -1097,6 +1307,7 @@ function loadHome(){
     ST.home=h; ST.myRecords=null; ST.calDay=null;
     document.getElementById('cal-detail').classList.remove('open');
     renderCal(h);
+    renderReadCard();
     checkNotices();          // 안 읽은 공지가 있으면 팝업
     var hv=document.getElementById('home-ver');
     if(hv)hv.textContent=verLine();
