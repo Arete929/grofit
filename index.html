@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.65.2 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.66.0 -->
+<!--   [0.66.0] WHR 입력 방식 선택 — «둘레로 계산»(허리·엉덩이) / «WHR 값 직접»(인바디 결과지 값) 토글. 직접 모드로 저장하면 둘레는 비우고 WHR만 보낸다(서버 calcWhr_ 이 직접값을 받음). 불러올 때 둘레 없이 WHR만 있으면 직접 모드로 열린다.
+        체력 «변화 그래프»가 바로 뜬다 — 이미 받아 둔 기록으로 즉시 그리고 서버 재조회는 뒤에서 조용히. 저장 직후에는 방금 입력값(최고기록·BMI·WHR 계산 포함)을 로컬에 먼저 반영해 3초 기다림 없이 그래프에 나온다. -->
 <!-- 수정요약: [0.65.2] 설치 아이콘 로고 확대 — any·애플용 88%, maskable 76%(안전영역 고려). 여섯 테마를 어두운 쌍(1·3·5)의
      로고 알파에서 다시 칠해 배경 얼룩(테마2·4·6)과 치우침 제거. 여섯 개 모양·크기 동일. -->
 <!-- 수정요약: [0.65.1] 설치 아이콘(any·애플용 512/192/180) 재생성 — 모서리 투명·반투명 밝은 테두리·로고 치우침 제거.
@@ -734,10 +736,15 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       <div class="field"><label>내장비만 (level)</label><input class="fi" id="f-visc" inputmode="decimal"></div>
       <div class="jr" id="j-visc"></div>
       <label>W.H.R. — 허리 ÷ 엉덩이 둘레</label>
-      <div class="grid2">
+      <div class="chiprow" id="whr-mode" style="margin-bottom:8px">
+        <button type="button" class="dbtn on" id="whr-m0" onclick="setWhrMode(0)">둘레로 계산</button>
+        <button type="button" class="dbtn" id="whr-m1" onclick="setWhrMode(1)">WHR 값 직접</button>
+      </div>
+      <div class="grid2" id="whr-box0">
         <div class="field"><input class="fi" id="f-waist" inputmode="decimal" placeholder="허리 cm"></div>
         <div class="field"><input class="fi" id="f-hip" inputmode="decimal" placeholder="엉덩이 cm"></div>
       </div>
+      <div class="field hidden" id="whr-box1"><input class="fi" id="f-whr" inputmode="decimal" placeholder="인바디 결과지의 WHR (예: 0.82)"></div>
       <div class="jr" id="j-whr"></div>
     </div>
 
@@ -910,7 +917,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.65.2';
+var PWA_VER = '0.66.0';
 var PWA_BUILD = '2026.09.03 23:42';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
@@ -2154,7 +2161,7 @@ function judgeNow(){
   setJr('j-muscle',mj?jrHtml(mj.라벨,DIAG_TONE[mj.라벨],'표준 '+mj.범위+(mj.근사?' ※기준표에 없는 신장이라 가장 가까운 구간('+mj.구간+') 적용':'')):'');
   var vd=diagOf('내장비만',nz('f-visc'));
   setJr('j-visc',vd?jrHtml(vd,DIAG_TONE[vd],'인바디 기준 · 10 미만 권장'):'');
-  var whr=calcWhr(nz('f-waist'),nz('f-hip'));
+  var whr=(WHR_MODE===1)?nz('f-whr'):calcWhr(nz('f-waist'),nz('f-hip'));   // [0.66.0]
   if(whr!==null){var wd=diagOf('WHR',whr);setJr('j-whr',jrHtml('WHR '+whr,DIAG_TONE[wd],wd));}
   else setJr('j-whr','');
 }
@@ -2170,13 +2177,26 @@ function selFitRound(r){ST.fitRound=r;renderFitRounds();fillFitForm();}
 var FIT_FIELDS=[['f-gripL','악력_왼손'],['f-gripR','악력_오른손'],['f-push','팔굽혀펴기'],['f-squat','앉았다일어나기'],
   ['f-flex1','앞으로굽히기_1차'],['f-flex2','앞으로굽히기_2차'],['f-back1','뒤로젖히기_1차'],['f-back2','뒤로젖히기_2차'],
   ['f-height','신장'],['f-weight','체중'],['f-fat','체지방률'],['f-muscle','골격근량'],['f-visc','내장비만'],
-  ['f-waist','허리둘레'],['f-hip','엉덩이둘레']];
+  ['f-waist','허리둘레'],['f-hip','엉덩이둘레'],['f-whr','WHR']];
+/* [0.66.0] WHR 입력 방식 — 0: 둘레로 계산, 1: 값 직접 */
+var WHR_MODE=0;
+function setWhrMode(m){
+  WHR_MODE=m;
+  document.getElementById('whr-m0').classList.toggle('on',m===0);
+  document.getElementById('whr-m1').classList.toggle('on',m===1);
+  document.getElementById('whr-box0').classList.toggle('hidden',m!==0);
+  document.getElementById('whr-box1').classList.toggle('hidden',m!==1);
+  judgeNow();
+}
 /* 선택 회차에 저장된 값이 있으면 불러와 채움(수정 가능) */
 function fillFitForm(){
   var rec=null;(ST.fitness||[]).forEach(function(x){if(x.회차===ST.fitRound)rec=x;});
   FIT_FIELDS.forEach(function(p){var el=document.getElementById(p[0]);
     if(el)el.value=(rec&&rec.있음&&rec[p[1]]!==''&&rec[p[1]]!==undefined)?rec[p[1]]:'';});
-  judgeNow();
+  /* [0.66.0] 둘레 없이 WHR 값만 저장돼 있으면 «값 직접» 모드로 열어 준다 */
+  var hasV=function(v){return v!==''&&v!==undefined&&v!==null;};
+  var direct=!!(rec&&rec.있음&&hasV(rec.WHR)&&!hasV(rec.허리둘레)&&!hasV(rec.엉덩이둘레));
+  setWhrMode(direct?1:0);
 }
 function loadFitness(cb){
   call('getFitness',[ST.student.학번],function(r){
@@ -2194,12 +2214,30 @@ function saveFitness(){
   if(!ST.fitRound){toast('측정 회차를 선택하세요');return;}
   var p={회차:ST.fitRound};
   FIT_FIELDS.forEach(function(f){p[f[1]]=val(f[0]);});
+  if(WHR_MODE===1){p.허리둘레='';p.엉덩이둘레='';}else{p.WHR='';}   // [0.66.0] 고른 방식의 값만 보낸다
   call('submitFitness',[ST.student.학번,p],function(r){
     if(r&&r.ok===false){toast(r.msg||'저장 실패');return;}
     toast('✅ '+ST.fitRound+' 저장'+savedMsg(r));
     showSaved('saved-fitness',r&&r.savedAt,true);
-    loadFitness();
+    mergeFitLocal(p);          // [0.66.0] 그래프가 바로 보이도록 방금 값을 먼저 반영
+    renderFitRounds();
+    ST.fitDirty=true;          // 서버 판정으로 다시 맞추기 (그래프 화면에서 뒤에서 조회)
+    loadFitness(function(){ST.fitDirty=false;});
   });
+}
+/* [0.66.0] 방금 저장한 입력값을 ST.fitness 에 끼워 넣는다 — 서버가 계산해 주는 판정(최고기록·BMI·WHR)도 같은 식으로 미리 계산 */
+function mergeFitLocal(p){
+  var num=function(v){v=(v===undefined||v===null)?'':String(v).trim();if(v==='')return null;var n=Number(v);return isNaN(n)?null:n;};
+  var mx=function(a,b){a=num(a);b=num(b);if(a===null&&b===null)return '';return Math.max(a===null?-999:a,b===null?-999:b);};
+  var rec={회차:ST.fitRound,있음:true};
+  FIT_FIELDS.forEach(function(f){rec[f[1]]=p[f[1]];});
+  var bmi=calcBmi(num(p.신장),num(p.체중)),whr=(WHR_MODE===1)?num(p.WHR):calcWhr(num(p.허리둘레),num(p.엉덩이둘레));
+  rec.판정={악력최고:mx(p.악력_왼손,p.악력_오른손),앞으로굽히기최고:mx(p.앞으로굽히기_1차,p.앞으로굽히기_2차),
+    뒤로젖히기최고:mx(p.뒤로젖히기_1차,p.뒤로젖히기_2차),BMI:bmi===null?'':bmi,WHR:whr===null?'':whr};
+  var list=ST.fitness||[],hit=false;
+  list=list.map(function(x){if(x.회차===rec.회차){hit=true;return rec;}return x;});
+  if(!hit)list.push(rec);
+  ST.fitness=list;
 }
 
 /* ---------- 체력 변화 그래프 (측정요소별 꺾은선 전부 표시) ---------- */
@@ -2223,7 +2261,16 @@ function fitVal(rec,k){
   if(v===''||v===null||v===undefined)return null;
   v=Number(v);return isNaN(v)?null:v;
 }
-function loadFitChart(){ loadFitness(function(){renderAllCharts();renderFitTable();}); }
+function loadFitChart(){
+  /* [0.66.0] 받아 둔 기록이 있으면 기다리지 않고 바로 그린다. 서버 재조회는 처음이거나 저장 직후에만, 그것도 뒤에서. */
+  var have=(ST.fitness||[]).some(function(x){return x.있음;});
+  if(have){renderAllCharts();renderFitTable();}
+  else document.getElementById('fit-charts').innerHTML='<div class="card"><p class="muted" style="text-align:center;padding:26px 0">기록을 불러오는 중…</p></div>';
+  if(!have||ST.fitDirty){
+    loadFitness(function(){ST.fitDirty=false;
+      if(document.getElementById('s-inbody-graph').classList.contains('on')){renderAllCharts();renderFitTable();}});
+  }
+}
 
 /* 측정요소별 꺾은선 그래프를 전부 세로로 쌓아서 보여준다 */
 function renderAllCharts(){
