@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.64.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.65.0 -->
+<!-- 수정요약: [0.65.0] ★로그인·부팅 속도 — GAS 왕복이 한 번에 3초대라 6번 부르면 20초가 넘었다.
+     studentBoot / studentBundle 한 번으로 설정·홈·공지·저장시각을 모두 받는다. 자동 로그인은 화면부터 먼저 띄운다. -->
 <!-- 수정요약: [0.64.0] 1주차 «준비 운동은 왜 해야 할까»(점성·동적/정적 스트레칭) · 4주차 «완벽하지 않아도 됩니다»
      (성장의 선순환·체력의 두 갈래). 읽을거리마다 «단단 첵!» OX 퀴즈 3문항 — 누르면 정답과 까닭이 펼쳐진다. -->
 <!-- 수정요약: [0.63.0] 2주차 읽을거리 «밥심이 근육이 됩니다» — 탄수화물·단백질. 그림 3장(세 영양소 · 굶었을 때 · 하루 채우기) 추가. -->
@@ -500,7 +502,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
     <div class="card">
       <div class="field"><label>학번</label><input id="in-sid" inputmode="numeric" placeholder="예: 3277"></div>
       <div class="field"><label>학생코드</label><input id="in-pin" placeholder="예: A001"></div>
-      <button class="btn" onclick="doLogin()">로그인</button>
+      <button class="btn" id="btn-login" onclick="doLogin()">로그인</button>
       <p class="cap" style="text-align:center;margin:14px 0 0">학생코드는 <b>[다했어요]에서 쓰던 코드</b>를 그대로 사용합니다.</p>
       <div id="theme-pick" class="hidden" style="margin-top:16px;border-top:1px solid var(--divider);padding-top:14px">
         <p class="cap" style="margin:0 0 8px;text-align:center">🎨 색을 골라보세요 <b>· 설치 전에 고르면 홈 아이콘도 그 색</b></p>
@@ -904,8 +906,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.64.0';
-var PWA_BUILD = '2026.09.02 02:40';
+var PWA_VER = '0.65.0';
+var PWA_BUILD = '2026.09.02 03:20';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
@@ -978,7 +980,7 @@ function dismissInstall(){localStorage.setItem('grofit_install_dismissed','1');d
 
 /* ---------- 화면 전환 ---------- */
 var TABS = {home:1,cert:1,inbody:1,reflect:1,score:1,notice:1};
-function go(name){
+function go(name, skipLoad){
   document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on')});
   var el = document.getElementById('s-'+name); if(el) el.classList.add('on');
   var tb = document.getElementById('tabbar');
@@ -986,7 +988,7 @@ function go(name){
   document.querySelectorAll('.tabbar button').forEach(function(b){
     b.classList.toggle('on', b.dataset.t===name);
   });
-  if(name==='home') loadHome();
+  if(name==='home' && !skipLoad) loadHome();
   if(name==='cardio'){renderDayPicker('cardio');renderRpe('c');renderSat('c');renderPn('c');loadPartners();}
   if(name==='strength'){renderDayPicker('strength');renderRpe('s');renderSat('s');renderPn('s');loadPartners();}
   if(name==='inbody'){loadFitness();loadMyStamps();}
@@ -1565,20 +1567,42 @@ function doLogin(){
   var sid=document.getElementById('in-sid').value.trim();
   var pin=document.getElementById('in-pin').value.trim();
   if(!sid){toast('학번을 입력하세요');return;}
-  call('studentLogin',[sid,pin],function(res){
+  var btn=document.getElementById('btn-login');
+  if(btn){ btn.disabled=true; btn.dataset.t=btn.textContent; btn.textContent='들어가는 중…'; }
+  /* [0.65.0] 예전엔 로그인 → 홈 → 공지 → 저장시각을 따로 불러 15초가 넘었다.
+     studentBoot 한 번으로 다 받는다.                                  */
+  call('studentBoot',[sid,pin],function(res){
+    if(btn){ btn.disabled=false; btn.textContent=btn.dataset.t||'로그인'; }
     if(!res||!res.ok){toast(res&&res.msg||'로그인 실패');return;}
     ST.student=res.student;
     if(res.token)localStorage.setItem('grofit_token',res.token);
     localStorage.setItem('grofit_student',JSON.stringify(res.student));
     toast(res.student.이름+'님 환영합니다');
-    go('home');
+    applyBundle(res);          // 받아온 데이터로 홈을 바로 그린다(추가 호출 없음)
+    go('home', true);
   });
+}
+
+/* 한 번에 받은 묶음으로 화면을 채운다 */
+function applyBundle(b){
+  if(!b) return;
+  if(b.config) ST.config=b.config;
+  if(b.home){ paintHome(b.home); }
+  if(b.stamps){ var s=b.stamps;
+    showSaved('saved-reflect',s.reflect,false); showSaved('saved-inbody',s.inbody,false);
+    var L=s.최근||{};
+    showUp('saved-cardio',   s.cardio   || L['유산소'] || '', false);
+    showUp('saved-strength', s.strength || L['근력']   || '', false);
+  }
+  if(b.notices){ ST.notices=b.notices; showUnread(b.notices); }
 }
 
 /* ---------- 홈 ---------- */
 function loadHome(){
   if(!ST.student){go('login');return;}
-  call('getStudentHome',[ST.student.학번],function(h){
+  call('getStudentHome',[ST.student.학번],function(h){ paintHome(h); });
+}
+function paintHome(h){
     if(!h)return; ST.config=h.config; ST.week=h.현재주차||1;
     document.getElementById('hi-name').textContent=ST.student.학번+' '+ST.student.이름;
     var who=document.getElementById('who');if(who)who.textContent=ST.student.학번+' '+ST.student.이름;
@@ -1605,10 +1629,9 @@ function loadHome(){
     document.getElementById('cal-detail').classList.remove('open');
     renderCal(h);
     renderReadCard();
-    checkNotices();          // 안 읽은 공지가 있으면 팝업
+    if(!ST.notices) checkNotices();   // 묶음으로 이미 받았으면 다시 부르지 않는다
     var hv=document.getElementById('home-ver');
     if(hv)hv.textContent=verLine();
-  });
 }
 function parseYmd(s){var p=String(s).split('-');return new Date(+p[0],(+p[1]||1)-1,(+p[2]||1));}
 function weekOfDate(ds,start,totalW){
@@ -2641,10 +2664,12 @@ function popClose(){
 }
 function checkNotices(){
   if(!ST.student)return;
-  call('getNotices',[ST.student.학번],function(list){
-    POP=(list||[]).filter(function(n){return !n.읽음 && n.공지ID;}).reverse();  // 오래된 것부터
-    POPi=0; showPop();
-  });
+  call('getNotices',[ST.student.학번],function(list){ ST.notices=list||[]; showUnread(ST.notices); });
+}
+/* 이미 받아둔 공지 목록으로 팝업을 띄운다(추가 호출 없음) */
+function showUnread(list){
+  POP=(list||[]).filter(function(n){return !n.읽음 && n.공지ID;}).reverse();  // 오래된 것부터
+  POPi=0; showPop();
 }
 function showPop(){
   var box=document.getElementById('nt-pop');
@@ -2768,10 +2793,19 @@ function mock(fn,args){
     if(c.평가명)document.getElementById('lg-sub').textContent=c.평가명;
   }});
   document.getElementById('ver').textContent=verLine();
-  // 자동 로그인(저장된 토큰)
+  /* [0.65.0] 자동 로그인 — 저장해 둔 학생 정보로 화면부터 띄우고,
+     studentBundle 한 번으로 설정·홈·공지·저장시각을 모두 받는다.  */
   var saved=localStorage.getItem('grofit_student');
   if(saved && localStorage.getItem('grofit_token')){
-    try{ ST.student=JSON.parse(saved); go('home'); }catch(e){}
+    try{
+      ST.student=JSON.parse(saved);
+      document.getElementById('hi-name').textContent=ST.student.학번+' '+ST.student.이름;
+      go('home', true);
+      call('studentBundle',[ST.student.학번],function(b){
+        if(!b||!b.ok)return;
+        applyBundle(b);
+      });
+    }catch(e){}
   }
 })();
 </script>
