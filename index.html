@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.66.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.66.1 -->
+<!--   [0.66.1] 체력 유연성(앞으로굽히기·뒤로젖히기) 1·2차 칸에 «−» 버튼 — 폰 소수 자판에 마이너스 키가 없어 발끝에 못 미치는 기록을 못 넣던 것. 버튼을 누르면 값 앞에 −가 붙고(다시 누르면 제거) 버튼이 진해진다. 등급·그래프는 음수 그대로 계산. -->
 <!--   [0.66.0] WHR 입력 방식 선택 — «둘레로 계산»(허리·엉덩이) / «WHR 값 직접»(인바디 결과지 값) 토글. 직접 모드로 저장하면 둘레는 비우고 WHR만 보낸다(서버 calcWhr_ 이 직접값을 받음). 불러올 때 둘레 없이 WHR만 있으면 직접 모드로 열린다.
         체력 «변화 그래프»가 바로 뜬다 — 이미 받아 둔 기록으로 즉시 그리고 서버 재조회는 뒤에서 조용히. 저장 직후에는 방금 입력값(최고기록·BMI·WHR 계산 포함)을 로컬에 먼저 반영해 3초 기다림 없이 그래프에 나온다. -->
 <!-- 수정요약: [0.65.2] 설치 아이콘 로고 확대 — any·애플용 88%, maskable 76%(안전영역 고려). 여섯 테마를 어두운 쌍(1·3·5)의
@@ -395,6 +396,10 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 .drop{border:1.5px dashed #c3ccc3;border-radius:18px;padding:26px 16px;text-align:center;color:var(--muted);cursor:pointer;
   background:repeating-linear-gradient(45deg,#fafbfa,#fafbfa 10px,#f4f6f3 10px,#f4f6f3 20px)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* [0.66.1] 유연성 마이너스 버튼 */
+.neg{display:flex;gap:6px;align-items:stretch}.neg .fi{flex:1;min-width:0}
+.sgn{flex:0 0 40px;border:1.5px solid #d6dbcd;border-radius:10px;background:#fff;color:#2b3a30;font-size:20px;font-weight:800;line-height:1;cursor:pointer}
+.sgn.on{background:#2b3a30;border-color:#2b3a30;color:#fff}
 .stat{background:var(--bg);border-radius:12px;padding:12px}
 .stat .v{font-size:22px;font-weight:800} .stat .l{font-size:12px;color:var(--muted)}
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
@@ -710,14 +715,14 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       <h2><img class="ic-s" src="ic-flex.png" alt=""> 유연성</h2>
       <label>앉아 윗몸 앞으로 굽히기 (cm)</label>
       <div class="grid2">
-        <div class="field"><input class="fi" id="f-flex1" inputmode="decimal" placeholder="1차"></div>
-        <div class="field"><input class="fi" id="f-flex2" inputmode="decimal" placeholder="2차"></div>
+        <div class="field"><div class="neg"><button type="button" class="sgn" data-for="f-flex1" onclick="negTog(&quot;f-flex1&quot;)" title="마이너스">−</button><input class="fi" id="f-flex1" inputmode="decimal" placeholder="1차"></div></div>
+        <div class="field"><div class="neg"><button type="button" class="sgn" data-for="f-flex2" onclick="negTog(&quot;f-flex2&quot;)" title="마이너스">−</button><input class="fi" id="f-flex2" inputmode="decimal" placeholder="2차"></div></div>
       </div>
       <div class="jr" id="j-flex"></div>
       <label>엎드려 윗몸 뒤로 젖히기 (cm)</label>
       <div class="grid2">
-        <div class="field"><input class="fi" id="f-back1" inputmode="decimal" placeholder="1차"></div>
-        <div class="field"><input class="fi" id="f-back2" inputmode="decimal" placeholder="2차"></div>
+        <div class="field"><div class="neg"><button type="button" class="sgn" data-for="f-back1" onclick="negTog(&quot;f-back1&quot;)" title="마이너스">−</button><input class="fi" id="f-back1" inputmode="decimal" placeholder="1차"></div></div>
+        <div class="field"><div class="neg"><button type="button" class="sgn" data-for="f-back2" onclick="negTog(&quot;f-back2&quot;)" title="마이너스">−</button><input class="fi" id="f-back2" inputmode="decimal" placeholder="2차"></div></div>
       </div>
       <p class="cap">※ 등급 기준이 없는 항목이라 기록만 남겨요. 등급은 <b>1·2차 중 높은 기록</b>으로 판정합니다.</p>
     </div>
@@ -917,7 +922,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.66.0';
+var PWA_VER = '0.66.1';
 var PWA_BUILD = '2026.09.03 23:42';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
@@ -2139,8 +2144,22 @@ function calcWhr(a,b){if(!a||!b)return null;return Math.round((a/b)*100)/100;}
 function jrHtml(main,tone,sub){return '<span class="chip '+(tone||'ok')+'">'+main+'</span>'+(sub?'<span class="cap" style="margin-left:8px">'+sub+'</span>':'');}
 function setJr(id,html){var el=document.getElementById(id);if(el)el.innerHTML=html||'';}
 
+/* [0.66.1] 유연성 − 버튼: 값 앞에 마이너스를 붙이거나 뗀다 */
+function negTog(id){
+  var el=document.getElementById(id); if(!el)return;
+  var v=el.value.trim();
+  el.value=(v.charAt(0)==='-')?v.slice(1):('-'+v);
+  if(el.value==='-')el.focus();
+  judgeNow();
+}
+function syncNeg(){
+  document.querySelectorAll('.sgn[data-for]').forEach(function(b){
+    var el=document.getElementById(b.dataset.for);
+    b.classList.toggle('on',!!(el&&el.value.trim().charAt(0)==='-'));});
+}
 /* 입력할 때마다 등급 즉시 표시 */
 function judgeNow(){
+  syncNeg();
   var gl=nz('f-gripL'),gr=nz('f-gripR');
   var gmax=(gl===null&&gr===null)?null:Math.max(gl||0,gr||0);
   var g=grade5('악력',gmax);
