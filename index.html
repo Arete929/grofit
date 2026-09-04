@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.67.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.68.0 -->
+<!--   [0.68.0] ★지난 주차 기록도 올릴 수 있다 — 인증 화면 위에 «1주차~이번 주차» 칩(renderWkSel). 마감 지난 주차를 고르면 초과일과 깎이는 %p 를 미리 알려 준다(renderLateWarn). 기록 카드에 «N일 늦음», 내 점수에 «늦은 제출 차감» 표시. 차감은 서버가 초과일에 비례해 계산(0.70.0).
+        ※함께 고침 — 근력 인증 화면의 날짜 팔레트가 여태 안 보였다. renderDayPicker('strength') 가 str-days/ST.strDate 와 이름이 어긋나 그림이 안 그려졌고, 그래서 근력은 늘 «오늘» 로 저장됐다. 'str' 로 통일. -->
 <!--   [0.67.0] ★읽을거리 v2 — 한 주 = 마음단단 1편 + 지식단단 2편. 홈 운동 링 아래 «♥ 이번 주 마음 한 줄» 카드(분홍) → 1분 마음 글+성찰 질문 화면(s-mind). 읽을거리 카드는 지식 2편(목차 칩·편별 OX). 예전 4편은 1·2주 지식으로 재배치(OLDR), 새 글 8편(마음 4·지식 4: 에너지·무산소유산소·키성장·근육과건). 읽음은 폰+서버(markReading→'읽음기록' 시트) 양쪽에 기록, 지난 주 글 다시 보기, 성찰 화면 위에 이번 주 질문. -->
 <!--   [0.66.1] 체력 유연성(앞으로굽히기·뒤로젖히기) 1·2차 칸에 «−» 버튼 — 폰 소수 자판에 마이너스 키가 없어 발끝에 못 미치는 기록을 못 넣던 것. 버튼을 누르면 값 앞에 −가 붙고(다시 누르면 제거) 버튼이 진해진다. 등급·그래프는 음수 그대로 계산. -->
 <!--   [0.66.0] WHR 입력 방식 선택 — «둘레로 계산»(허리·엉덩이) / «WHR 값 직접»(인바디 결과지 값) 토글. 직접 모드로 저장하면 둘레는 비우고 WHR만 보낸다(서버 calcWhr_ 이 직접값을 받음). 불러올 때 둘레 없이 WHR만 있으면 직접 모드로 열린다.
@@ -517,6 +519,17 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 .daysel button{flex:1;min-width:40px;height:54px;border-radius:12px;border:1.5px solid var(--line2);background:#fff;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
 .daysel button span{font-size:11px;color:var(--muted)} .daysel button b{font-size:15px;color:var(--ink)}
 .daysel button.on{background:var(--primary);border-color:var(--primary)} .daysel button.on span,.daysel button.on b{color:#fff}
+/* [0.68.0] 주차 고르기 · 늦은 제출 경고 */
+.wksel{display:flex;gap:6px;margin-bottom:8px;overflow-x:auto}
+.wksel button{flex:0 0 auto;padding:7px 13px;border-radius:999px;border:1.5px solid var(--line2);background:#fff;
+  font-family:inherit;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
+.wksel button.on{background:var(--ink2);border-color:var(--ink2);color:#fff}
+.wksel button.late{border-color:var(--warning);color:var(--warning)}
+.wksel button.late.on{background:var(--warning);border-color:var(--warning);color:#fff}
+.latewarn{background:var(--warning-tint);border:1px solid var(--warning);border-radius:12px;padding:11px 13px;
+  margin-bottom:12px;font-size:13px;line-height:1.6;color:var(--ink2)}
+.latewarn b{color:var(--warning)}
+.chip.late{background:var(--warning-tint);color:var(--warning)}
 .daysel button:disabled{opacity:.35;cursor:not-allowed}
 .logo{width:56px;height:56px;border-radius:16px;background:var(--primary-tint);display:flex;align-items:center;
   justify-content:center;font-size:28px;margin:0 auto 14px}
@@ -627,7 +640,10 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
   <!-- 3. 유산소 -->
   <section id="s-cardio" class="scr">
     <div class="topbar"><button class="back" onclick="go('cert')">←</button><img class="ic-t" src="ic-cardio.png" alt=""><h1>유산소 인증</h1></div>
-    <label>운동한 요일 (이번 주)</label><div id="cardio-days" class="daysel"></div>
+    <label>운동한 날짜</label>
+    <div class="wksel hidden" id="cardio-wk"></div>
+    <div id="cardio-days" class="daysel"></div>
+    <div id="cardio-late" class="latewarn hidden"></div>
     <div class="guidebox">
       <b>📱 운동 앱 하나를 골라 쓰세요</b>
       <p><b>삼성헬스 · 애플 피트니스 · 나이키 런클럽(NRC)</b> 중 <b>하나</b>를 정해 4주 동안 계속 사용하세요.<br>
@@ -673,7 +689,10 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
   <!-- 4. 근력 -->
   <section id="s-strength" class="scr">
     <div class="topbar"><button class="back" onclick="go('cert')">←</button><img class="ic-t" src="ic-strength.png" alt=""><h1>근력 인증</h1></div>
-    <label>운동한 요일 (이번 주)</label><div id="str-days" class="daysel"></div>
+    <label>운동한 날짜</label>
+    <div class="wksel hidden" id="str-wk"></div>
+    <div id="str-days" class="daysel"></div>
+    <div id="str-late" class="latewarn hidden"></div>
     <div class="card">
       <h2>누구와 운동했나요?</h2>
       <p class="cap" style="margin:-4px 0 10px">먼저 골라주세요. 함께한 친구는 다음부터 태그로 바로 나와요</p>
@@ -838,6 +857,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       <h2>점수 구성</h2>
       <div class="list-item"><span>운동 달성률</span><span id="sc-ex">—</span></div>
       <div class="list-item"><span>제출 정시성</span><span id="sc-sub">—</span></div>
+      <div class="list-item"><span>늦은 제출 차감</span><span id="sc-late">—</span></div>
     </div>
     <div class="card">
       <h2>내가 올린 운동 기록</h2>
@@ -973,7 +993,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.67.0';
+var PWA_VER = '0.68.0';
 var PWA_BUILD = '2026.09.03 23:42';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
@@ -1057,7 +1077,7 @@ function go(name, skipLoad){
   });
   if(name==='home' && !skipLoad) loadHome();
   if(name==='cardio'){renderDayPicker('cardio');renderRpe('c');renderSat('c');renderPn('c');loadPartners();}
-  if(name==='strength'){renderDayPicker('strength');renderRpe('s');renderSat('s');renderPn('s');loadPartners();}
+  if(name==='strength'){renderDayPicker('str');renderRpe('s');renderSat('s');renderPn('s');loadPartners();}
   if(name==='inbody'){loadFitness();loadMyStamps();}
   if(name==='inbody-graph')loadFitChart();
   if(name==='reflect'){loadReflect();loadMyStamps();renderReflectQ();}
@@ -2137,20 +2157,70 @@ function toggleCalDay(ds){
 
 /* ---------- 요일 선택 (이번 주 다른 요일도 제출) ---------- */
 function fmtLocal(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
-function currentWeekDates(){
-  var c=ST.config||{},start=c.기간_시작일,week=ST.week||1,base;
-  if(start){var p=String(start).split('-');base=new Date(+p[0],(+p[1]||1)-1,(+p[2]||1));base.setDate(base.getDate()+(week-1)*7);}
+/* [0.68.0] 주차를 골라 그 주 7일을 만든다(week 생략 = 이번 주차) */
+function currentWeekDates(week){
+  var c=ST.config||{},start=c.기간_시작일,base;
+  var w=Number(week||ST.week||1);
+  if(start){var p=String(start).split('-');base=new Date(+p[0],(+p[1]||1)-1,(+p[2]||1));base.setDate(base.getDate()+(w-1)*7);}
   else{base=new Date();base.setHours(0,0,0,0);base.setDate(base.getDate()-base.getDay());}
   var today=new Date();today.setHours(0,0,0,0);var wk=['일','월','화','수','목','금','토'],arr=[];
   for(var i=0;i<7;i++){var d=new Date(base.getFullYear(),base.getMonth(),base.getDate()+i);
     arr.push({date:fmtLocal(d),label:wk[d.getDay()],num:d.getDate(),future:d.getTime()>today.getTime(),today:d.getTime()===today.getTime()});}
   return arr;
 }
+/* [0.68.0] 그 주차 마감 = 그 주 일요일 밤 10시 */
+function weekDeadlineLocal(w){
+  var st=(ST.config||{}).기간_시작일; if(!st)return null;
+  var p=String(st).split('-'); if(p.length<3)return null;
+  return new Date(+p[0],(+p[1]||1)-1,(+p[2]||1)+(Number(w)-1)*7+6,22,0,0);
+}
+function lateDaysFor(w){
+  var dl=weekDeadlineLocal(w); if(!dl)return 0;
+  var ms=Date.now()-dl.getTime(); return ms>0?Math.ceil(ms/86400000):0;
+}
+function latePenaltyFor(days){
+  var c=ST.config||{};
+  var per=(c.지각_감점_1일당===undefined?0.5:Number(c.지각_감점_1일당));
+  var cap=(c.지각_감점_건당상한===undefined?5:Number(c.지각_감점_건당상한));
+  return Math.min(days*per,cap);
+}
+function nowWeekNo(){
+  var w=Number((ST.home&&ST.home.현재주차)||ST.week||1);
+  var tw=Number((ST.config||{}).총_주차수)||4;
+  return Math.min(tw,Math.max(1,w||1));
+}
+function lateChip(d){ return (Number(d)>0)?'<span class="chip late">⏰ '+Number(d)+'일 늦음</span>':''; }
+/* [0.68.0] 주차 고르기 — 1주차부터 이번 주차까지 열어 둔다(지난 주차 채워 넣기) */
+function renderWkSel(prov){
+  var box=document.getElementById(prov+'-wk'); if(!box)return;
+  var cur=nowWeekNo();
+  if(cur<=1){box.innerHTML='';box.classList.add('hidden');return;}
+  box.classList.remove('hidden');
+  var h='';
+  for(var w=1;w<=cur;w++){
+    var late=lateDaysFor(w);
+    h+='<button class="'+(ST[prov+'Week']===w?'on':'')+(late>0?' late':'')+'" onclick="selWk(&quot;'+prov+'&quot;,'+w+')">'
+      +w+'주차'+(late>0?' ⏰':'')+'</button>';
+  }
+  box.innerHTML=h;
+}
+function selWk(prov,w){ ST[prov+'Week']=Number(w); renderDayPicker(prov); }
+function renderLateWarn(prov){
+  var el=document.getElementById(prov+'-late'); if(!el)return;
+  var w=ST[prov+'Week']||nowWeekNo(), d=lateDaysFor(w);
+  if(d<=0){el.classList.add('hidden');el.innerHTML='';return;}
+  el.classList.remove('hidden');
+  el.innerHTML='⏰ <b>'+w+'주차</b> 마감(일요일 밤 10시)을 <b>'+d+'일</b> 지났습니다.<br>'
+    +'지금 올려도 도장은 찍히지만 <b>늦은 제출</b>로 남고, 성취율에서 <b>'+latePenaltyFor(d).toFixed(1)+'%p</b>가 깎입니다.';
+}
 function renderDayPicker(prov){
-  var days=currentWeekDates(),avail=days.filter(function(d){return !d.future;}),def=null;
+  if(!ST[prov+'Week'])ST[prov+'Week']=nowWeekNo();
+  renderWkSel(prov);
+  var days=currentWeekDates(ST[prov+'Week']),avail=days.filter(function(d){return !d.future;}),def=null;
   for(var i=0;i<days.length;i++){if(days[i].today){def=days[i];break;}}
   if(!def)def=avail.length?avail[avail.length-1]:days[0];
   ST[prov+'Date']=def.date;
+  renderLateWarn(prov);
   var el=document.getElementById(prov+'-days');if(!el)return;
   el.innerHTML=days.map(function(d){
     return '<button '+(d.future?'disabled':'onclick="selDay(\''+prov+'\',\''+d.date+'\',this)"')
@@ -2159,8 +2229,8 @@ function renderDayPicker(prov){
 }
 function selDay(prov,date,btn){ST[prov+'Date']=date;
   btn.parentNode.querySelectorAll('button').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');
-  // 근력은 사진 날짜와 대조하므로 요일을 바꾸면 다시 검사
-  if(prov==='strength'&&typeof strB64!=='undefined'&&strB64)setTimeout(checkStrPhoto,60);}
+  // 근력은 사진 날짜와 대조하므로 날짜를 바꾸면 다시 검사
+  if(prov==='str'&&typeof strB64!=='undefined'&&strB64)setTimeout(checkStrPhoto,60);}
 
 /* ---------- 유산소 ---------- */
 var cardioB64=null;
@@ -3023,6 +3093,8 @@ function loadScore(){
     document.getElementById('sc-weeks').innerHTML=html;
     document.getElementById('sc-ex').textContent=s.운동달성률+'%';
     document.getElementById('sc-sub').textContent=s.정시성+'%';
+    var lt=Number(s.늦은건수)||0, el=document.getElementById('sc-late');   // [0.68.0]
+    if(el)el.innerHTML=lt?('<b style="color:var(--warning)">'+lt+'건 · 총 '+(s.총초과일||0)+'일 · −'+(s.지각차감||0)+'%p</b>'):'없음';
   });
   loadMyRecords();
 }
@@ -3032,7 +3104,7 @@ function loadMyRecords(){
       var chip=kindChip(r.종류);
       var sub=(r.종류==='유산소' && (r.거리||r.시간))?((r.거리?r.거리+'km ':'')+(r.시간?r.시간+'분':'')):'';
       html+='<div class="list-item" style="align-items:flex-start">'
-        +'<div style="flex:1"><div>'+r.날짜+' '+chip+pnChip(r.파트너)+'</div>'
+        +'<div style="flex:1"><div>'+r.날짜+' '+chip+pnChip(r.파트너)+lateChip(r.초과일)+'</div>'
         +'<div class="cap" style="margin-top:3px">'+esc(sub||r.내용||'')+'</div>'
         +(r.저장시각?'<div class="cap" style="margin-top:2px;opacity:.8">🕒 저장 '+esc(r.저장시각)+'</div>':'')
         +(r.자각도||r.만족도?'<div style="margin-top:4px">'
