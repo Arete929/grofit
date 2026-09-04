@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.66.1 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.67.0 -->
+<!--   [0.67.0] ★읽을거리 v2 — 한 주 = 마음단단 1편 + 지식단단 2편. 홈 운동 링 아래 «♥ 이번 주 마음 한 줄» 카드(분홍) → 1분 마음 글+성찰 질문 화면(s-mind). 읽을거리 카드는 지식 2편(목차 칩·편별 OX). 예전 4편은 1·2주 지식으로 재배치(OLDR), 새 글 8편(마음 4·지식 4: 에너지·무산소유산소·키성장·근육과건). 읽음은 폰+서버(markReading→'읽음기록' 시트) 양쪽에 기록, 지난 주 글 다시 보기, 성찰 화면 위에 이번 주 질문. -->
 <!--   [0.66.1] 체력 유연성(앞으로굽히기·뒤로젖히기) 1·2차 칸에 «−» 버튼 — 폰 소수 자판에 마이너스 키가 없어 발끝에 못 미치는 기록을 못 넣던 것. 버튼을 누르면 값 앞에 −가 붙고(다시 누르면 제거) 버튼이 진해진다. 등급·그래프는 음수 그대로 계산. -->
 <!--   [0.66.0] WHR 입력 방식 선택 — «둘레로 계산»(허리·엉덩이) / «WHR 값 직접»(인바디 결과지 값) 토글. 직접 모드로 저장하면 둘레는 비우고 WHR만 보낸다(서버 calcWhr_ 이 직접값을 받음). 불러올 때 둘레 없이 WHR만 있으면 직접 모드로 열린다.
         체력 «변화 그래프»가 바로 뜬다 — 이미 받아 둔 기록으로 즉시 그리고 서버 재조회는 뒤에서 조용히. 저장 직후에는 방금 입력값(최고기록·BMI·WHR 계산 포함)을 로컬에 먼저 반영해 3초 기다림 없이 그래프에 나온다. -->
@@ -334,6 +335,32 @@ label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0
 .rdcard .rd-go{display:block;margin-top:9px;font-size:12.5px;font-weight:800;color:var(--primary-dark)}
 .rdcard.done{background:var(--surface);border-color:var(--line)}
 .rdcard.done .rd-tag{background:var(--line2,#dfe4da);color:var(--muted)}
+/* [0.67.0] 마음단단 — 분홍 계열 */
+:root{--mind:#c25a8f;--mind-dark:#a4437a;--mind-tint:#fbe9f2}
+.rdcard.mindcard{border:1px solid var(--mind);background:linear-gradient(160deg,#fff 0%,var(--mind-tint) 100%)}
+.rdcard.mindcard .rd-tag{background:var(--mind);color:#fff}
+.rdcard.mindcard q{display:block;quotes:none;font-size:18px;font-weight:900;line-height:1.35;letter-spacing:-.02em;margin:10px 0 4px;color:var(--ink)}
+.rdcard.mindcard .rd-go{color:var(--mind-dark)}
+.rdcard.mindcard.done{background:var(--surface);border-color:var(--line)}
+.rdcard.mindcard.done q{font-size:14.5px;font-weight:800;color:var(--muted);margin:6px 0 0}
+.rdcard.mindcard.done .rd-sub{display:none}
+.rdcard.mindcard.done .rd-tag{background:var(--line2,#dfe4da);color:var(--muted)}
+.rd-w.mind{background:var(--mind)}
+.rdsec.mind{border-color:var(--mind);background:linear-gradient(180deg,#fff 0%,#fff 72%,var(--mind-tint) 100%)}
+.rdsec.mind b{color:var(--mind-dark)}
+.rd-lead b{color:var(--mind-dark)}
+.pull{margin:12px 0 0;padding:10px 12px;border-left:3px solid var(--mind);background:var(--mind-tint);border-radius:0 10px 10px 0;font-size:14px;font-weight:800;line-height:1.45;color:var(--ink)}
+.toc{display:flex;gap:6px;margin:0 0 14px}
+.toc button{flex:1;min-width:0;font-family:inherit;font-size:11.5px;font-weight:800;padding:8px 6px;border-radius:9px;background:#fff;border:1px solid var(--line2);color:var(--muted);cursor:pointer;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rp{margin:18px 2px 10px;scroll-margin-top:12px}
+.rp .kind{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.06em;padding:2px 8px;border-radius:999px;background:var(--primary-tint);color:var(--primary-dark)}
+.rp .rp-t{margin:8px 0 4px;font-size:19px;font-weight:800;line-height:1.32;letter-spacing:-.02em}
+.pasth{margin:22px 4px 8px;font-size:13px;font-weight:800;color:var(--muted)}
+.pastbtn{display:flex;gap:10px;align-items:center;width:100%;text-align:left;font-family:inherit;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:7px;cursor:pointer}
+.pastbtn .pw{flex:0 0 auto;font-size:11.5px;font-weight:800;color:var(--primary-dark);background:var(--primary-tint);padding:3px 8px;border-radius:999px}
+.pastbtn .pt{font-size:13px;font-weight:700;color:var(--ink2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pastbtn.now .pw{background:var(--ink2);color:#fff}
 
 .rd-head{margin:2px 4px 16px}
 .rd-w{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.05em;
@@ -549,7 +576,13 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
         </div>
       </div>
     </div>
-    <button class="rdcard" id="rd-card" onclick="go('read')">
+    <button class="rdcard mindcard" id="mind-card" onclick="openMind(0)">
+      <span class="rd-tag" id="mind-tag">♥ 이번 주 마음 한 줄</span>
+      <q id="mind-q">—</q>
+      <span class="rd-sub" id="mind-sub"></span>
+      <span class="rd-go" id="mind-go">1분 읽기 ›</span>
+    </button>
+    <button class="rdcard" id="rd-card" onclick="openRead(0)">
       <span class="rd-tag" id="rd-tag">이번 주 읽을거리</span>
       <b id="rd-title">—</b>
       <span class="rd-sub" id="rd-sub"></span>
@@ -773,6 +806,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
     <div id="rf-summary"></div>
     <div class="card">
       <h2>이번 주 성찰</h2>
+      <div id="rf-q"></div>
       <div class="row" style="gap:6px;margin-bottom:8px;flex-wrap:wrap">
         <button class="btn sec sm" style="width:auto;padding:0 12px" onclick="insertGuide()">💡 질문 보기</button>
       </div>
@@ -820,16 +854,33 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
   </section>
 
   <!-- 주차별 읽을거리 -->
-  <section id="s-read" class="scr">
+  <!-- [0.67.0] 마음단단 -->
+  <section id="s-mind" class="scr">
+    <div class="topbar"><button class="back" onclick="go('home')">←</button><h1>이번 주 마음 한 줄</h1></div>
     <div class="rd-head">
-      <span class="rd-w" id="rv-week">3주차 읽을거리</span>
+      <span class="rd-w mind" id="mv-week">주차 · 마음단단</span>
+      <h1 id="mv-title">—</h1>
+      <p class="rd-lead" id="mv-lead"></p>
+    </div>
+    <div id="mv-body"></div>
+    <button class="btn" id="mv-done" onclick="markRead('마음')">읽었어요</button>
+    <button class="btn sec" style="margin-top:8px" onclick="openRead(0)">📖 이번 주 지식 읽을거리로</button>
+    <p class="savedat" id="mv-stamp"></p>
+    <div id="mv-past"></div>
+  </section>
+
+  <section id="s-read" class="scr">
+    <div class="topbar"><button class="back" onclick="go('home')">←</button><h1>이번 주 읽을거리</h1></div>
+    <div class="rd-head">
+      <span class="rd-w" id="rv-week">읽을거리</span>
       <h1 id="rv-title">—</h1>
       <p class="rd-lead" id="rv-lead"></p>
     </div>
     <div id="rv-body"></div>
-    <button class="btn" id="rv-done" onclick="markRead()">읽었어요</button>
+    <button class="btn" id="rv-done" onclick="markRead('지식')">읽었어요</button>
     <button class="btn sec" style="margin-top:8px" onclick="go('home')">홈으로</button>
     <p class="savedat" id="rv-stamp"></p>
+    <div id="rv-past"></div>
   </section>
 
   <!-- 문의하기 -->
@@ -922,7 +973,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.66.1';
+var PWA_VER = '0.67.0';
 var PWA_BUILD = '2026.09.03 23:42';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
@@ -1009,11 +1060,13 @@ function go(name, skipLoad){
   if(name==='strength'){renderDayPicker('strength');renderRpe('s');renderSat('s');renderPn('s');loadPartners();}
   if(name==='inbody'){loadFitness();loadMyStamps();}
   if(name==='inbody-graph')loadFitChart();
-  if(name==='reflect'){loadReflect();loadMyStamps();}
+  if(name==='reflect'){loadReflect();loadMyStamps();renderReflectQ();}
   if(name==='score') loadScore();
   if(name==='notice') loadNoticesStudent();
   if(name==='inquiry'){ renderIqType(); renderIqPrev(); loadMyInq(); }
   if(name==='read') renderReading();
+  if(name==='mind') renderMind();
+  if(name==='home') ST.readWeek=null;   // [0.67.0] 홈으로 오면 «이번 주 글»로 되돌린다
   window.scrollTo(0,0);
 }
 function savedMsg(r){return (r&&r.savedAt)?(' · '+r.savedAt):'';}
@@ -1221,7 +1274,7 @@ function figFitKind(){
     + '</svg>';
 }
 
-var READINGS = {
+var OLDR = {   /* [0.67.0] 예전 읽을거리 4편 — 1·2주 지식으로 재배치 */
   1: {
     주차: 1,
     제목: '준비 운동은 왜 해야 할까',
@@ -1377,80 +1430,385 @@ var READINGS = {
   }
 };
 
-function curReading(){
-  var w = (ST.home && ST.home.현재주차) || 1;
-  return READINGS[w] || READINGS[3];      /* 아직 안 만든 주차는 3주차 편을 보여준다 */
-}
-function readKey(r){ return 'grofit_read_' + r.주차; }
-function readDone(r){ try{ return localStorage.getItem(readKey(r)) || ''; }catch(e){ return ''; } }
-
-function renderReadCard(){
-  var r = curReading(), c = document.getElementById('rd-card');
-  if(!c) return;
-  var at = readDone(r);
-  document.getElementById('rd-tag').textContent = at ? '읽음 · ' + r.주차 + '주차' : r.주차 + '주차 읽을거리';
-  document.getElementById('rd-title').textContent = r.제목;
-  document.getElementById('rd-sub').textContent = r.카드부제;
-  c.classList.toggle('done', !!at);
-}
-function renderReading(){
-  var r = curReading();
-  document.getElementById('rv-week').textContent = r.주차 + '주차 읽을거리';
-  document.getElementById('rv-title').textContent = r.제목;
-  document.getElementById('rv-lead').textContent = r.부제;
-  var h = '';
-  r.본문.forEach(function(s){
-    if(s.myth){
-      h += '<div class="rdmyth"><span class="x">✗ ' + esc(s.myth) + '</span>'
-         + s.p.map(function(t){ return '<p>' + t + '</p>'; }).join('') + '</div>';
-      return;
-    }
-    h += '<div class="rdsec"><h3>' + esc(s.h) + '</h3>'
-       + s.p.map(function(t){ return '<p>' + t + '</p>'; }).join('')
-       + (s.fig ? '<div class="fig">' + s.fig + '</div>' : '')
-       + (s.cap ? '<p class="figcap">' + esc(s.cap) + '</p>' : '')
-       + '</div>';
-  });
-  if(r.퀴즈 && r.퀴즈.length){
-    h += '<div class="rdox"><b>단단 첵!</b><span class="sub">○ 인지 × 인지 눌러 보세요</span>';
-    r.퀴즈.forEach(function(q,i){
-      h += '<div class="oxq"><p>' + esc(q.q) + '</p>'
-         + '<div class="oxbtns" id="ox-' + i + '">'
-         + '<button onclick="oxPick(' + i + ',true)">○</button>'
-         + '<button onclick="oxPick(' + i + ',false)">×</button></div>'
-         + '<div class="oxwhy" id="oxw-' + i + '" hidden></div></div>';
-    });
-    h += '</div>';
+/* ═══════ [0.67.0] 주차별 읽을거리 v2 — 한 주 = 마음단단 1편 + 지식단단 2편 ═══════
+   OLDR = 예전 글 4편(그대로 살려 1·2주 지식으로 배치). KN = 새 지식 4편. 마음 4편은 READINGS 안에.
+   같은 주제로 새로 쓴 글이며 책 본문이 아니다. */
+var KN = {
+  에너지: {
+    제목: '나는 하루에 에너지를 얼마나 쓸까',
+    부제: '가만히 있어도 몸은 쉬지 않습니다. 하루 소비의 절반 넘게가 «그냥 살아 있는 데» 듭니다.',
+    카드부제: '기초대사량 · 활동대사량 · 1학기에 배운 MET 가 여기서 쓰입니다',
+    본문: [
+      {h:'누워만 있어도 1,300kcal',
+       p:['심장을 뛰게 하고, 체온을 36.5도로 지키고, 숨을 쉬고, 뇌를 돌리는 데 드는 에너지가 <b>기초대사량</b>입니다. '
+         +'중학교 3학년 여학생은 하루 <b>약 1,300kcal</b> 안팎으로, 하루 전체 소비의 <b>60~70%</b>가 여기에 듭니다.',
+          '나머지는 두 칸입니다. 걷고, 계단을 오르고, 운동하는 <b>활동대사량</b>이 20~30%, '
+         +'먹은 음식을 소화하고 흡수하는 데 쓰는 에너지가 <b>약 10%</b>입니다.']},
+      {h:'운동으로 바꿀 수 있는 칸',
+       p:['운동은 <b>활동 칸</b>을 키웁니다. 1학기에 배운 <b>MET</b>가 바로 이 칸을 계산하는 단위였습니다. '
+         +'체중 52kg 기준으로 빠르게 걷기 30분은 약 110kcal, 달리기 30분은 약 220kcal입니다.',
+          '숫자가 작아 보이지요. 그런데 매일 30분이면 한 달에 밥 스무 공기가 넘습니다. '
+         +'그리고 더 중요한 것 — <b>근육이 늘면 기초대사 칸도 같이 커집니다.</b> 근력 운동은 운동하는 시간뿐 아니라 '
+         +'잠자는 시간에도 에너지를 더 쓰게 만듭니다.'],
+       fig:figEnergy(), cap:'하루 약 2,000kcal 를 쓴다면 — 초록은 살아 있는 데, 파랑은 움직이는 데, 노랑은 소화하는 데'},
+      {h:'그래서 «얼마나 먹을까»가 아니라',
+       p:['체중을 관리하고 싶다면 «덜 먹기»보다 <b>«더 움직이고 근육을 남기기»</b>가 먼저입니다. '
+         +'굶으면 몸은 기초대사를 낮춰 버텨서, 오히려 살이 잘 안 빠지는 몸이 됩니다. '
+         +'하루 에너지의 그림을 알면, 운동을 왜 <b>매일 조금씩</b> 하는지가 보입니다.']}
+    ],
+    퀴즈: [
+      {q:'가만히 누워만 있으면 몸은 에너지를 거의 쓰지 않는다.', a:false,
+       why:'누워만 있어도 하루 소비의 60~70%를 씁니다. 심장·체온·호흡·뇌가 계속 일하기 때문입니다.'},
+      {q:'근육이 늘면 가만히 있을 때 쓰는 에너지도 늘어난다.', a:true,
+       why:'근육은 쉬는 동안에도 에너지를 씁니다. 근력 운동이 «기초대사 칸»을 키우는 이유입니다.'}
+    ]
+  },
+  무유: {
+    제목: '무산소와 유산소 — 왜 둘 다 2일씩인가',
+    부제: '근육이 힘을 내는 방법은 두 가지입니다. 한쪽만 하면 한쪽만 자랍니다.',
+    카드부제: '짧고 세게 vs 길고 꾸준히 · 혜원핏이 유2 + 근2 인 이유',
+    본문: [
+      {h:'산소를 기다릴 틈이 없을 때',
+       p:['스쿼트·푸시업처럼 몇 초에서 1~2분 사이 힘을 쥐어짜는 운동은 <b>무산소</b> 방식입니다. '
+         +'산소가 도착하기를 기다리지 않고 근육 안에 저장된 연료를 바로 태웁니다. 대신 금방 바닥나고, 젖산이 쌓여 <b>«타는 듯한 느낌»</b>이 옵니다.',
+          '달리기·자전거·빠르게 걷기처럼 <b>20분 넘게</b> 이어 가는 운동은 <b>유산소</b> 방식입니다. '
+         +'숨으로 들어온 산소로 지방과 탄수화물을 천천히 태워서, 세지는 않지만 오래 갑니다.'],
+       fig:figAnAer(), cap:'처음 10초는 근육 속 비상 연료, 1~2분은 무산소, 그 뒤부터는 유산소가 주인이 됩니다'},
+      {h:'두 방식이 키우는 것이 다릅니다',
+       p:['무산소 운동은 <b>근육을 굵게</b> 만들고 기초대사량을 올립니다. '
+         +'유산소 운동은 <b>심장과 폐를 키워</b> 한 번에 내보내는 피의 양을 늘리고, 오래 버티는 힘을 줍니다.',
+          '근력만 하면 계단 두 층에 숨이 차고, 유산소만 하면 근육이 빠져 기초대사가 내려갑니다. '
+         +'그래서 혜원핏의 한 주는 <b>유산소 2일 + 근력 2일</b>입니다. 같은 날 둘 다 하면 각각 인정되는 것도 이 때문입니다.']},
+      {h:'내 운동은 어느 쪽?',
+       p:['헷갈리면 이렇게 봅니다. <b>말을 이어서 할 수 있으면 유산소</b>, 말이 끊기고 근육이 타면 무산소. '
+         +'줄넘기 3분은 유산소에 가깝고, 전력 질주 20초는 무산소입니다. 타임마크로 찍는 근력 인증은 무산소, 걷기 앱 기록은 유산소로 올리면 됩니다.']}
+    ],
+    퀴즈: [
+      {q:'근력 운동은 유산소 운동이다.', a:false,
+       why:'스쿼트·푸시업은 산소 없이 저장 연료를 바로 태우는 무산소 운동입니다. 그래서 유산소와 따로 셉니다.'},
+      {q:'달리기를 꾸준히 하면 심장이 한 번에 내보내는 피의 양이 늘어난다.', a:true,
+       why:'유산소 운동은 심장 근육을 키워 한 번의 박동으로 더 많은 피를 보냅니다. 그래서 같은 속도가 점점 편해집니다.'}
+    ]
+  },
+  키: {
+    제목: '근력 운동을 하면 키가 안 큰다?',
+    부제: '가장 많이 듣는 걱정입니다. 답부터 말하면 — 제대로 하면 오히려 돕습니다.',
+    카드부제: '성장판 · 뼈 밀도 · 성장기에 맞는 무게와 자세',
+    본문: [
+      {myth:'무거운 걸 들면 성장판이 눌려서 키가 안 큰다',
+       p:['오래된 오해입니다. 여러 나라 소아과·스포츠의학 단체가 같은 결론을 냈습니다. '
+         +'<b>올바른 자세로 하는 근력 운동은 성장을 방해하지 않고</b>, 뼈를 두껍고 단단하게 만듭니다. '
+         +'성장판을 다치는 것은 «근력 운동» 자체가 아니라 <b>잘못된 자세, 너무 무거운 무게, 넘어짐 같은 사고</b>입니다.']},
+      {h:'뼈는 눌러 줘야 자랍니다',
+       p:['뼈는 힘을 받으면 그 방향으로 더 촘촘해집니다. 뛰고, 착지하고, 스쿼트로 체중을 견디는 자극이 <b>뼈 밀도</b>를 올립니다. '
+         +'청소년기에 쌓은 뼈가 평생의 밑천이라, 지금 하는 점핑 잭과 스쿼트가 <b>수십 년 뒤 골다공증</b>을 막습니다.',
+          '근력 운동 뒤에는 <b>성장호르몬</b>이 더 나옵니다. 잠을 충분히 자고, 단백질과 칼슘을 먹고, 몸을 쓰는 것 — 셋이 성장의 세 다리입니다.']},
+      {h:'성장기에 맞는 방법',
+       p:['<b>맨몸이나 가벼운 무게로, 정확한 자세를 먼저.</b> 한 세트에 10~15번 할 수 있는 무게면 충분하고, '
+         +'근육이 타는 느낌은 좋지만 관절이 아픈 느낌은 멈추라는 신호입니다.',
+          '단단프로젝트의 운동이 맨몸 위주인 것도 그래서입니다. 무게를 올리는 것은 자세가 몸에 밴 뒤, 지도자와 함께.']}
+    ],
+    퀴즈: [
+      {q:'근력 운동을 하면 키가 안 큰다.', a:false,
+       why:'올바른 자세의 근력 운동은 성장을 방해하지 않고 뼈를 튼튼하게 합니다. 위험한 것은 잘못된 자세와 과한 무게입니다.'},
+      {q:'성장기에는 무거운 바벨보다 맨몸·가벼운 무게로 자세를 익히는 것이 먼저다.', a:true,
+       why:'10~15번 할 수 있는 무게로 정확한 자세를 익히는 것이 성장기 근력 운동의 기본입니다.'}
+    ]
+  },
+  건: {
+    제목: '근육과 건, 부상 없이 단단해지는 길',
+    부제: '근육은 빨리 자라고 힘줄은 천천히 따라옵니다. 그 시차가 부상의 틈입니다.',
+    카드부제: '힘줄·인대는 왜 느린가 · 10% 규칙 · 통증 두 가지 구별법',
+    본문: [
+      {h:'근육은 몇 주, 힘줄은 몇 달',
+       p:['근육은 피가 많이 흘러서 <b>몇 주</b>면 눈에 띄게 강해집니다. 근육을 뼈에 붙이는 <b>힘줄(건)</b>과 뼈끼리 잇는 <b>인대</b>는 '
+         +'피가 적게 흘러 <b>몇 달</b>이 걸립니다.',
+          '그래서 3주차쯤 «이제 할 만한데?» 하고 갑자기 강도를 올리면, 근육은 버티는데 힘줄이 못 따라와 '
+         +'무릎 앞·아킬레스·어깨가 아파 옵니다. 부상은 대개 <b>너무 빨리 늘렸을 때</b> 옵니다.'],
+       fig:figTendon(), cap:'같은 운동을 해도 근육(초록)은 빨리, 힘줄(주황)은 천천히 강해집니다 — 그 사이가 조심할 구간'},
+      {h:'10% 규칙',
+       p:['거리든 횟수든 무게든, <b>한 주에 10% 넘게 늘리지 않기.</b> 지난주 스쿼트 30개였으면 이번 주는 33개. '
+         +'느리게 느껴져도 4주면 46개가 됩니다. 힘줄이 따라올 시간을 주는 속도입니다.',
+          '준비 운동(1주차 글)이 여기서 다시 나옵니다. 따뜻해진 힘줄은 늘어나고, 차가운 힘줄은 찢어집니다.']},
+      {h:'아픔에는 두 종류가 있습니다',
+       p:['운동 다음 날 <b>넓은 부위가 뻐근한 것</b>은 정상적인 근육통입니다. 가볍게 움직이면 풀립니다. '
+         +'그런데 <b>한 점이 콕 찌르듯 아프거나, 붓거나, 움직일 때 «뚝» 하거나, 사흘 넘게 같은 자리가 아프면</b> 힘줄·인대 쪽입니다.',
+          '그때는 참고 하는 것이 «단단해지는 길»이 아닙니다. 쉬고, 김진호 선생님께 말해 주세요. 쉬는 것도 프로그램의 일부입니다.']}
+    ],
+    퀴즈: [
+      {q:'근육이 커진 만큼 힘줄도 같은 속도로 튼튼해진다.', a:false,
+       why:'힘줄과 인대는 피가 적게 흘러 근육보다 훨씬 천천히 강해집니다. 그래서 강도를 급히 올리면 다칩니다.'},
+      {q:'운동 다음 날 넓은 부위가 뻐근한 것은 정상적인 근육통이다.', a:true,
+       why:'넓게 뻐근한 것은 근육이 회복하며 자라는 신호입니다. 한 점이 콕 찌르거나 붓는 통증과는 다릅니다.'}
+    ]
   }
-  h += '<div class="rdq"><b>이번 주 성찰에 써 보세요</b><p>' + esc(r.질문) + '</p></div>';
-  document.getElementById('rv-body').innerHTML = h;
-  var at = readDone(r);
-  document.getElementById('rv-done').textContent = at ? '다 읽었어요 ✓' : '읽었어요';
-  showUp('rv-stamp', at, false);
+};
+
+var READINGS = {
+  1: { 주차: 1,
+    마음: {
+      제목: 'TO DO LIST 맨 위에 운동을',
+      한줄: '할 일 목록에 없는 운동은 하지 않은 운동이 됩니다',
+      부제: '1주차. 의욕은 가장 높고, 계획은 아직 없는 때.',
+      원리: '개별성 · 특이성 — 남의 계획이 아니라 내 몸에 맞는 계획',
+      본문: [
+        {p:['새 학기, 새 결심. 그런데 «운동해야지»는 계획이 아닙니다. <b>언제, 어디서, 무엇을</b>이 빠져 있기 때문입니다. '
+           +'«화요일 저녁 7시, 집 앞 놀이터에서 스쿼트 30개와 20분 걷기»라고 적는 순간 그것은 할 일이 됩니다.',
+            '심리학 실험에서 «언제 어디서 무엇을»까지 적은 사람은 그냥 결심만 한 사람보다 <b>두세 배</b> 더 실천했습니다. '
+           +'뇌는 구체적인 문장을 만나야 몸을 움직입니다.',
+            '1학기에 배운 운동처방 원리 중 <b>개별성</b>이 여기서 시작됩니다. 친구의 계획을 베끼지 말고, '
+           +'내 시간표·내 체력·내가 좋아하는 운동으로 한 주를 짜 보세요. 그 목록에서 운동은 맨 아래가 아니라 <b>위쪽</b>에 있어야 합니다.']}
+      ],
+      인용: '결심은 마음에, 계획은 종이에. 종이에 적힌 것만 몸이 합니다.',
+      질문: '이번 주 내 할 일 목록에서 운동은 몇 번째였나요? 실제로 언제·어디서 했는지 적어 보세요.'
+    },
+    지식: null   /* 아래에서 채움: [OLDR[1] 준비운동, OLDR[4] 완벽하지 않아도] */
+  },
+  2: { 주차: 2,
+    마음: {
+      제목: '작심삼일은 의지가 아니라 환경 탓',
+      한줄: '운동을 막는 것은 게으름이 아니라 «귀찮은 20초»입니다',
+      부제: '2주차. 가장 많이 그만두는 주.',
+      원리: '반복성 · 규칙성 — 습관은 환경이 만든다',
+      본문: [
+        {p:['2주차에 절반이 흔들립니다. 의지가 약해서가 아닙니다. 첫 주의 설렘이 빠지고, 운동복은 서랍 깊숙이, '
+           +'앱은 홈 화면 세 번째 페이지에 있기 때문입니다. <b>시작하기까지 걸리는 20초</b>가 운동을 막습니다.',
+            '그러니 의지를 키우지 말고 <b>환경을 바꾸세요.</b> 운동복을 침대 옆에 꺼내 두기, 혜원핏을 홈 화면 첫 줄에, '
+           +'운동 시간을 시간표처럼 고정하기, 친구와 «7시에 놀이터» 약속하기. 하나하나가 20초를 깎습니다.',
+            '운동처방 원리의 <b>반복성</b>은 «많이»가 아니라 «같은 시간에 계속»입니다. 몸은 같은 시간에 같은 일이 반복되면 '
+           +'그 시간이 되기 전에 미리 준비합니다. 그때부터 운동은 결심이 아니라 그냥 일과가 됩니다.']}
+      ],
+      인용: '의지는 하루를 버티게 하고, 환경은 한 달을 버티게 합니다.',
+      질문: '이번 주 운동을 막은 «환경» 하나와, 다음 주에 바꿀 수 있는 것 하나는 무엇인가요?'
+    },
+    지식: null   /* [OLDR[3] 근육통·초과회복, OLDR[2] 밥심] */
+  },
+  3: { 주차: 3,
+    마음: {
+      제목: '비교는 «남»이 아니라 «어제의 나»와',
+      한줄: '비교 상대는 옆 친구가 아니라 방학 전의 나',
+      부제: '3주차. 남의 기록이 눈에 들어오기 시작할 때.',
+      원리: '과부하 · 점진성 — 어제보다 1%만 더',
+      본문: [
+        {p:['3주차쯤 되면 옆 친구의 기록이 보입니다. 더 멀리 뛰고, 더 많이 들고. 그런데 그 친구는 출발선이 달랐습니다. '
+           +'키도, 지난 1년의 운동량도, 오늘의 컨디션도.',
+            '이번 주 체력측정에서 비교할 상대는 하나뿐입니다. <b>방학 전의 나.</b> 체력 화면의 그래프에서 점이 조금이라도 올라갔다면, '
+           +'그것이 이번 주의 승리입니다.',
+            '운동처방 원리의 <b>과부하와 점진성</b>은 거창한 말이 아닙니다. 오늘은 어제보다 딱 <b>1퍼센트</b>만 더. '
+           +'스쿼트 한 개, 달리기 100미터, 플랭크 5초. 4주 뒤에 그 1퍼센트가 쌓여 있고, 몸은 그것을 알아챕니다.']}
+      ],
+      인용: '남과 비교하면 오늘 그만두고, 어제의 나와 비교하면 내일도 합니다.',
+      질문: '방학 전 측정과 비교해 1%라도 나아진 항목은 무엇인가요? 숫자로 적어 보세요.'
+    },
+    지식: [KN.에너지, KN.무유]
+  },
+  4: { 주차: 4,
+    마음: {
+      제목: '지금은 뿌리를 내리는 시간',
+      한줄: '보이지 않아도 자라고 있습니다',
+      부제: '4주차. «변한 게 없는데?» 싶은 마지막 주.',
+      원리: '지속성 · 가역성 — 계속하면 남고, 멈추면 돌아간다',
+      본문: [
+        {p:['모죽이라는 대나무 이야기가 있습니다. 심고 나서 4년 동안 땅 위로는 아무것도 나오지 않습니다. '
+           +'그러다 5년째, 하루에 수십 센티씩 자라 몇 달 만에 25미터가 됩니다. 4년 동안 땅속에서 <b>뿌리를 넓히고 있었던</b> 것입니다.',
+            '4주 뒤 측정에서 숫자가 별로 안 변했을 수 있습니다. 실망할 일이 아닙니다. 체력이 눈에 띄게 바뀌는 데는 <b>8~12주</b>가 걸립니다. '
+           +'지금 4주는 뿌리입니다. 심장은 조금 커졌고, 힘줄은 두꺼워지는 중이고, 몸은 «저녁 7시에 움직이는 몸»이 되어 갑니다.',
+            '운동처방 원리의 마지막 둘, <b>지속성과 가역성</b>. 계속하면 남고, 멈추면 몇 주 만에 되돌아갑니다. '
+           +'그래서 4주의 끝은 «끝»이 아니라 <b>혼자 계속하는 시작점</b>입니다. 감상문에는 숫자보다 그것을 적어 주세요.']}
+      ],
+      인용: '뿌리는 보이지 않을 때 자랍니다. 4주는 뿌리였습니다.',
+      질문: '4주 뒤에도 계속할 한 가지는 무엇인가요? 멈추면 무엇이 먼저 사라질까요?'
+    },
+    지식: [KN.키, KN.건]
+  }
+};
+READINGS[1].지식 = [OLDR[1], OLDR[4]];
+READINGS[2].지식 = [OLDR[3], OLDR[2]];
+
+/* ── 새 글 그림 (SVG) ── */
+function figEnergy(){
+  return '<svg viewBox="0 0 320 78" width="100%" style="display:block">'
+    +'<text x="0" y="11" font-size="10.5" fill="#8a978c">하루 약 2,000kcal 를 쓴다면</text>'
+    +'<rect x="0" y="20" width="208" height="30" rx="6" fill="#19c37d"/>'
+    +'<rect x="208" y="20" width="72" height="30" fill="#2f8cf0"/>'
+    +'<rect x="280" y="20" width="40" height="30" rx="6" fill="#f2b134"/>'
+    +'<text x="8" y="40" font-size="11" font-weight="800" fill="#fff">기초대사 65%</text>'
+    +'<text x="214" y="40" font-size="11" font-weight="800" fill="#fff">활동 25%</text>'
+    +'<text x="285" y="40" font-size="10" font-weight="800" fill="#fff">소화</text>'
+    +'<text x="0" y="70" font-size="10.5" fill="#5b6b60">운동이 키우는 칸은 파랑 — 근육이 늘면 초록 칸도 같이 커진다</text>'
+    +'</svg>';
 }
-/* OX 퀴즈 — 누르면 정답과 까닭을 보여준다 */
-function oxPick(i, pick){
-  var r = curReading(), q = (r.퀴즈||[])[i];
-  if(!q) return;
-  var box = document.getElementById('ox-' + i);
-  var b = box.querySelectorAll('button');
-  var right = (pick === q.a);
-  b[0].className = ''; b[1].className = '';
-  b[pick ? 0 : 1].className = right ? 'pick' : 'wrong';
-  if(!right) b[q.a ? 0 : 1].className = 'pick';       // 정답도 같이 알려준다
-  var w = document.getElementById('oxw-' + i);
-  w.innerHTML = (right ? '<b>맞았어요.</b> ' : '<b>아쉬워요.</b> ') + q.why;
-  w.hidden = false;
+function figAnAer(){
+  return '<svg viewBox="0 0 320 96" width="100%" style="display:block">'
+    +'<line x1="16" y1="62" x2="308" y2="62" stroke="#dfe5df" stroke-width="1.5"/>'
+    +'<rect x="16" y="26" width="30" height="36" rx="5" fill="#f28034"/>'
+    +'<rect x="50" y="36" width="70" height="26" rx="5" fill="#f5a06a"/>'
+    +'<rect x="124" y="44" width="184" height="18" rx="5" fill="#2f8cf0"/>'
+    +'<text x="31" y="19" font-size="9.5" font-weight="800" fill="#e0700f" text-anchor="middle">10초</text>'
+    +'<text x="85" y="19" font-size="9.5" font-weight="800" fill="#e0700f" text-anchor="middle">1~2분</text>'
+    +'<text x="216" y="19" font-size="9.5" font-weight="800" fill="#2f8cf0" text-anchor="middle">그 뒤 — 20분, 40분…</text>'
+    +'<text x="31" y="78" font-size="9" fill="#5b6b60" text-anchor="middle">비상 연료</text>'
+    +'<text x="85" y="78" font-size="9" fill="#5b6b60" text-anchor="middle">무산소</text>'
+    +'<text x="216" y="78" font-size="9" fill="#5b6b60" text-anchor="middle">유산소 (산소로 지방·탄수화물을 태움)</text>'
+    +'<text x="16" y="92" font-size="9.5" font-weight="800" fill="#e0700f">근력 = 왼쪽</text>'
+    +'<text x="308" y="92" font-size="9.5" font-weight="800" fill="#2f8cf0" text-anchor="end">달리기·걷기 = 오른쪽</text>'
+    +'</svg>';
 }
-function markRead(){
-  var r = curReading();
-  var at = nowStamp();
-  try{ localStorage.setItem(readKey(r), at); }catch(e){}
-  showUp('rv-stamp', at, true);
-  document.getElementById('rv-done').textContent = '다 읽었어요 ✓';
-  renderReadCard();
-  toast('✅ 읽음 표시했어요 — 성찰 쓸 때 참고하세요');
+function figTendon(){
+  return '<svg viewBox="0 0 320 110" width="100%" style="display:block">'
+    +'<line x1="30" y1="86" x2="308" y2="86" stroke="#dfe5df" stroke-width="1.5"/>'
+    +'<line x1="30" y1="14" x2="30" y2="86" stroke="#dfe5df" stroke-width="1.5"/>'
+    +'<path d="M30 84 C 90 70, 130 30, 200 22 S 290 16, 308 15" fill="none" stroke="#19c37d" stroke-width="3" stroke-linecap="round"/>'
+    +'<path d="M30 84 C 120 82, 200 66, 308 40" fill="none" stroke="#f28034" stroke-width="3" stroke-linecap="round"/>'
+    +'<rect x="118" y="20" width="96" height="60" rx="8" fill="#f28034" opacity=".08"/>'
+    +'<text x="166" y="14" font-size="9.5" font-weight="800" fill="#e0700f" text-anchor="middle">조심할 구간 (3~6주)</text>'
+    +'<text x="304" y="12" font-size="10" font-weight="800" fill="#12a869" text-anchor="end">근육</text>'
+    +'<text x="304" y="54" font-size="10" font-weight="800" fill="#e0700f" text-anchor="end">힘줄·인대</text>'
+    +'<text x="30" y="100" font-size="9.5" fill="#8a978c">시작</text>'
+    +'<text x="170" y="100" font-size="9.5" fill="#8a978c" text-anchor="middle">4주</text>'
+    +'<text x="308" y="100" font-size="9.5" fill="#8a978c" text-anchor="end">몇 달 뒤</text>'
+    +'<text x="18" y="18" font-size="9" fill="#8a978c">강함</text>'
+    +'</svg>';
 }
+
+/* ── 상태 ── */
+function curWeekNo(){ var w=Number((ST.home&&ST.home.현재주차)||1); return Math.min(4,Math.max(1,w||1)); }
+function readWeekNo(){ var w=Number(ST.readWeek||0); return (w&&READINGS[w])?w:curWeekNo(); }
+function weekReading(w){ return READINGS[w]||READINGS[1]; }
+function readKey(w,kind){ return 'grofit_read_'+w+'_'+kind; }
+/* 서버 기록(ST.reads) → 폰 저장 → 옛 키(지식만) 순으로 찾는다 */
+function readDone(w,kind){
+  var k=w+'-'+kind;
+  if(ST.reads&&ST.reads[k])return ST.reads[k];
+  try{
+    var v=localStorage.getItem(readKey(w,kind));
+    if(!v&&kind==='지식')v=localStorage.getItem('grofit_read_'+w);
+    return v||'';
+  }catch(e){return '';}
+}
+
+/* ── 홈 카드 둘 ── */
+function renderMindCard(){
+  var c=document.getElementById('mind-card'); if(!c)return;
+  var w=curWeekNo(), R=weekReading(w), m=R.마음, at=readDone(w,'마음');
+  c.classList.toggle('done',!!at);
+  document.getElementById('mind-tag').textContent=at?('♥ '+w+'주차 마음 · 읽음 ✓'):('♥ 이번 주 마음 한 줄');
+  document.getElementById('mind-q').textContent=m.한줄;
+  document.getElementById('mind-sub').textContent=m.부제;
+  document.getElementById('mind-go').textContent=at?'다시 보기 ›':'1분 읽기 ›';
+}
+function renderReadCard(){
+  var c=document.getElementById('rd-card'); if(!c)return;
+  var w=curWeekNo(), R=weekReading(w), at=readDone(w,'지식');
+  document.getElementById('rd-tag').textContent=at?('읽음 · '+w+'주차 지식'):(w+'주차 읽을거리 · 지식 2편');
+  document.getElementById('rd-title').textContent=R.지식[0].제목+' · '+R.지식[1].제목;
+  document.getElementById('rd-sub').textContent=R.지식[0].카드부제||'';
+  c.classList.toggle('done',!!at);
+}
+function openMind(w){ ST.readWeek=w||null; go('mind'); }
+function openRead(w){ ST.readWeek=w||null; go('read'); }
+
+/* ── 지난 주 글 목록 (현재 주 이전만) ── */
+function pastHtml(kind){
+  var cur=curWeekNo(), now=readWeekNo(), h='';
+  for(var w=1;w<=4;w++){
+    if(w>cur||w===now)continue;
+    var R=weekReading(w), t=(kind==='마음')?R.마음.제목:(R.지식[0].제목+' · '+R.지식[1].제목);
+    var at=readDone(w,kind);
+    h+='<button class="pastbtn" onclick="'+(kind==='마음'?'openMind':'openRead')+'('+w+')">'
+      +'<span class="pw">'+w+'주차'+(at?' ✓':'')+'</span><span class="pt">'+esc(t)+'</span></button>';
+  }
+  if(now!==cur)h+='<button class="pastbtn now" onclick="'+(kind==='마음'?'openMind':'openRead')+'(0)"><span class="pw">이번 주</span><span class="pt">'+cur+'주차 글로 돌아가기</span></button>';
+  return h?'<h2 class="pasth">'+(kind==='마음'?'지난 주 마음 한 줄':'지난 주 읽을거리')+'</h2>'+h:'';
+}
+
+/* ── 마음 화면 ── */
+function renderMind(){
+  var w=readWeekNo(), R=weekReading(w), m=R.마음;
+  document.getElementById('mv-week').textContent=w+'주차 · 마음단단';
+  document.getElementById('mv-title').textContent=m.제목;
+  document.getElementById('mv-lead').innerHTML='운동처방 원리로는 <b>'+esc(m.원리)+'</b>';
+  var h='<div class="rdsec mind">';
+  m.본문.forEach(function(s){ h+=s.p.map(function(t){return '<p>'+t+'</p>';}).join(''); });
+  if(m.인용)h+='<div class="pull">'+esc(m.인용)+'</div>';
+  h+='</div>';
+  h+='<div class="rdq"><b>이번 주 성찰 질문</b><p>'+esc(m.질문)+'</p></div>';
+  document.getElementById('mv-body').innerHTML=h;
+  var at=readDone(w,'마음');
+  document.getElementById('mv-done').textContent=at?'다 읽었어요 ✓':'읽었어요';
+  showUp('mv-stamp',at,false);
+  document.getElementById('mv-past').innerHTML=pastHtml('마음');
+  window.scrollTo(0,0);
+}
+
+/* ── 지식 화면 (2편) ── */
+function renderReading(){
+  var w=readWeekNo(), R=weekReading(w), K=R.지식;
+  document.getElementById('rv-week').textContent=w+'주차 읽을거리 · 지식 2편';
+  document.getElementById('rv-title').textContent=K[0].제목+' · '+K[1].제목;
+  document.getElementById('rv-lead').textContent='두 편입니다. 아래 칩을 누르면 바로 건너뜁니다.';
+  var h='<div class="toc">'
+    +'<button onclick="document.getElementById(&quot;rp-0&quot;).scrollIntoView({behavior:&quot;smooth&quot;})">① '+esc(K[0].제목)+'</button>'
+    +'<button onclick="document.getElementById(&quot;rp-1&quot;).scrollIntoView({behavior:&quot;smooth&quot;})">② '+esc(K[1].제목)+'</button></div>';
+  K.forEach(function(r,k){
+    h+='<div class="rp" id="rp-'+k+'"><span class="kind k">지식단단 '+(k?'②':'①')+'</span>'
+      +'<h2 class="rp-t">'+esc(r.제목)+'</h2><p class="rd-lead">'+esc(r.부제||'')+'</p></div>';
+    r.본문.forEach(function(s){
+      if(s.myth){
+        h+='<div class="rdmyth"><span class="x">✗ '+esc(s.myth)+'</span>'+s.p.map(function(t){return '<p>'+t+'</p>';}).join('')+'</div>';
+        return;
+      }
+      h+='<div class="rdsec"><h3>'+esc(s.h)+'</h3>'+s.p.map(function(t){return '<p>'+t+'</p>';}).join('')
+        +(s.fig?'<div class="fig">'+s.fig+'</div>':'')+(s.cap?'<p class="figcap">'+esc(s.cap)+'</p>':'')+'</div>';
+    });
+    if(r.퀴즈&&r.퀴즈.length){
+      h+='<div class="rdox"><b>단단 첵!</b><span class="sub">○ 인지 × 인지 눌러 보세요</span>';
+      r.퀴즈.forEach(function(q,i){
+        h+='<div class="oxq"><p>'+esc(q.q)+'</p><div class="oxbtns" id="ox-'+k+'-'+i+'">'
+          +'<button onclick="oxPick('+k+','+i+',true)">○</button><button onclick="oxPick('+k+','+i+',false)">×</button></div>'
+          +'<div class="oxwhy" id="oxw-'+k+'-'+i+'" hidden></div></div>';
+      });
+      h+='</div>';
+    }
+  });
+  h+='<div class="rdq"><b>이번 주 성찰 질문</b><p>'+esc(R.마음.질문)+'</p></div>';
+  document.getElementById('rv-body').innerHTML=h;
+  var at=readDone(w,'지식');
+  document.getElementById('rv-done').textContent=at?'다 읽었어요 ✓':'읽었어요';
+  showUp('rv-stamp',at,false);
+  document.getElementById('rv-past').innerHTML=pastHtml('지식');
+  window.scrollTo(0,0);
+}
+function oxPick(k,i,pick){
+  var R=weekReading(readWeekNo()), q=((R.지식[k]||{}).퀴즈||[])[i]; if(!q)return;
+  var box=document.getElementById('ox-'+k+'-'+i), b=box.querySelectorAll('button'), right=(pick===q.a);
+  b[0].className='';b[1].className='';
+  b[pick?0:1].className=right?'pick':'wrong';
+  if(!right)b[q.a?0:1].className='pick';
+  var w=document.getElementById('oxw-'+k+'-'+i);
+  w.innerHTML=(right?'<b>맞았어요.</b> ':'<b>아쉬워요.</b> ')+q.why; w.hidden=false;
+}
+
+/* ── 읽음 표시: 폰 + 서버 ── */
+function markRead(kind){
+  kind=(kind==='마음')?'마음':'지식';
+  var w=readWeekNo(), at=nowStamp();
+  try{localStorage.setItem(readKey(w,kind),at);}catch(e){}
+  ST.reads=ST.reads||{}; ST.reads[w+'-'+kind]=at;
+  var bid=(kind==='마음')?'mv':'rv';
+  showUp(bid+'-stamp',at,true);
+  document.getElementById(bid+'-done').textContent='다 읽었어요 ✓';
+  renderMindCard(); renderReadCard();
+  toast(kind==='마음'?'✅ 읽음 표시했어요 — 성찰 질문을 기억해 두세요':'✅ 읽음 표시했어요 — 성찰 쓸 때 참고하세요');
+  if(ST.student)call('markReading',[ST.student.학번,w,kind],function(r){ if(r&&r.reads)ST.reads=r.reads; });
+}
+/* 성찰 화면 위에 이번 주 질문 */
+function renderReflectQ(){
+  var el=document.getElementById('rf-q'); if(!el)return;
+  var w=curWeekNo(), R=weekReading(w);
+  el.innerHTML='<div class="rdq" style="margin-bottom:10px"><b>'+w+'주차 성찰 질문 · 마음단단</b><p>'+esc(R.마음.질문)+'</p></div>';
+}
+
 function nowStamp(){
   var d = new Date(), z = function(n){ return (n<10?'0':'') + n; };
   return d.getFullYear() + '.' + z(d.getMonth()+1) + '.' + z(d.getDate())
@@ -1602,6 +1960,7 @@ function doLogin(){
 /* 한 번에 받은 묶음으로 화면을 채운다 */
 function applyBundle(b){
   if(!b) return;
+  if(b.reads) ST.reads=b.reads;   // [0.67.0] 서버 읽음 기록
   if(b.config) ST.config=b.config;
   if(b.home){ paintHome(b.home); }
   if(b.stamps){ var s=b.stamps;
@@ -1644,7 +2003,7 @@ function paintHome(h){
     ST.home=h; ST.myRecords=null; ST.calDay=null;
     document.getElementById('cal-detail').classList.remove('open');
     renderCal(h);
-    renderReadCard();
+    renderReadCard(); renderMindCard();
     if(!ST.notices) checkNotices();   // 묶음으로 이미 받았으면 다시 부르지 않는다
     var hv=document.getElementById('home-ver');
     if(hv)hv.textContent=verLine();
