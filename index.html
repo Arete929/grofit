@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.68.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.69.0 -->
+<!--   [0.69.0] 늦은 제출 표기를 «-N%p» 에서 «N일 초과»로 바꿨다. 점수는 선생님이 '초과일급간' 시트로 정한다(GAS 0.71.0). -->
 <!--   [0.68.0] ★지난 주차 기록도 올릴 수 있다 — 인증 화면 위에 «1주차~이번 주차» 칩(renderWkSel). 마감 지난 주차를 고르면 초과일과 깎이는 %p 를 미리 알려 준다(renderLateWarn). 기록 카드에 «N일 늦음», 내 점수에 «늦은 제출 차감» 표시. 차감은 서버가 초과일에 비례해 계산(0.70.0).
         ※함께 고침 — 근력 인증 화면의 날짜 팔레트가 여태 안 보였다. renderDayPicker('strength') 가 str-days/ST.strDate 와 이름이 어긋나 그림이 안 그려졌고, 그래서 근력은 늘 «오늘» 로 저장됐다. 'str' 로 통일. -->
 <!--   [0.67.0] ★읽을거리 v2 — 한 주 = 마음단단 1편 + 지식단단 2편. 홈 운동 링 아래 «♥ 이번 주 마음 한 줄» 카드(분홍) → 1분 마음 글+성찰 질문 화면(s-mind). 읽을거리 카드는 지식 2편(목차 칩·편별 OX). 예전 4편은 1·2주 지식으로 재배치(OLDR), 새 글 8편(마음 4·지식 4: 에너지·무산소유산소·키성장·근육과건). 읽음은 폰+서버(markReading→'읽음기록' 시트) 양쪽에 기록, 지난 주 글 다시 보기, 성찰 화면 위에 이번 주 질문. -->
@@ -857,7 +858,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       <h2>점수 구성</h2>
       <div class="list-item"><span>운동 달성률</span><span id="sc-ex">—</span></div>
       <div class="list-item"><span>제출 정시성</span><span id="sc-sub">—</span></div>
-      <div class="list-item"><span>늦은 제출 차감</span><span id="sc-late">—</span></div>
+      <div class="list-item"><span>제출 초과일</span><span id="sc-late">—</span></div>
     </div>
     <div class="card">
       <h2>내가 올린 운동 기록</h2>
@@ -993,7 +994,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.68.0';
+var PWA_VER = '0.69.0';
 var PWA_BUILD = '2026.09.03 23:42';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
@@ -2189,7 +2190,7 @@ function nowWeekNo(){
   var tw=Number((ST.config||{}).총_주차수)||4;
   return Math.min(tw,Math.max(1,w||1));
 }
-function lateChip(d){ return (Number(d)>0)?'<span class="chip late">⏰ '+Number(d)+'일 늦음</span>':''; }
+function lateChip(d){ return (Number(d)>0)?'<span class="chip late">⏰ '+Number(d)+'일 초과</span>':''; }
 /* [0.68.0] 주차 고르기 — 1주차부터 이번 주차까지 열어 둔다(지난 주차 채워 넣기) */
 function renderWkSel(prov){
   var box=document.getElementById(prov+'-wk'); if(!box)return;
@@ -2211,7 +2212,7 @@ function renderLateWarn(prov){
   if(d<=0){el.classList.add('hidden');el.innerHTML='';return;}
   el.classList.remove('hidden');
   el.innerHTML='⏰ <b>'+w+'주차</b> 마감(일요일 밤 10시)을 <b>'+d+'일</b> 지났습니다.<br>'
-    +'지금 올려도 도장은 찍히지만 <b>늦은 제출</b>로 남고, 성취율에서 <b>'+latePenaltyFor(d).toFixed(1)+'%p</b>가 깎입니다.';
+    +'지금 올려도 도장은 찍히지만 <b>'+d+'일 초과</b>로 기록되고, 초과한 날수만큼 점수가 달라집니다.';
 }
 function renderDayPicker(prov){
   if(!ST[prov+'Week'])ST[prov+'Week']=nowWeekNo();
@@ -3093,8 +3094,8 @@ function loadScore(){
     document.getElementById('sc-weeks').innerHTML=html;
     document.getElementById('sc-ex').textContent=s.운동달성률+'%';
     document.getElementById('sc-sub').textContent=s.정시성+'%';
-    var lt=Number(s.늦은건수)||0, el=document.getElementById('sc-late');   // [0.68.0]
-    if(el)el.innerHTML=lt?('<b style="color:var(--warning)">'+lt+'건 · 총 '+(s.총초과일||0)+'일 · −'+(s.지각차감||0)+'%p</b>'):'없음';
+    var lt=Number(s.늦은건수)||0, el=document.getElementById('sc-late');   // [0.69.0]
+    if(el)el.innerHTML=lt?('<b style="color:var(--warning)">총 '+(s.총초과일||0)+'일 초과</b> <span class="cap">('+lt+'건)</span>'):'없음 (모두 제때 제출)';
   });
   loadMyRecords();
 }
