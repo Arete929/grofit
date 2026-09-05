@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.80.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.81.0 -->
+<!--   [0.81.0] 근력 화면을 «이번 주 필수 운동»과 «➕ 선택 운동» 두 타일로 나눴다. ＋ 운동 추가는 선택 타일 안으로.
+        저장 문자열도 «[필수·하체] …» / «[선택] …» 으로 갈라 적고, 필수·선택 개수를 따로 서버에 보낸다(나중에 집계용). -->
 <!--   [0.80.0] «운동한 날짜» 옆에 «1주차» 배지를 붙였다(고른 주차를 늘 알 수 있게).
         유산소 화면에 «어떤 화면을 올리나요» 예시 3종(삼성 헬스·애플 피트니스·나이키 런 클럽 꼴) — 거리·시간·날짜 세 가지가 보여야 함을 그림으로.
         ※예시는 실제 앱 캡처가 아니라 직접 그린 그림. 진짜 캡처가 들어오면 <img>로 바꾸면 된다. -->
@@ -776,7 +778,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       <div id="str-check"></div>
     </div>
     <div class="card">
-      <h2>운동 내용 <span class="cap" id="str-req-lab">· 상체 · 하체 · 유연성 필수</span></h2>
+      <h2>이번 주 필수 운동 <span class="cap" id="str-req-lab"></span></h2>
       <div class="guidebox" id="str-guidebox">
         <b>💪 3가지는 이렇게 구성하세요</b>
         <ol><li><b>상체</b> 운동 — 예) 무릎대고 팔굽혀펴기</li>
@@ -787,9 +789,15 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
         <span class="good">✓ 무릎대고 팔굽혀펴기 · 덤벨 숄더프레스 · 스쿼트 · 런지 · 플랭크 · 앉아 앞으로 굽히기</span></p>
         <p>세 칸을 모두 채워야 저장됩니다. 더 했으면 ＋로 추가하세요.</p>
       </div>
-      <p class="cap" style="margin:-2px 0 10px">운동명 · 세트 · <b>횟수</b>는 필수, 무게는 기구 운동일 때만 적으면 돼요.<br>
+      <p class="cap" style="margin:-2px 0 10px"><b>세트</b>와 <b>횟수</b>를 채우면 됩니다.
       플랭크처럼 버티는 운동은 <b>시간</b>을 눌러 <b>분 · 초</b>로 적으세요.</p>
       <div id="str-list"></div>
+    </div>
+    <div class="card">
+      <h2>➕ 선택 운동 <span class="cap">· 안 적어도 괜찮아요</span></h2>
+      <p class="cap" style="margin:-4px 0 10px">필수 말고 <b>더 한 운동</b>이 있으면 여기에 적으세요.
+      스트레칭 · 줄넘기 · 덤벨 운동 무엇이든 좋습니다. 여기에는 <b>무게</b>도 적을 수 있어요.</p>
+      <div id="str-opt"></div>
       <button class="btn sec sm" onclick="addStrRow()" style="margin-top:8px">＋ 운동 추가</button>
     </div>
     <div class="card">
@@ -1057,7 +1065,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.80.0';
+var PWA_VER = '0.81.0';
 var PWA_BUILD = '2026.09.03 23:42';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
@@ -2739,7 +2747,8 @@ var STR_PARTS=[{k:'상체',c:'p1',ph:'상체 운동 (예: 무릎대고 팔굽혀
                     +'<br><b>유튜브를 따라 했다면 영상 제목과 채널 이름</b>을 정확히 적어주세요.'
                     +'<br><span class="good">✓ 「10분 전신 스트레칭」 · 채널 ○○○</span>'}];
 function addStrRow(part){
-  var list=document.getElementById('str-list');
+  /* [0.81.0] 필수는 위 타일, 선택(추가)은 아래 타일 */
+  var list=document.getElementById(part?'str-list':'str-opt') || document.getElementById('str-list');
   var d=document.createElement('div');d.className='exrow'+(part?' fixed':'');
   var head;
   if(part){ d.setAttribute('data-part',part.k);
@@ -2886,6 +2895,7 @@ function strRepText(row){
 /* 상체·하체·유연성 고정칸을 미리 만들어 둔다 */
 function resetStrRows(){
   document.getElementById('str-list').innerHTML='';
+  var opt=document.getElementById('str-opt'); if(opt)opt.innerHTML='';
   strParts().forEach(function(p){addStrRow(p);});
 }
 /* 비어 있는 첫 필수칸으로 커서 보내기 */
@@ -2901,24 +2911,30 @@ function focusEmptyStr(){
   }
 }
 function saveStrength(){
-  var rows=[],빠진=[],미완=[];
-  document.querySelectorAll('#str-list .exrow').forEach(function(r){
-    var part=r.getAttribute('data-part')||'';
-    var nm=r.querySelector('.s-name').value.trim();
+  var rows=[],빠진=[],미완=[],reqN=0,optN=0;
+  /* [0.81.0] 한 칸에서 값 읽기 */
+  var read=function(r){
     var wtEl=r.querySelector('.s-wt');                // [0.76.0] 맨몸 칸에는 무게 입력이 아예 없다
+    var nm=r.querySelector('.s-name').value.trim();
     var wt=wtEl?wtEl.value.trim():'';
     var st=r.querySelector('.s-set').value.trim();
     var rp=strRepText(r);                             // '12회' 또는 '1분 30초'
-    var txt=nm+(wt?' '+wt+'kg':'')+' '+st+'세트×'+rp;
-    if(part){                                        // 상체·하체·유연성 고정칸 = 필수
-      if(!nm&&!st&&!rp){빠진.push(part);return;}
-      if(!nm||!st||!rp){미완.push(part);return;}
-      rows.push('['+part+'] '+txt);
-      return;
-    }
-    if(!nm&&!wt&&!st&&!rp)return;                    // 추가칸은 완전히 비면 무시
-    if(!nm||!st||!rp){미완.push('추가 칸');return;}
-    rows.push(txt);
+    return {nm:nm,wt:wt,st:st,rp:rp,txt:nm+(wt?' '+wt+'kg':'')+' '+st+'세트×'+rp};
+  };
+  /* 필수 운동 */
+  document.querySelectorAll('#str-list .exrow').forEach(function(r){
+    var part=r.getAttribute('data-part')||'';
+    var v=read(r);
+    if(!v.nm&&!v.st&&!v.rp){빠진.push(part);return;}
+    if(!v.nm||!v.st||!v.rp){미완.push(part);return;}
+    rows.push('[필수·'+part+'] '+v.txt); reqN++;
+  });
+  /* 선택 운동 — 완전히 비어 있으면 그냥 넘어간다 */
+  document.querySelectorAll('#str-opt .exrow').forEach(function(r){
+    var v=read(r);
+    if(!v.nm&&!v.wt&&!v.st&&!v.rp)return;
+    if(!v.nm||!v.st||!v.rp){미완.push('선택 운동');return;}
+    rows.push('[선택] '+v.txt); optN++;
   });
   var N=String.fromCharCode(10);
   // 근력은 상체·하체·유연성 각 1가지씩 필수
@@ -2950,7 +2966,8 @@ function saveStrength(){
   }
   if(!pnCheck('s'))return;
   progOpen('근력 운동 제출');
-  callP('submitStrength',[ST.student.학번,{imageBase64:strB64,date:ST.strDate,summary:rows.join(', '),reflect:val('st-reflect'),
+  callP('submitStrength',[ST.student.학번,{imageBase64:strB64,date:ST.strDate,summary:rows.join(', '),
+    reqCount:reqN,optCount:optN,reflect:val('st-reflect'),
     rpe:PICK.s.rpe,sat:PICK.s.sat,check:strCheck,exception:strException,partner:pnValue('s')}],
     function(r){progDone(strB64?'제출했어요 · 선생님 확인을 기다려요':'기록만 저장했어요',function(){
       showUp('saved-strength',r&&r.savedAt,true);
