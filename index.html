@@ -1,4 +1,7 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.85.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.86.0 -->
+<!--   [0.86.0] ① «이번 주» 대신 «1주차 필수 운동» 처럼 주차를 적는다(고른 주차를 따라간다).
+        ② 안내 상자를 «안내 ▾» 로 접을 수 있게 했다 — 한 번 접으면 그 폰에서는 계속 접힌 채로.
+        ③ 상체·하체·코어 타일 배경색을 라벨 색과 맞춰 한눈에 구분되게 했다. -->
 <!--   [0.85.0] 웨이브 니 푸시업에 단계별 그림 4장과 주의 그림을 붙였다 — steps 는 문자열 대신 {d,img} 도 받는다.
         운동 그림을 모두 JPEG 로 바꿔 용량을 1/8 로 줄였다(오프라인 캐시가 가벼워진다). -->
 <!--   [0.84.0] 필수 운동 칸에 늘 보이는 한 줄을 «단단프로젝트 설명 원문»으로 바꿨다(내가 쓰던 요령 문구 note 는 걷어냄).
@@ -161,6 +164,13 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .exrow .exfig{display:block;width:100%;max-height:240px;object-fit:contain;background:#fff;
   border:1px solid var(--line);border-radius:10px;margin:8px 0 2px}
 .exrow.fixed{border-color:var(--line2)}
+/* [0.86.0] 부위별 타일 배경 — 라벨 색과 맞춘다 */
+.exrow.c-p1{background:#F4F8FE;border-color:#D6E5F6}   /* 상체 */
+.exrow.c-p2{background:#FEF8F1;border-color:#F6E2CB}   /* 하체 */
+.exrow.c-p3{background:#F5FAF0;border-color:#DCEBCD}   /* 코어 */
+/* [0.86.0] 안내 접기 단추 */
+.gbtn{flex:none;height:28px;padding:0 11px;border-radius:9px;border:1.5px solid var(--line2);background:#fff;
+  color:var(--muted);font-family:inherit;font-size:12px;font-weight:800;cursor:pointer}
 /* [0.74.0] «방법» 아코디언 */
 .wkbadge{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;background:var(--ink2);
   color:#fff;font-size:11px;font-weight:800;vertical-align:1px}
@@ -797,7 +807,11 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       <div id="str-check"></div>
     </div>
     <div class="card">
-      <h2>이번 주 필수 운동 <span class="cap" id="str-req-lab"></span></h2>
+      <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h2 style="margin:0"><span id="str-week-ttl">1주차</span> 필수 운동</h2>
+        <button type="button" class="gbtn" id="str-gbtn" onclick="toggleGuide()">안내 ▴</button>
+      </div>
+      <p class="cap" style="margin:-4px 0 8px" id="str-req-lab"></p>
       <div class="guidebox" id="str-guidebox">
         <b>💪 3가지는 이렇게 구성하세요</b>
         <ol><li><b>상체</b> 운동 — 예) 무릎대고 팔굽혀펴기</li>
@@ -1087,8 +1101,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.85.0';
-var PWA_BUILD = '2026.09.05 23:41';
+var PWA_VER = '0.86.0';
+var PWA_BUILD = '2026.09.06 00:21';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2730,14 +2744,33 @@ function syncStrRows(){
   if(want !== have) resetStrRows();
 }
 /* 화면 위 안내문을 이번 주 필수 운동에 맞춰 쓴다 */
+function strWeekNo(){ return Number(ST.strWeek || nowWeekNo()); }
+/* [0.86.0] 안내 상자 접기 — 한 번 접으면 그 폰에서는 계속 접힌 채로 */
+function guideHidden(){ try{ return localStorage.getItem('grofit_guide_hide')==='1'; }catch(e){ return false; } }
+function applyGuideState(){
+  var box=document.getElementById('str-guidebox'), b=document.getElementById('str-gbtn');
+  if(!box||!b) return;
+  var hide=guideHidden();
+  box.classList.toggle('hidden',hide);
+  b.textContent = hide ? '안내 ▾' : '안내 ▴';
+}
+function toggleGuide(){
+  var box=document.getElementById('str-guidebox'), b=document.getElementById('str-gbtn');
+  if(!box||!b) return;
+  var hide=box.classList.toggle('hidden');
+  b.textContent = hide ? '안내 ▾' : '안내 ▴';
+  try{ localStorage.setItem('grofit_guide_hide', hide?'1':''); }catch(e){}
+}
 function renderStrGuide(){
-  var ps = strParts(), fixed = ps[0] && ps[0].name;
+  var ps = strParts(), fixed = ps[0] && ps[0].name, wk = strWeekNo();
+  var ttl = document.getElementById('str-week-ttl');
+  if(ttl) ttl.textContent = wk + '주차';
   var lab = document.getElementById('str-req-lab');
-  if(lab) lab.textContent = '· ' + ps.map(function(p){return p.name || p.k;}).join(' · ') + ' 필수';
+  if(lab) lab.textContent = ps.map(function(p){return p.name || p.k;}).join(' · ');
   var box = document.getElementById('str-guidebox');
   if(!box) return;
   if(fixed){
-    box.innerHTML = '<b>💪 이번 주 필수 운동은 '
+    box.innerHTML = '<b>💪 ' + wk + '주차 필수 운동은 '
       + ps.map(function(p){return '«'+p.name+'»';}).join(' · ') + ' 입니다</b>'
       + '<p>운동 이름은 이미 적혀 있어요.<br><b>세트와 횟수만</b> 채우면 됩니다.<br>'
       + '플랭크처럼 버티는 운동은 <b>시간</b>으로 적어요.</p>'
@@ -2753,6 +2786,7 @@ function renderStrGuide(){
       + '<span class="good">✓ 무릎대고 팔굽혀펴기 · 덤벨 숄더프레스 · 스쿼트 · 런지 · 플랭크 · 앉아 앞으로 굽히기</span></p>'
       + '<p>세 칸을 모두 채워야 저장됩니다.<br>더 했으면 아래 <b>➕ 선택 운동</b>에 넣으세요.</p>';
   }
+  applyGuideState();
 }
 /* 근력은 상체·하체·유연성 3종목 필수 → 개수 상수 대신 STR_PARTS 로 관리 */
 /* 근력 3종목은 부위가 고정 — 상체 · 하체 · 유연성 각 1개씩 필수 */
@@ -2770,7 +2804,8 @@ var STR_PARTS=[{k:'상체',c:'p1',ph:'상체 운동 (예: 무릎대고 팔굽혀
 function addStrRow(part){
   /* [0.81.0] 필수는 위 타일, 선택(추가)은 아래 타일 */
   var list=document.getElementById(part?'str-list':'str-opt') || document.getElementById('str-list');
-  var d=document.createElement('div');d.className='exrow'+(part?' fixed':'');
+  var d=document.createElement('div');
+  d.className='exrow'+(part?' fixed':'')+((part&&part.c)?(' c-'+part.c):'');   // [0.86.0] 부위별 배경색
   var head;
   if(part){ d.setAttribute('data-part',part.k);
     head='<span class="partlab '+part.c+'">'+part.k+'</span>'; }
