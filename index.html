@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.71.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.72.0 -->
+<!--   [0.72.0] 1주차 필수 운동을 «스쿼트 · 플랭크 · 레그 레이즈» 셋으로. 자세 그림 3장(ex-squat/plank/legraise.png) 첨부. part.unit='time' 이면 그 칸은 처음부터 «시간(분·초)» 으로 열린다 — 플랭크는 횟수가 아니라 버틴 시간이라서. -->
 <!--   [0.71.0] ★주차별 근력 «필수 운동» — STR_WEEK 에 주차별로 정해 두면 그 주에는 그 운동이 이름 고정(readonly)으로 뜨고, 세트·횟수만 적으면 된다. 1주차 = 스쿼트 + 크런치. 정해 두지 않은 주차는 예전대로 상체·하체·유연성 세 칸. 추가 운동은 ＋로 얼마든지. 필수 칸에는 자세 그림(ex-squat.png)과 한 줄 요령을 함께 보여 준다. -->
 <!--   [0.70.0] 1주차 지식단단에 «달리기 앱 제대로 활용하기» 추가(유산소를 앱 화면으로 인증하니 첫 주에 가장 쓸모 있다) → 1주차만 3편. 지식 편수를 2편으로 못 박아 두었던 곳(제목·목차·번호·«두 편입니다»)을 편수에 맞춰 자동으로 만들도록 고쳤다. -->
 <!--   [0.69.0] 늦은 제출 표기를 «-N%p» 에서 «N일 초과»로 바꿨다. 점수는 선생님이 '초과일급간' 시트로 정한다(GAS 0.71.0). -->
@@ -131,7 +132,7 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .partlab.p3{background:#EAF6E2;color:#4A8A00}
 /* [0.71.0] 필수 운동 — 이름 고정 칸과 자세 그림 */
 .exrow .s-name[readonly]{background:var(--bg);font-weight:800;color:var(--ink)}
-.exrow .exfig{display:block;width:100%;max-height:190px;object-fit:contain;background:#fff;
+.exrow .exfig{display:block;width:100%;max-height:240px;object-fit:contain;background:#fff;
   border:1px solid var(--line);border-radius:10px;margin:8px 0 2px}
 .exrow.fixed{border-color:var(--line2)}
 /* 횟수 / 시간 토글 — 플랭크처럼 버티는 운동은 분·초로 적는다 */
@@ -1000,7 +1001,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.71.0';
+var PWA_VER = '0.72.0';
 var PWA_BUILD = '2026.09.03 23:42';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
@@ -2469,8 +2470,12 @@ function askException(){
 var STR_WEEK = {
   1: [{k:'하체', c:'p2', name:'스쿼트', img:'ex-squat.png',
        note:'<b>무릎이 발끝을 넘지 않게</b> 엉덩이를 뒤로 빼며 의자에 앉듯 내려갑니다. 등은 곧게 펴고, 발은 어깨너비로.'},
-      {k:'코어', c:'p3', name:'크런치',
-       note:'누워서 무릎을 세우고 <b>허리는 바닥에 붙인 채</b> 어깨만 살짝 들어 올립니다. 손으로 목을 당기지 말고 시선은 위로.'}]
+      {k:'코어', c:'p1', name:'플랭크', img:'ex-plank.png', unit:'time',
+       note:'팔꿈치는 <b>어깨 바로 아래</b>, 머리부터 발뒤꿈치까지 <b>한 줄</b>로. 엉덩이가 처지거나 들리면 안 됩니다. '
+           +'<b>버틴 시간</b>을 분·초로 적으세요.'},
+      {k:'하복부', c:'p3', name:'레그 레이즈', img:'ex-legraise.png',
+       note:'누워서 <b>허리를 바닥에 붙인 채</b> 양다리를 천천히 들어 올렸다 내립니다. '
+           +'허리가 뜨면 무릎을 살짝 굽히고, 발이 바닥에 닿기 직전에 멈추세요.'}]
 };
 function strParts(){ return STR_WEEK[nowWeekNo()] || STR_PARTS; }
 /* 필수 칸이 이번 주 것과 다르면 다시 만든다 */
@@ -2490,7 +2495,7 @@ function renderStrGuide(){
   if(fixed){
     box.innerHTML = '<b>💪 이번 주 필수 운동은 '
       + ps.map(function(p){return '«'+p.name+'»';}).join(' · ') + ' 입니다</b>'
-      + '<p>운동 이름은 이미 적혀 있어요. <b>세트와 횟수만</b> 채우면 됩니다.</p>'
+      + '<p>운동 이름은 이미 적혀 있어요. <b>세트와 횟수만</b> 채우면 됩니다. 플랭크처럼 버티는 운동은 <b>시간</b>으로 적어요.</p>'
       + '<p>더 한 운동이 있으면 아래 <b>＋ 운동 추가</b>로 얼마든지 넣으세요. 스트레칭도 좋고, 하고 싶은 운동도 좋습니다.</p>';
   } else {
     box.innerHTML = '<b>💪 3가지는 이렇게 구성하세요</b>'
@@ -2524,6 +2529,7 @@ function addStrRow(part){
     head='<span class="partlab '+part.c+'">'+part.k+'</span>'; }
   else { head='<span class="strno">＋</span>'; }
   var fixName=(part&&part.name)?part.name:'';
+  var tmode=!!(part&&part.unit==='time');       // [0.72.0] 플랭크처럼 버티는 운동은 처음부터 시간 칸으로
   d.innerHTML='<div class="exname">'+head
       +'<input class="s-name" placeholder="'+(part?(part.ph||part.name||''):'운동명 (예: 플랭크)')+'"'
       +(fixName?' value="'+fixName+'" readonly':'')+'></div>'
@@ -2533,11 +2539,11 @@ function addStrRow(part){
     +'<div class="exnum">'
       +'<label>무게<input class="s-wt" inputmode="decimal" placeholder="kg"><span class="unit">kg</span></label>'
       +'<label>세트<input class="s-set" inputmode="numeric" placeholder="0"><span class="unit">세트</span></label>'
-      +'<label><span class="usel">'
-        +'<button type="button" class="on" data-m="rep" onclick="pickUnit(this)">횟수</button>'
-        +'<button type="button" data-m="time" onclick="pickUnit(this)">시간</button></span>'
-        +'<span class="repwrap"><span class="tf"><input class="s-rep" inputmode="numeric" placeholder="0"><span class="u">회</span></span></span>'
-        +'<span class="timewrap hidden">'
+      +'<label'+(tmode?' class="tmode"':'')+'><span class="usel">'
+        +'<button type="button"'+(tmode?'':' class="on"')+' data-m="rep" onclick="pickUnit(this)">횟수</button>'
+        +'<button type="button"'+(tmode?' class="on"':'')+' data-m="time" onclick="pickUnit(this)">시간</button></span>'
+        +'<span class="repwrap'+(tmode?' hidden':'')+'"><span class="tf"><input class="s-rep" inputmode="numeric" placeholder="0"><span class="u">회</span></span></span>'
+        +'<span class="timewrap'+(tmode?'':' hidden')+'">'
           +'<span class="tf"><input class="s-min" inputmode="numeric" placeholder="0"><span class="u">분</span></span>'
           +'<span class="tf"><input class="s-sec" inputmode="numeric" placeholder="0"><span class="u">초</span></span>'
         +'</span></label>'
