@@ -1,8 +1,8 @@
 /* 그로핏 PWA 서비스워커 | 버전 올리면 캐시 갱신·자동 새로고침 */
-var CACHE = 'grofit-v0.84.0';
+var CACHE = 'grofit-v0.85.0';
 var ASSETS = ['./', './index.html',
   './tab-home.png', './tab-cert.png', './tab-exercise.png', './tab-fit.png', './tab-reflect.png', './tab-score.png', './tab-notice.png', './ic-cardio.png', './ic-strength.png',
-  './jinho.png', './ex-squat.png', './ex-squat-knee.png', './ex-squat-back.png', './ex-squat-wall.png', './ex-plank.png', './ex-legraise.png',
+  './jinho.png', './ex-squat.jpg', './ex-wave-1.jpg', './ex-wave-2.jpg', './ex-wave-3.jpg', './ex-wave-4.jpg', './ex-wave-warn.jpg', './ex-squat-knee.jpg', './ex-squat-back.jpg', './ex-squat-wall.jpg', './ex-plank.jpg', './ex-legraise.jpg',
   './st-verygood.png','./st-good.png','./st-nice.png','./st-peace.png','./st-regret.png','./st-frustration.png',
   './splash-locke.jpg','./ic-flex.png','./ic-body.png'];
 /* 테마 6종의 manifest·아이콘·로고도 오프라인 캐시 (설치 아이콘이 테마별로 다름) */

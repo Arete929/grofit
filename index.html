@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.84.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.85.0 -->
+<!--   [0.85.0] 웨이브 니 푸시업에 단계별 그림 4장과 주의 그림을 붙였다 — steps 는 문자열 대신 {d,img} 도 받는다.
+        운동 그림을 모두 JPEG 로 바꿔 용량을 1/8 로 줄였다(오프라인 캐시가 가벼워진다). -->
 <!--   [0.84.0] 필수 운동 칸에 늘 보이는 한 줄을 «단단프로젝트 설명 원문»으로 바꿨다(내가 쓰던 요령 문구 note 는 걷어냄).
         설명이 밖으로 나왔으므로 «방법» 아코디언 안에서는 설명을 빼고 운동 부위부터 시작한다. -->
 <!--   [0.83.0] 읽기 편하게 두 가지 — ① word-break:keep-all 로 한글이 «스쿼/트» 처럼 낱말 중간에서 잘리지 않게 했다.
@@ -20,7 +22,7 @@
 <!--   [0.74.0] 필수 운동 칸의 «방법 ▾» 아코디언 — 펼치면 설명·운동 부위·자세 그림·수행 방법 단계·⚠주의·다른 방법·📺시연 영상(책 QR 주소)이 나온다. 그림을 늘 띄우던 것을 접어 넣어 입력 칸이 먼저 보이게 했다. 수행 방법 글은 단단프로젝트와 같은 순서·같은 내용이되 문장은 새로 썼다(그림을 일러스트로 바꾼 것과 같은 이유). -->
 <!--   [0.73.0] «이번 주 성찰 질문»을 김진호 선생님 캐릭터 말풍선으로 바꿨다(jinho.png · qBubble). 마음 한 줄 화면 · 읽을거리 화면 · 성찰 쓰는 화면 세 곳 모두 같은 모양. 선생님 코멘트 말풍선(.cmc)과 결을 맞췄다. -->
 <!--   [0.72.0] 1주차 필수 운동을 «스쿼트 · 플랭크 · 레그 레이즈» 셋으로. 자세 그림 3장(ex-squat/plank/legraise.png) 첨부. part.unit='time' 이면 그 칸은 처음부터 «시간(분·초)» 으로 열린다 — 플랭크는 횟수가 아니라 버틴 시간이라서. -->
-<!--   [0.71.0] ★주차별 근력 «필수 운동» — STR_WEEK 에 주차별로 정해 두면 그 주에는 그 운동이 이름 고정(readonly)으로 뜨고, 세트·횟수만 적으면 된다. 1주차 = 스쿼트 + 크런치. 정해 두지 않은 주차는 예전대로 상체·하체·유연성 세 칸. 추가 운동은 ＋로 얼마든지. 필수 칸에는 자세 그림(ex-squat.png)과 한 줄 요령을 함께 보여 준다. -->
+<!--   [0.71.0] ★주차별 근력 «필수 운동» — STR_WEEK 에 주차별로 정해 두면 그 주에는 그 운동이 이름 고정(readonly)으로 뜨고, 세트·횟수만 적으면 된다. 1주차 = 스쿼트 + 크런치. 정해 두지 않은 주차는 예전대로 상체·하체·유연성 세 칸. 추가 운동은 ＋로 얼마든지. 필수 칸에는 자세 그림(ex-squat.jpg)과 한 줄 요령을 함께 보여 준다. -->
 <!--   [0.70.0] 1주차 지식단단에 «달리기 앱 제대로 활용하기» 추가(유산소를 앱 화면으로 인증하니 첫 주에 가장 쓸모 있다) → 1주차만 3편. 지식 편수를 2편으로 못 박아 두었던 곳(제목·목차·번호·«두 편입니다»)을 편수에 맞춰 자동으로 만들도록 고쳤다. -->
 <!--   [0.69.0] 늦은 제출 표기를 «-N%p» 에서 «N일 초과»로 바꿨다. 점수는 선생님이 '초과일급간' 시트로 정한다(GAS 0.71.0). -->
 <!--   [0.68.0] ★지난 주차 기록도 올릴 수 있다 — 인증 화면 위에 «1주차~이번 주차» 칩(renderWkSel). 마감 지난 주차를 고르면 초과일과 깎이는 %p 를 미리 알려 준다(renderLateWarn). 기록 카드에 «N일 늦음», 내 점수에 «늦은 제출 차감» 표시. 차감은 서버가 초과일에 비례해 계산(0.70.0).
@@ -185,6 +187,7 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .howbox .hwarn b,.howbox .halt b{display:block;margin-bottom:4px;font-size:13px}
 .howbox .hwarn p,.howbox .halt p{margin:0}
 .howbox .hwarn .exfig,.howbox .halt .exfig{max-height:170px;margin:8px 0 0}
+.howbox ol li .exfig{max-height:160px;margin:7px 0 2px}
 .howbox .hsrc{display:block;margin-top:9px;text-align:right;font-size:11px;color:var(--muted2)}
 .howbox .hvid{display:block;margin-top:11px;text-align:center;padding:12px;border-radius:11px;
   background:var(--primary);color:#fff;font-weight:800;font-size:14px;text-decoration:none}
@@ -1084,8 +1087,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.84.0';
-var PWA_BUILD = '2026.09.05 23:32';
+var PWA_VER = '0.85.0';
+var PWA_BUILD = '2026.09.05 23:41';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2580,13 +2583,13 @@ var STR_WEEK = {
        desc:'무릎을 바닥에 대고 상체를 물결처럼 움직여 팔과 가슴 근육을 강화하는 운동이다.',
        body:'큰가슴근(대흉근), 위팔세갈래근(상완삼두근), 어깨세모근(삼각근)',
        feat:'스트레칭이 포함되어 있어 등과 어깨 부위의 유연성을 기르는 데도 효과적이다.',
-       steps:['양팔의 간격을 어깨보다 약간 넓게 벌린 후, 두 손과 무릎을 바닥에 대고 엎드린다.',
-              '팔을 구부리면서 상체를 천천히 아래로 내린다.',
-              '손바닥으로 바닥을 밀면서 상체를 들어 올리고 가슴 근육을 수축시킨다.',
-              '엉덩이를 뒤로 빼고 팔과 어깨를 펴면서 근육과 관절을 이완시킨다.'],
-       warn:[{t:'어깨 펴기', d:'어깨를 움츠리고 푸시업을 하면 부상 위험이 높아진다. 따라서 움츠린 어깨를 펴고 검지와 중지가 위쪽을 향하도록 자세를 잡는다.'}],
+       steps:[{d:'양팔의 간격을 어깨보다 약간 넓게 벌린 후, 두 손과 무릎을 바닥에 대고 엎드린다.', img:'ex-wave-1.jpg'},
+              {d:'팔을 구부리면서 상체를 천천히 아래로 내린다.', img:'ex-wave-2.jpg'},
+              {d:'손바닥으로 바닥을 밀면서 상체를 들어 올리고 가슴 근육을 수축시킨다.', img:'ex-wave-3.jpg'},
+              {d:'엉덩이를 뒤로 빼고 팔과 어깨를 펴면서 근육과 관절을 이완시킨다.', img:'ex-wave-4.jpg'}],
+       warn:[{t:'어깨 펴기', img:'ex-wave-warn.jpg', d:'어깨를 움츠리고 푸시업을 하면 부상 위험이 높아진다. 따라서 움츠린 어깨를 펴고 검지와 중지가 위쪽을 향하도록 자세를 잡는다.'}],
        alt:[{t:'난이도 UP · 다리 올리고 푸시업', d:'하체를 올리면 무게 중심이 상체로 이동하여 조금 더 난이도가 높은 동작의 푸시업을 할 수 있다.'}]},
-      {k:'하체', c:'p2', name:'스쿼트', nowt:true, img:'ex-squat.png', vid:'https://m.site.naver.com/1Q75J',
+      {k:'하체', c:'p2', name:'스쿼트', nowt:true, img:'ex-squat.jpg', vid:'https://m.site.naver.com/1Q75J',
        book:'단단프로젝트 29쪽 · 하프 스쿼트 / 월 스쿼트 홀드',
        desc:'무릎을 절반 정도 굽혔다가 펴면서 허벅지와 엉덩이 근육을 강화하는 운동이다.',
        body:'넙다리네갈래근(대퇴사두근), 볼기근(둔근), 넙다리뒤근육(햄스트링)',
@@ -2594,15 +2597,15 @@ var STR_WEEK = {
        steps:['발을 어깨너비 정도로 벌리고 발끝을 정면으로 향하게 하여 편안하게 선다.',
               '허리, 등이 둥글게 말리지 않도록 자세를 유지하면서 천천히 아래로 내려간다.'],
        tip:'팔다리를 곧게 유지하면 운동 효과가 더욱 증가해요!',
-       warn:[{t:'무릎의 위치', img:'ex-squat-knee.png',
+       warn:[{t:'무릎의 위치', img:'ex-squat-knee.jpg',
               d:'무릎이 발끝보다 앞으로 나갈 경우 체중이 무릎 관절에 집중될 수 있으므로, 무릎의 위치를 조정하여 하체 근육이 받는 힘을 적절히 분배해야 한다.'},
-             {t:'허리의 곡선', img:'ex-squat-back.png',
+             {t:'허리의 곡선', img:'ex-squat-back.jpg',
               d:'허리와 어깨가 둥글게 말리면 허리 통증을 유발할 수 있으므로 주의한다.'}],
-       alt:[{t:'월 스쿼트 홀드', img:'ex-squat-wall.png',
+       alt:[{t:'월 스쿼트 홀드', img:'ex-squat-wall.jpg',
              d:'무릎 각도를 90도로 유지하며 버틴다. 허리와 엉덩이를 벽에 붙이고 코어를 긴장시켜요!'},
             {t:'난이도 UP · 중량 하프 스쿼트',
              d:'케틀벨이나 덤벨을 활용하면 저항을 늘릴 수 있어서 운동 강도를 높일 수 있다.'}]},
-      {k:'코어', c:'p3', name:'레그 레이즈', nowt:true, img:'ex-legraise.png', vid:'https://m.site.naver.com/1Q7lU',
+      {k:'코어', c:'p3', name:'레그 레이즈', nowt:true, img:'ex-legraise.jpg', vid:'https://m.site.naver.com/1Q7lU',
        book:'단단프로젝트 54쪽 · 레그 레이즈',
        desc:'등을 바닥에 대고 양다리를 들어 올렸다가 내리는 하복부 강화 운동이다.',
        body:'엉덩허리근(장요근), 배곧은근(복직근), 넙다리네갈래근(대퇴사두근)',
@@ -2639,7 +2642,7 @@ var STR_WEEK = {
        warn:[{t:'균형 잡기', d:'무릎이 몸 안쪽으로 기울어지지 않도록 균형을 잡는다.'}],
        alt:[{t:'난이도 UP · 덤벨 런지',
              d:'덤벨을 들고 런지를 수행하면 운동 강도를 한 단계 더 높일 수 있다. 가벼운 무게의 덤벨부터 점차 무게를 늘려 가는 것이 안전하다.'}]},
-      {k:'코어', c:'p3', name:'플랭크', nowt:true, img:'ex-plank.png', unit:'time', vid:'https://m.site.naver.com/1Q76B',
+      {k:'코어', c:'p3', name:'플랭크', nowt:true, img:'ex-plank.jpg', unit:'time', vid:'https://m.site.naver.com/1Q76B',
        book:'단단프로젝트 30쪽 · 플랭크',
        desc:'팔꿈치와 발끝을 바닥에 대고 몸을 곧게 유지하는 코어 운동이다.',
        body:'배가로근(복횡근), 배곧은근(복직근), 배빗근(복사근)',
@@ -2860,7 +2863,10 @@ function howHTML(part){
   if(part.feat) h+='<span class="hbody">특징 · '+esc(part.feat)+'</span>';
   h+=fig(part.img, (part.name||'')+' 자세');
   if(part.steps&&part.steps.length){
-    h+='<b class="httl">수행 방법</b><ol>'+part.steps.map(function(t){return '<li>'+t+'</li>';}).join('')+'</ol>';
+    h+='<b class="httl">수행 방법</b><ol>'+part.steps.map(function(t){        /* [0.85.0] {d,img} 도 받는다 */
+      var d=(typeof t==='string')?t:(t.d||''), im=(typeof t==='string')?'':(t.img||'');
+      return '<li>'+d+fig(im,'')+'</li>';
+    }).join('')+'</ol>';
   }
   if(part.tip) h+='<p class="htip">💡 '+part.tip+'</p>';
   (part.warn||[]).forEach(function(w){
