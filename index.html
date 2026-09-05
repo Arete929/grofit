@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.75.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.76.0 -->
+<!--   [0.76.0] 맨몸 운동 칸에서 «무게(kg)» 입력을 뺐다 — part.nowt 인 필수 운동(1주차 스쿼트·플랭크·레그 레이즈)은 세트와 횟수/시간만 적는다. ＋로 넣는 추가 칸에는 무게가 그대로 있다(덤벨 운동을 적을 수 있게). 저장할 때 무게 칸이 없어도 터지지 않도록 읽는 쪽도 함께 손봤다. -->
 <!--   [0.75.0] ★스쿼트 본동작 그림을 바로잡았다 — 여태 «무릎의 위치» 주의 그림(knee_bend)을 본동작으로 잘못 썼다. 본동작은 cartoon_exercise_reference_style(팔 앞으로 뻗고 앉는 2단 그림). 주의 그림 두 장(무릎의 위치·허리의 곡선)과 월 스쿼트 홀드 그림도 각 자리에 붙였다. 설명·운동 부위·특징·수행 방법·팁·주의·난이도는 단단프로젝트 해당 쪽 그대로. -->
 <!--   [0.74.0] 필수 운동 칸의 «방법 ▾» 아코디언 — 펼치면 설명·운동 부위·자세 그림·수행 방법 단계·⚠주의·다른 방법·📺시연 영상(책 QR 주소)이 나온다. 그림을 늘 띄우던 것을 접어 넣어 입력 칸이 먼저 보이게 했다. 수행 방법 글은 단단프로젝트와 같은 순서·같은 내용이되 문장은 새로 썼다(그림을 일러스트로 바꾼 것과 같은 이유). -->
 <!--   [0.73.0] «이번 주 성찰 질문»을 김진호 선생님 캐릭터 말풍선으로 바꿨다(jinho.png · qBubble). 마음 한 줄 화면 · 읽을거리 화면 · 성찰 쓰는 화면 세 곳 모두 같은 모양. 선생님 코멘트 말풍선(.cmc)과 결을 맞췄다. -->
@@ -1040,7 +1041,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.75.0';
+var PWA_VER = '0.76.0';
 var PWA_BUILD = '2026.09.03 23:42';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
@@ -2514,7 +2515,7 @@ function askException(){
 /* [0.71.0] 주차별 «필수 운동». 여기 적어 둔 주차는 운동 이름이 고정되고, 학생은 세트·횟수만 적는다.
    적어 두지 않은 주차는 아래 STR_PARTS(상체·하체·유연성 자유 입력)로 돌아간다. */
 var STR_WEEK = {
-  1: [{k:'하체', c:'p2', name:'스쿼트', img:'ex-squat.png', vid:'https://m.site.naver.com/1Q75J',
+  1: [{k:'하체', c:'p2', name:'스쿼트', img:'ex-squat.png', nowt:true, vid:'https://m.site.naver.com/1Q75J',
        note:'<b>무릎이 발끝을 넘지 않게</b> 엉덩이를 뒤로 빼며 의자에 앉듯 내려갑니다. 등은 곧게 펴고, 발은 어깨너비로.',
        book:'단단프로젝트 29쪽 · 하프 스쿼트 / 월 스쿼트 홀드',
        desc:'무릎을 절반 정도 굽혔다가 펴면서 허벅지와 엉덩이 근육을 강화하는 운동이다.',
@@ -2531,7 +2532,7 @@ var STR_WEEK = {
              d:'무릎 각도를 90도로 유지하며 버틴다. 허리와 엉덩이를 벽에 붙이고 코어를 긴장시켜요!'},
             {t:'난이도 UP · 중량 하프 스쿼트',
              d:'케틀벨이나 덤벨을 활용하면 저항을 늘릴 수 있어서 운동 강도를 높일 수 있다.'}]},
-      {k:'코어', c:'p1', name:'플랭크', img:'ex-plank.png', unit:'time', vid:'https://m.site.naver.com/1Q76B',
+      {k:'코어', c:'p1', name:'플랭크', img:'ex-plank.png', nowt:true, unit:'time', vid:'https://m.site.naver.com/1Q76B',
        note:'팔꿈치는 <b>어깨 바로 아래</b>, 머리부터 발뒤꿈치까지 <b>한 줄</b>로. 엉덩이가 처지거나 들리면 안 됩니다. '
            +'<b>버틴 시간</b>을 분·초로 적으세요.',
        book:'단단프로젝트 30쪽 · 플랭크',
@@ -2545,7 +2546,7 @@ var STR_WEEK = {
               d:'허리가 아래쪽으로 휘거나 엉덩이, 목 등을 과도하게 드는 자세는 신체에 무리를 주기 때문에 척추 중립 자세를 유지해야 한다.'}],
        alt:[{t:'난이도 UP · 플랭크 자세 유지하며 다리 들기',
              d:'플랭크 자세를 유지한 채 양쪽 다리를 번갈아 가면서 들어 올린다.'}]},
-      {k:'하복부', c:'p3', name:'레그 레이즈', img:'ex-legraise.png', vid:'https://m.site.naver.com/1Q7lU',
+      {k:'하복부', c:'p3', name:'레그 레이즈', img:'ex-legraise.png', nowt:true, vid:'https://m.site.naver.com/1Q7lU',
        note:'누워서 <b>허리를 바닥에 붙인 채</b> 양다리를 천천히 들어 올렸다 내립니다. '
            +'허리가 뜨면 무릎을 살짝 굽히고, 발이 바닥에 닿기 직전에 멈추세요.',
        book:'단단프로젝트 54쪽 · 레그 레이즈',
@@ -2615,6 +2616,7 @@ function addStrRow(part){
   else { head='<span class="strno">＋</span>'; }
   var fixName=(part&&part.name)?part.name:'';
   var tmode=!!(part&&part.unit==='time');       // [0.72.0] 플랭크처럼 버티는 운동은 처음부터 시간 칸으로
+  var nowt=!!(part&&part.nowt);                 // [0.76.0] 맨몸 운동은 무게 칸을 만들지 않는다
   d.innerHTML='<div class="exname">'+head
       +'<input class="s-name" placeholder="'+(part?(part.ph||part.name||''):'운동명 (예: 플랭크)')+'"'
       +(fixName?' value="'+fixName+'" readonly':'')+'>'
@@ -2623,7 +2625,7 @@ function addStrRow(part){
     +((part&&part.note)?'<p class="exnote">'+part.note+'</p>':'')
     +howHTML(part)
     +'<div class="exnum">'
-      +'<label>무게<input class="s-wt" inputmode="decimal" placeholder="kg"><span class="unit">kg</span></label>'
+      +(nowt?'':'<label>무게<input class="s-wt" inputmode="decimal" placeholder="kg"><span class="unit">kg</span></label>')
       +'<label>세트<input class="s-set" inputmode="numeric" placeholder="0"><span class="unit">세트</span></label>'
       +'<label'+(tmode?' class="tmode"':'')+'><span class="usel">'
         +'<button type="button"'+(tmode?'':' class="on"')+' data-m="rep" onclick="pickUnit(this)">횟수</button>'
@@ -2717,7 +2719,8 @@ function saveStrength(){
   document.querySelectorAll('#str-list .exrow').forEach(function(r){
     var part=r.getAttribute('data-part')||'';
     var nm=r.querySelector('.s-name').value.trim();
-    var wt=r.querySelector('.s-wt').value.trim();     // 무게는 선택(맨몸운동은 비움)
+    var wtEl=r.querySelector('.s-wt');                // [0.76.0] 맨몸 칸에는 무게 입력이 아예 없다
+    var wt=wtEl?wtEl.value.trim():'';
     var st=r.querySelector('.s-set').value.trim();
     var rp=strRepText(r);                             // '12회' 또는 '1분 30초'
     var txt=nm+(wt?' '+wt+'kg':'')+' '+st+'세트×'+rp;
