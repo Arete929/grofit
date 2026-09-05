@@ -1,4 +1,7 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.87.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.88.0 -->
+<!--   [0.88.0] ★주차를 바꿔도 운동 칸이 1주차 그대로이던 버그 수정.
+        syncStrRows 가 «상체·하체·코어» 부위 이름만 비교했는데 이건 주차마다 같아서 늘 «그대로»로 판단했다.
+        이제 칸을 만든 주차(data-week)를 기억했다가 다르면 다시 그린다. -->
 <!--   [0.87.0] 암 워킹·리버스 런지 그림을 단계와 주의에 붙였다.
         3277(선생님) 계정은 주차 칩에 <b>모든 주차</b>가 나와 다음 주 내용을 미리 볼 수 있다(«미리보기» 표시). 읽을거리·마음 한 줄도 마찬가지. -->
 <!--   [0.86.0] ① «이번 주» 대신 «1주차 필수 운동» 처럼 주차를 적는다(고른 주차를 따라간다).
@@ -1105,8 +1108,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.87.0';
-var PWA_BUILD = '2026.09.06 01:12';
+var PWA_VER = '0.88.0';
+var PWA_BUILD = '2026.09.06 01:19';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2742,10 +2745,11 @@ var STR_WEEK = {
 function strParts(w){ w = Number(w || ST.strWeek || nowWeekNo()); return STR_WEEK[w] || STR_PARTS; }
 /* 필수 칸이 이번 주 것과 다르면 다시 만든다 */
 function syncStrRows(){
-  var want = strParts().map(function(p){return p.k;}).join(',');
-  var have = [].map.call(document.querySelectorAll('#str-list .exrow[data-part]'),
-                         function(r){return r.getAttribute('data-part');}).join(',');
-  if(want !== have) resetStrRows();
+  /* [0.88.0] 부위 이름(상체·하체·코어)은 주차마다 같아서 비교 기준이 못 된다.
+     칸을 만든 «주차»를 기억해 두고, 주차가 달라졌거나 칸이 비었으면 다시 그린다. */
+  var list = document.getElementById('str-list'); if(!list) return;
+  var w = String(strWeekNo());
+  if(list.getAttribute('data-week') !== w || !list.children.length) resetStrRows();
 }
 /* 화면 위 안내문을 이번 주 필수 운동에 맞춰 쓴다 */
 function strWeekNo(){ return Number(ST.strWeek || nowWeekNo()); }
@@ -2959,7 +2963,9 @@ function strRepText(row){
 }
 /* 상체·하체·유연성 고정칸을 미리 만들어 둔다 */
 function resetStrRows(){
-  document.getElementById('str-list').innerHTML='';
+  var list=document.getElementById('str-list');
+  list.innerHTML='';
+  list.setAttribute('data-week', String(strWeekNo()));      // [0.88.0] 어느 주차로 만든 칸인지 기억
   var opt=document.getElementById('str-opt'); if(opt)opt.innerHTML='';
   strParts().forEach(function(p){addStrRow(p);});
 }
