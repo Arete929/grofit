@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.76.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.77.0 -->
+<!--   [0.77.0] 지난 주차를 채워 넣을 때 «그 주»의 필수 운동이 뜨도록 고쳤다. strParts() 가 늘 현재 주차만 보던 탓에, 3주차에 1주차 기록을 넣으면 3주차 필수 운동이 떴다. 이제 고른 주차(ST.strWeek)를 따른다. -->
 <!--   [0.76.0] 맨몸 운동 칸에서 «무게(kg)» 입력을 뺐다 — part.nowt 인 필수 운동(1주차 스쿼트·플랭크·레그 레이즈)은 세트와 횟수/시간만 적는다. ＋로 넣는 추가 칸에는 무게가 그대로 있다(덤벨 운동을 적을 수 있게). 저장할 때 무게 칸이 없어도 터지지 않도록 읽는 쪽도 함께 손봤다. -->
 <!--   [0.75.0] ★스쿼트 본동작 그림을 바로잡았다 — 여태 «무릎의 위치» 주의 그림(knee_bend)을 본동작으로 잘못 썼다. 본동작은 cartoon_exercise_reference_style(팔 앞으로 뻗고 앉는 2단 그림). 주의 그림 두 장(무릎의 위치·허리의 곡선)과 월 스쿼트 홀드 그림도 각 자리에 붙였다. 설명·운동 부위·특징·수행 방법·팁·주의·난이도는 단단프로젝트 해당 쪽 그대로. -->
 <!--   [0.74.0] 필수 운동 칸의 «방법 ▾» 아코디언 — 펼치면 설명·운동 부위·자세 그림·수행 방법 단계·⚠주의·다른 방법·📺시연 영상(책 QR 주소)이 나온다. 그림을 늘 띄우던 것을 접어 넣어 입력 칸이 먼저 보이게 했다. 수행 방법 글은 단단프로젝트와 같은 순서·같은 내용이되 문장은 새로 썼다(그림을 일러스트로 바꾼 것과 같은 이유). -->
@@ -1041,7 +1042,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.76.0';
+var PWA_VER = '0.77.0';
 var PWA_BUILD = '2026.09.03 23:42';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
@@ -2321,7 +2322,11 @@ function renderWkSel(prov){
   }
   box.innerHTML=h;
 }
-function selWk(prov,w){ ST[prov+'Week']=Number(w); renderDayPicker(prov); }
+function selWk(prov,w){
+  ST[prov+'Week']=Number(w);
+  renderDayPicker(prov);
+  if(prov==='str'){ renderStrGuide(); syncStrRows(); }   // [0.77.0] 그 주 필수 운동으로 갈아 끼운다
+}
 function renderLateWarn(prov){
   var el=document.getElementById(prov+'-late'); if(!el)return;
   var w=ST[prov+'Week']||nowWeekNo(), d=lateDaysFor(w);
@@ -2562,7 +2567,8 @@ var STR_WEEK = {
              d:'무릎을 접어서 레그 레이즈를 실시하는 운동으로, 다리를 곧게 펴는 레그 레이즈보다 허리에 가해지는 압력이 적어 '
               +'허리 통증이 있거나 복부 근력이 약한 사람도 안전하게 수행할 수 있다.'}]}]
 };
-function strParts(){ return STR_WEEK[nowWeekNo()] || STR_PARTS; }
+/* [0.77.0] 고른 주차의 필수 운동. 지난 주차를 채워 넣을 때도 그 주 것이 떠야 한다 */
+function strParts(w){ w = Number(w || ST.strWeek || nowWeekNo()); return STR_WEEK[w] || STR_PARTS; }
 /* 필수 칸이 이번 주 것과 다르면 다시 만든다 */
 function syncStrRows(){
   var want = strParts().map(function(p){return p.k;}).join(',');
