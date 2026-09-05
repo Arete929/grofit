@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.83.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.84.0 -->
+<!--   [0.84.0] 필수 운동 칸에 늘 보이는 한 줄을 «단단프로젝트 설명 원문»으로 바꿨다(내가 쓰던 요령 문구 note 는 걷어냄).
+        설명이 밖으로 나왔으므로 «방법» 아코디언 안에서는 설명을 빼고 운동 부위부터 시작한다. -->
 <!--   [0.83.0] 읽기 편하게 두 가지 — ① word-break:keep-all 로 한글이 «스쿼/트» 처럼 낱말 중간에서 잘리지 않게 했다.
         ② 안내 글은 마침표마다 줄을 바꿔 한 문장씩 보이게 했다(근력·유산소 안내 상자). -->
 <!--   [0.82.0] 로그인한 화면 맨 아래(탭바 바로 위)에 «혜원핏 v0.82.0 · 배포 시각 · 서버 v0.72.0» 한 줄 표시.
@@ -130,6 +132,9 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .exnote{margin:7px 0 2px;background:var(--warning-tint);border-radius:9px;padding:8px 10px;
   font-size:11.5px;line-height:1.7;color:var(--ink2)}
 .exnote b{color:var(--warning)}
+/* [0.84.0] 책 설명 원문은 안내(주황) 아닌 차분한 회색 상자로 */
+.exnote.bookdesc{background:var(--bg);border:1px solid var(--line);color:var(--ink2)}
+.exnote.bookdesc b{color:var(--ink)}
 .exnote .bad,.exex .bad{color:var(--danger);font-weight:700}
 .exnote .good,.exex .good{color:var(--primary-dark);font-weight:700}
 .exex{margin:6px 0 0;font-size:11.5px;line-height:1.75}
@@ -1079,8 +1084,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.83.0';
-var PWA_BUILD = '2026.09.05 23:27';
+var PWA_VER = '0.84.0';
+var PWA_BUILD = '2026.09.05 23:32';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2571,7 +2576,6 @@ function askException(){
 var STR_WEEK = {
   /* ═══ 1주차 ═══ */
   1: [{k:'상체', c:'p1', name:'웨이브 니 푸시업', nowt:true, vid:'https://m.site.naver.com/1Q71P',
-       note:'무릎을 대고 <b>상체를 물결처럼</b> 움직입니다. 어깨를 움츠리지 말고 펴세요.',
        book:'단단프로젝트 28쪽 · 웨이브 니 푸시업',
        desc:'무릎을 바닥에 대고 상체를 물결처럼 움직여 팔과 가슴 근육을 강화하는 운동이다.',
        body:'큰가슴근(대흉근), 위팔세갈래근(상완삼두근), 어깨세모근(삼각근)',
@@ -2583,7 +2587,6 @@ var STR_WEEK = {
        warn:[{t:'어깨 펴기', d:'어깨를 움츠리고 푸시업을 하면 부상 위험이 높아진다. 따라서 움츠린 어깨를 펴고 검지와 중지가 위쪽을 향하도록 자세를 잡는다.'}],
        alt:[{t:'난이도 UP · 다리 올리고 푸시업', d:'하체를 올리면 무게 중심이 상체로 이동하여 조금 더 난이도가 높은 동작의 푸시업을 할 수 있다.'}]},
       {k:'하체', c:'p2', name:'스쿼트', nowt:true, img:'ex-squat.png', vid:'https://m.site.naver.com/1Q75J',
-       note:'<b>무릎이 발끝을 넘지 않게</b> 엉덩이를 뒤로 빼며 의자에 앉듯 내려갑니다. 등은 곧게 펴고, 발은 어깨너비로.',
        book:'단단프로젝트 29쪽 · 하프 스쿼트 / 월 스쿼트 홀드',
        desc:'무릎을 절반 정도 굽혔다가 펴면서 허벅지와 엉덩이 근육을 강화하는 운동이다.',
        body:'넙다리네갈래근(대퇴사두근), 볼기근(둔근), 넙다리뒤근육(햄스트링)',
@@ -2600,7 +2603,6 @@ var STR_WEEK = {
             {t:'난이도 UP · 중량 하프 스쿼트',
              d:'케틀벨이나 덤벨을 활용하면 저항을 늘릴 수 있어서 운동 강도를 높일 수 있다.'}]},
       {k:'코어', c:'p3', name:'레그 레이즈', nowt:true, img:'ex-legraise.png', vid:'https://m.site.naver.com/1Q7lU',
-       note:'누워서 <b>허리를 바닥에 붙인 채</b> 양다리를 천천히 들어 올렸다 내립니다. 허리가 뜨면 무릎을 살짝 굽히세요.',
        book:'단단프로젝트 54쪽 · 레그 레이즈',
        desc:'등을 바닥에 대고 양다리를 들어 올렸다가 내리는 하복부 강화 운동이다.',
        body:'엉덩허리근(장요근), 배곧은근(복직근), 넙다리네갈래근(대퇴사두근)',
@@ -2614,7 +2616,6 @@ var STR_WEEK = {
 
   /* ═══ 2주차 ═══ */
   2: [{k:'상체', c:'p1', name:'암 워킹', nowt:true, vid:'https://m.site.naver.com/1Q7GX',
-       note:'선 자세에서 <b>손으로 걸어 나가</b> 플랭크까지 갔다 돌아옵니다. 무릎은 펴고 허리는 곧게.',
        book:'단단프로젝트 107쪽 · 암 워킹',
        desc:'손으로 바닥을 짚고 앞으로 이동하며 상체 근육을 강화하는 전신 운동이다.',
        body:'어깨세모근(삼각근), 큰가슴근(대흉근), 위팔세갈래근(상완삼두근)',
@@ -2628,7 +2629,6 @@ var STR_WEEK = {
        alt:[{t:'난이도 UP · 암 워킹 니 턱',
              d:'암 워킹 동작 후 플랭크 자세에서 무릎을 가슴 쪽으로 당기는 동작을 추가해, 상체와 하체·코어 근육을 동시에 강화하고 심박수까지 높여 주는 복합 전신 운동이다.'}]},
       {k:'하체', c:'p2', name:'리버스 런지', nowt:true, vid:'https://m.site.naver.com/1Q7fT',
-       note:'한쪽 발을 <b>뒤로</b> 내디디며 무릎을 굽힙니다. 등이 굽지 않게 일직선을 지키세요.',
        book:'단단프로젝트 41쪽 · 리버스 런지',
        desc:'한쪽 발을 뒤로 내딛는 동시에 무릎을 굽혀 하체 근육을 강화하는 운동이다.',
        body:'볼기근(둔근), 넙다리네갈래근(대퇴사두근), 넙다리뒤근육(햄스트링)',
@@ -2640,7 +2640,6 @@ var STR_WEEK = {
        alt:[{t:'난이도 UP · 덤벨 런지',
              d:'덤벨을 들고 런지를 수행하면 운동 강도를 한 단계 더 높일 수 있다. 가벼운 무게의 덤벨부터 점차 무게를 늘려 가는 것이 안전하다.'}]},
       {k:'코어', c:'p3', name:'플랭크', nowt:true, img:'ex-plank.png', unit:'time', vid:'https://m.site.naver.com/1Q76B',
-       note:'팔꿈치는 <b>어깨 바로 아래</b>, 머리부터 발뒤꿈치까지 <b>한 줄</b>로. <b>버틴 시간</b>을 분·초로 적으세요.',
        book:'단단프로젝트 30쪽 · 플랭크',
        desc:'팔꿈치와 발끝을 바닥에 대고 몸을 곧게 유지하는 코어 운동이다.',
        body:'배가로근(복횡근), 배곧은근(복직근), 배빗근(복사근)',
@@ -2653,7 +2652,6 @@ var STR_WEEK = {
 
   /* ═══ 3주차 ═══ */
   3: [{k:'상체', c:'p1', name:'스탠다드 / 내로우 푸시업', nowt:true, vid:'https://m.site.naver.com/1Q7Bb',
-       note:'몸을 <b>일직선</b>으로 유지한 채 팔꿈치를 굽혀 내려갑니다. 힘들면 <b>무릎을 대고</b> 하세요.',
        book:'단단프로젝트 92쪽 · 스탠다드 / 내로우 푸시업',
        desc:'손 위치를 조절하여 가슴, 어깨, 팔 근육을 강화하는 기본적인 상체 운동이다.',
        body:'큰가슴근(대흉근), 위팔세갈래근(상완삼두근), 어깨세모근(삼각근)',
@@ -2665,7 +2663,6 @@ var STR_WEEK = {
        alt:[{t:'다이아몬드 푸시업', d:'손을 다이아몬드 모양으로 모아 팔꿈치를 몸에 가까이 두어 위팔세갈래근에 자극을 주는 운동이다.'},
             {t:'디클라인 푸시업', d:'발을 높인 상태에서 푸시업을 진행하여 상체와 어깨에 자극을 주는 운동이다.'}]},
       {k:'하체', c:'p2', name:'와이드 스쿼트', nowt:true, vid:'https://m.site.naver.com/1Q7oy',
-       note:'다리를 <b>어깨너비보다 넓게</b> 벌리고 발끝은 45도. 무릎이 발끝 방향을 따라가야 합니다.',
        book:'단단프로젝트 65쪽 · 와이드 스쿼트',
        desc:'다리를 어깨너비보다 넓게 벌린 자세에서 무릎을 굽혔다가 펴는 하체 운동이다.',
        body:'볼기근(둔근), 긴모음근(장내전근), 넙다리네갈래근(대퇴사두근)',
@@ -2677,7 +2674,6 @@ var STR_WEEK = {
        warn:[{t:'상체의 각도', d:'상체를 과도하게 앞으로 숙이게 되면 체중이 앞으로 쏠리면서 볼기근(둔근)의 개입이 줄고 허리에만 힘이 들어가는 비효율적인 자세가 되어 운동 효과가 현저하게 떨어진다.'}],
        alt:[{t:'내로우 스쿼트', d:'기본 스쿼트보다 양발의 폭을 줄여서 운동하는 동작이다. 양발의 간격을 좁히면 허벅지 앞쪽 근육에 더 큰 자극이 가해지고, 무릎의 안정성 강화에도 도움이 된다.'}]},
       {k:'코어', c:'p3', name:'사이드 플랭크', nowt:true, unit:'time', vid:'https://m.site.naver.com/1Q7uw',
-       note:'옆으로 누워 <b>아래팔은 어깨 아래</b>에 두고 엉덩이를 들어 한 줄로. <b>버틴 시간</b>을 적으세요.',
        book:'단단프로젝트 82쪽 · 사이드 플랭크',
        desc:'몸을 옆으로 눕혀 한쪽 팔과 다리로 자세를 유지하는 코어 운동이다.',
        body:'배빗근(복사근), 중간볼기근(중둔근), 배가로근(복횡근)',
@@ -2689,7 +2685,6 @@ var STR_WEEK = {
 
   /* ═══ 4주차 ═══ */
   4: [{k:'상체', c:'p1', name:'베어 크롤', nowt:true, vid:'https://m.site.naver.com/1Q7W4',
-       note:'네발 자세에서 <b>무릎을 살짝 띄우고</b> 손발을 번갈아 옮깁니다. 좁으면 제자리에서 손발만 번갈아 들어도 됩니다.',
        book:'단단프로젝트 132쪽 · 베어 크롤',
        desc:'네발(손과 발)로 기어가듯 전진하는 유산소 및 근력 운동이다.',
        body:'어깨세모근(삼각근), 위팔세갈래근(상완삼두근), 코어 근육',
@@ -2701,7 +2696,6 @@ var STR_WEEK = {
        warn:[{t:'엉덩이 위치', d:'엉덩이가 상체보다 높이 올라가지 않도록 낮은 자세를 유지한다.'}],
        alt:[{t:'난이도 UP · 덤벨 베어 크롤', d:'덤벨을 들고 베어 크롤 동작을 수행함으로써 상체 근육에 더 큰 저항을 주고, 코어 안정성을 강화하는 변형 운동이다.'}]},
       {k:'하체', c:'p2', name:'크로스 백 런지', nowt:true, vid:'https://m.site.naver.com/1Q7Yc',
-       note:'한쪽 다리를 <b>반대쪽 다리 뒤로 교차</b>시키며 무릎을 굽힙니다. 몸이 비틀어지지 않게 정면을 보세요.',
        book:'단단프로젝트 133쪽 · 크로스 백 런지',
        desc:'한쪽 다리를 뒤로 보내면서 신체 균형을 잡는 하체 및 코어 운동이다.',
        body:'볼기근(둔근), 넙다리네갈래근(대퇴사두근), 모음근(내전근)',
@@ -2712,7 +2706,6 @@ var STR_WEEK = {
        warn:[{t:'정면 바라보기', d:'한쪽 다리를 반대편 대각선 뒤쪽으로 보낼 때 몸이 비틀어지지 않도록 정면을 바라보면서 자세를 유지한다.'}],
        alt:[{t:'사이드 런지', d:'다리를 옆으로 넓게 벌려 한쪽 무릎을 굽혔다 펴는 동작으로, 하체와 엉덩이 근육에 다양한 자극을 줄 수 있다.'}]},
       {k:'코어', c:'p3', name:'힐 터치', nowt:true, vid:'https://m.site.naver.com/1Q7TJ',
-       note:'누워서 무릎을 세우고 <b>좌우로 번갈아</b> 발뒤꿈치를 손으로 터치합니다. 목에 힘을 빼세요.',
        book:'단단프로젝트 118쪽 · 힐 터치',
        desc:'몸을 좌우로 비틀며 손으로 발뒤꿈치를 번갈아 터치하는 복부 강화 운동이다.',
        body:'바깥배빗근(외복사근), 배곧은근(복직근)',
@@ -2787,7 +2780,7 @@ function addStrRow(part){
       +(fixName?' value="'+fixName+'" readonly':'')+'>'
       +((part&&(part.steps||part.img||part.vid))?'<button type="button" class="howbtn" onclick="toggleHow(this)">방법 ▾</button>':'')
     +'</div>'
-    +((part&&part.note)?'<p class="exnote">'+part.note+'</p>':'')
+    +((part&&(part.desc||part.note))?'<p class="exnote'+(part.desc?' bookdesc':'')+'">'+(part.desc||part.note)+'</p>':'')
     +howHTML(part)
     +'<div class="exnum">'
       +(nowt?'':'<label>무게<input class="s-wt" inputmode="decimal" placeholder="kg"><span class="unit">kg</span></label>')
@@ -2863,7 +2856,6 @@ function howHTML(part){
   if(!part || !(part.steps || part.img || part.vid)) return '';
   var fig=function(src,alt){ return src?('<img class="exfig" src="'+src+'" alt="'+esc(alt||'')+'" onerror="this.style.display=\'none\'">'):''; };
   var h='<div class="howbox hidden">';
-  if(part.desc) h+='<p class="hdesc">'+part.desc+'</p>';
   if(part.body) h+='<span class="hbody">운동 부위 · '+esc(part.body)+'</span>';
   if(part.feat) h+='<span class="hbody">특징 · '+esc(part.feat)+'</span>';
   h+=fig(part.img, (part.name||'')+' 자세');
