@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.69.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.70.0 -->
+<!--   [0.70.0] 1주차 지식단단에 «달리기 앱 제대로 활용하기» 추가(유산소를 앱 화면으로 인증하니 첫 주에 가장 쓸모 있다) → 1주차만 3편. 지식 편수를 2편으로 못 박아 두었던 곳(제목·목차·번호·«두 편입니다»)을 편수에 맞춰 자동으로 만들도록 고쳤다. -->
 <!--   [0.69.0] 늦은 제출 표기를 «-N%p» 에서 «N일 초과»로 바꿨다. 점수는 선생님이 '초과일급간' 시트로 정한다(GAS 0.71.0). -->
 <!--   [0.68.0] ★지난 주차 기록도 올릴 수 있다 — 인증 화면 위에 «1주차~이번 주차» 칩(renderWkSel). 마감 지난 주차를 고르면 초과일과 깎이는 %p 를 미리 알려 준다(renderLateWarn). 기록 카드에 «N일 늦음», 내 점수에 «늦은 제출 차감» 표시. 차감은 서버가 초과일에 비례해 계산(0.70.0).
         ※함께 고침 — 근력 인증 화면의 날짜 팔레트가 여태 안 보였다. renderDayPicker('strength') 가 str-days/ST.strDate 와 이름이 어긋나 그림이 안 그려졌고, 그래서 근력은 늘 «오늘» 로 저장됐다. 'str' 로 통일. -->
@@ -994,7 +995,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.69.0';
+var PWA_VER = '0.70.0';
 var PWA_BUILD = '2026.09.03 23:42';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
@@ -1565,6 +1566,63 @@ var KN = {
   }
 };
 
+KN.달리기앱 = {
+  제목: '달리기 앱 제대로 쓰기',
+  부제: '유산소 인증은 앱 화면을 찍어 올립니다. 첫 주에 설정을 잡아 두면 4주가 편합니다.',
+  카드부제: '무엇을 켜고 무엇을 찍어야 하나 · 실내에서 거리가 0인 이유',
+  본문: [
+    {h:'무엇으로 재도 됩니다',
+     p:['삼성 헬스, 나이키 런 클럽, 스트라바, 아이폰 건강 앱 — <b>거리와 시간이 나오는 앱이면 무엇이든</b> 됩니다. '
+       +'이미 쓰던 것이 있으면 그대로 쓰세요. 새로 깔 필요 없습니다.',
+        '<b>달리기가 아니어도 됩니다.</b> 빠르게 걷기, 자전거도 유산소입니다. 앱에서 종목만 맞게 고르면 됩니다.']},
+    {h:'시작 전에 두 가지만',
+     p:['첫째, <b>위치(GPS)를 켜세요.</b> 이것이 꺼져 있으면 아무리 뛰어도 <b>거리가 0km</b>로 남습니다. '
+       +'인증할 거리가 없어서 다시 뛰어야 합니다.',
+        '둘째, <b>실내에서는 GPS가 잡히지 않습니다.</b> 러닝머신이나 아파트 복도에서 뛰면 거리가 안 나옵니다. '
+       +'실내라면 러닝머신 화면을 찍거나, 앱에서 «실내 러닝»을 고르세요.']},
+    {h:'무엇을 찍어야 하나',
+     p:['운동이 끝나면 앱이 <b>결과 화면</b>을 보여 줍니다. 그 화면을 그대로 캡처해서 올리면 됩니다. '
+       +'여기에 <b>거리 · 시간 · 날짜</b> 세 가지가 보여야 합니다. 지도만 나온 화면이나 주간 합계 화면은 안 됩니다.',
+        '캡처한 화면을 보고 <b>거리와 시간을 직접 적습니다.</b> 앱이 대신 읽어 주지 않습니다. '
+       +'자기 손으로 적어 보는 것에 뜻이 있습니다.'],
+     fig:figRunShot(), cap:'이 세 가지가 한 화면에 보이면 됩니다 — 거리 · 시간 · 날짜'},
+    {h:'자주 걸리는 것',
+     p:['<b>자동 일시정지</b>를 켜 두면 신호등에서 멈출 때마다 시간이 멈춥니다. 30분을 나갔는데 기록은 21분으로 남습니다. '
+       +'끄는 편이 실제와 가깝습니다.',
+        '<b>페이스</b>는 1km를 가는 데 걸린 시간입니다. «7\'30\"»이면 1km에 7분 30초입니다. 숫자가 작을수록 빠릅니다. '
+       +'남과 견주지 말고 <b>지난주의 나</b>와 견주세요.']}
+  ],
+  퀴즈: [
+    {q:'위치(GPS)를 꺼도 앱이 거리를 재 준다.', a:false,
+     why:'GPS가 꺼져 있으면 거리가 0km로 남습니다. 나가기 전에 위치 권한과 GPS를 켜세요.'},
+    {q:'러닝머신에서 뛰면 앱에 거리가 잘 안 잡힌다.', a:true,
+     why:'실내는 GPS 신호가 닿지 않습니다. 러닝머신 화면을 찍거나 앱에서 «실내 러닝»을 고르세요.'},
+    {q:'페이스 6분 30초가 7분 30초보다 빠른 것이다.', a:true,
+     why:'페이스는 1km에 걸린 시간이라 숫자가 작을수록 빠릅니다.'}
+  ]
+};
+/* 운동 앱 결과 화면에서 무엇을 봐야 하는지 */
+function figRunShot(){
+  return '<svg viewBox="0 0 320 150" width="100%" style="display:block">'
+    +'<rect x="86" y="6" width="148" height="138" rx="14" fill="#f6f8f5" stroke="#dfe5df" stroke-width="1.5"/>'
+    +'<text x="160" y="30" font-size="10.5" fill="#8a978c" text-anchor="middle">오늘의 달리기</text>'
+    +'<text x="160" y="62" font-size="30" font-weight="800" fill="#17211b" text-anchor="middle">3.20</text>'
+    +'<text x="160" y="76" font-size="10" fill="#8a978c" text-anchor="middle">킬로미터</text>'
+    +'<line x1="102" y1="88" x2="218" y2="88" stroke="#e6ebe6" stroke-width="1"/>'
+    +'<text x="126" y="108" font-size="15" font-weight="800" fill="#17211b" text-anchor="middle">24:10</text>'
+    +'<text x="126" y="120" font-size="9" fill="#8a978c" text-anchor="middle">시간</text>'
+    +'<text x="194" y="108" font-size="15" font-weight="800" fill="#17211b" text-anchor="middle">7\'33"</text>'
+    +'<text x="194" y="120" font-size="9" fill="#8a978c" text-anchor="middle">페이스</text>'
+    +'<text x="160" y="138" font-size="9.5" fill="#5b6b60" text-anchor="middle">2026. 9. 8. 화요일</text>'
+    +'<circle cx="70" cy="60" r="11" fill="#19c37d"/><text x="70" y="64" font-size="11" font-weight="800" fill="#fff" text-anchor="middle">1</text>'
+    +'<text x="54" y="82" font-size="9.5" font-weight="700" fill="#12a869" text-anchor="middle">거리</text>'
+    +'<circle cx="250" cy="106" r="11" fill="#19c37d"/><text x="250" y="110" font-size="11" font-weight="800" fill="#fff" text-anchor="middle">2</text>'
+    +'<text x="266" y="128" font-size="9.5" font-weight="700" fill="#12a869" text-anchor="middle">시간</text>'
+    +'<circle cx="70" cy="132" r="11" fill="#19c37d"/><text x="70" y="136" font-size="11" font-weight="800" fill="#fff" text-anchor="middle">3</text>'
+    +'<text x="36" y="136" font-size="9.5" font-weight="700" fill="#12a869">날짜</text>'
+    +'</svg>';
+}
+
 var READINGS = {
   1: { 주차: 1,
     마음: {
@@ -1643,7 +1701,7 @@ var READINGS = {
     지식: [KN.키, KN.건]
   }
 };
-READINGS[1].지식 = [OLDR[1], OLDR[4]];
+READINGS[1].지식 = [OLDR[1], OLDR[4], KN.달리기앱];   /* [0.70.0] 첫 주에 유산소 인증이 시작되므로 달리기 앱 편을 함께 */
 READINGS[2].지식 = [OLDR[3], OLDR[2]];
 
 /* ── 새 글 그림 (SVG) ── */
@@ -1721,8 +1779,8 @@ function renderMindCard(){
 function renderReadCard(){
   var c=document.getElementById('rd-card'); if(!c)return;
   var w=curWeekNo(), R=weekReading(w), at=readDone(w,'지식');
-  document.getElementById('rd-tag').textContent=at?('읽음 · '+w+'주차 지식'):(w+'주차 읽을거리 · 지식 2편');
-  document.getElementById('rd-title').textContent=R.지식[0].제목+' · '+R.지식[1].제목;
+  document.getElementById('rd-tag').textContent=at?('읽음 · '+w+'주차 지식'):(w+'주차 읽을거리 · 지식 '+R.지식.length+'편');
+  document.getElementById('rd-title').textContent=readTitles(R);
   document.getElementById('rd-sub').textContent=R.지식[0].카드부제||'';
   c.classList.toggle('done',!!at);
 }
@@ -1734,7 +1792,7 @@ function pastHtml(kind){
   var cur=curWeekNo(), now=readWeekNo(), h='';
   for(var w=1;w<=4;w++){
     if(w>cur||w===now)continue;
-    var R=weekReading(w), t=(kind==='마음')?R.마음.제목:(R.지식[0].제목+' · '+R.지식[1].제목);
+    var R=weekReading(w), t=(kind==='마음')?R.마음.제목:readTitles(R);
     var at=readDone(w,kind);
     h+='<button class="pastbtn" onclick="'+(kind==='마음'?'openMind':'openRead')+'('+w+')">'
       +'<span class="pw">'+w+'주차'+(at?' ✓':'')+'</span><span class="pt">'+esc(t)+'</span></button>';
@@ -1763,16 +1821,21 @@ function renderMind(){
 }
 
 /* ── 지식 화면 (2편) ── */
+/* [0.70.0] 편수가 몇이든 제목·목차·번호를 만들어 쓴다 */
+var RD_NUM=['①','②','③','④','⑤'];
+var RD_CNT=['','한 편','두 편','세 편','네 편','다섯 편'];
+function readTitles(R){ return R.지식.map(function(x){return x.제목;}).join(' · '); }
 function renderReading(){
   var w=readWeekNo(), R=weekReading(w), K=R.지식;
-  document.getElementById('rv-week').textContent=w+'주차 읽을거리 · 지식 2편';
-  document.getElementById('rv-title').textContent=K[0].제목+' · '+K[1].제목;
-  document.getElementById('rv-lead').textContent='두 편입니다. 아래 칩을 누르면 바로 건너뜁니다.';
-  var h='<div class="toc">'
-    +'<button onclick="document.getElementById(&quot;rp-0&quot;).scrollIntoView({behavior:&quot;smooth&quot;})">① '+esc(K[0].제목)+'</button>'
-    +'<button onclick="document.getElementById(&quot;rp-1&quot;).scrollIntoView({behavior:&quot;smooth&quot;})">② '+esc(K[1].제목)+'</button></div>';
+  document.getElementById('rv-week').textContent=w+'주차 읽을거리 · 지식 '+K.length+'편';
+  document.getElementById('rv-title').textContent=readTitles(R);
+  document.getElementById('rv-lead').textContent=(RD_CNT[K.length]||K.length+'편')+'입니다. 아래 칩을 누르면 바로 건너뜁니다.';
+  var h='<div class="toc">'+K.map(function(r,k){
+    return '<button onclick="document.getElementById(&quot;rp-'+k+'&quot;).scrollIntoView({behavior:&quot;smooth&quot;})">'
+      +RD_NUM[k]+' '+esc(r.제목)+'</button>';
+  }).join('')+'</div>';
   K.forEach(function(r,k){
-    h+='<div class="rp" id="rp-'+k+'"><span class="kind k">지식단단 '+(k?'②':'①')+'</span>'
+    h+='<div class="rp" id="rp-'+k+'"><span class="kind k">지식단단 '+RD_NUM[k]+'</span>'
       +'<h2 class="rp-t">'+esc(r.제목)+'</h2><p class="rd-lead">'+esc(r.부제||'')+'</p></div>';
     r.본문.forEach(function(s){
       if(s.myth){
