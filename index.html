@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.77.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.78.0 -->
+<!--   [0.78.0] «인증» 이라는 말을 «운동» 으로 바꿨다 — 탭 이름과 아이콘(tab-exercise.png · 아령+운동복+운동화), «유산소 인증»→«유산소 운동하기», «근력 인증»→«근력 운동하기». 검사받는 느낌보다 운동하러 가는 느낌이 되게. -->
 <!--   [0.77.0] 지난 주차를 채워 넣을 때 «그 주»의 필수 운동이 뜨도록 고쳤다. strParts() 가 늘 현재 주차만 보던 탓에, 3주차에 1주차 기록을 넣으면 3주차 필수 운동이 떴다. 이제 고른 주차(ST.strWeek)를 따른다. -->
 <!--   [0.76.0] 맨몸 운동 칸에서 «무게(kg)» 입력을 뺐다 — part.nowt 인 필수 운동(1주차 스쿼트·플랭크·레그 레이즈)은 세트와 횟수/시간만 적는다. ＋로 넣는 추가 칸에는 무게가 그대로 있다(덤벨 운동을 적을 수 있게). 저장할 때 무게 칸이 없어도 터지지 않도록 읽는 쪽도 함께 손봤다. -->
 <!--   [0.75.0] ★스쿼트 본동작 그림을 바로잡았다 — 여태 «무릎의 위치» 주의 그림(knee_bend)을 본동작으로 잘못 썼다. 본동작은 cartoon_exercise_reference_style(팔 앞으로 뻗고 앉는 2단 그림). 주의 그림 두 장(무릎의 위치·허리의 곡선)과 월 스쿼트 홀드 그림도 각 자리에 붙였다. 설명·운동 부위·특징·수행 방법·팁·주의·난이도는 단단프로젝트 해당 쪽 그대로. -->
@@ -663,7 +664,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       </div>
       <p class="cap" style="text-align:center;margin:6px 0 0">점이 찍힌 날짜를 누르면 그날 기록을 볼 수 있어요</p>
     </div>
-    <button class="btn" onclick="go('cert')">＋ 오늘 인증하기</button>
+    <button class="btn" onclick="go('cert')">＋ 오늘 운동하기</button>
     <div class="card" style="margin-top:14px;padding:14px 16px">
       <div class="row" style="justify-content:space-between;align-items:center">
         <span class="cap">👤 <b id="who">—</b> 으로 로그인 중</span>
@@ -675,20 +676,20 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 
   <!-- 인증 종류 선택 -->
   <section id="s-cert" class="scr">
-    <div class="topbar"><button class="back" onclick="go('home')">←</button><h1>오늘 인증</h1></div>
+    <div class="topbar"><button class="back" onclick="go('home')">←</button><h1>오늘 운동</h1></div>
     <div class="card" style="cursor:pointer" onclick="go('cardio')">
       <div class="row" style="align-items:center"><img class="ic-big" src="ic-cardio.png" alt="">
-        <div><h2 style="margin:0">유산소 인증</h2><p class="cap" style="margin:2px 0 0">삼성헬스·NRC·애플피트니스 스크린샷</p></div></div>
+        <div><h2 style="margin:0">유산소 운동하기</h2><p class="cap" style="margin:2px 0 0">삼성헬스·NRC·애플피트니스 스크린샷</p></div></div>
     </div>
     <div class="card" style="cursor:pointer" onclick="go('strength')">
       <div class="row" style="align-items:center"><img class="ic-big" src="ic-strength.png" alt="">
-        <div><h2 style="margin:0">근력 인증</h2><p class="cap" style="margin:2px 0 0">운동 사진 + 세트·횟수 입력</p></div></div>
+        <div><h2 style="margin:0">근력 운동하기</h2><p class="cap" style="margin:2px 0 0">운동 사진 + 세트·횟수 입력</p></div></div>
     </div>
   </section>
 
   <!-- 3. 유산소 -->
   <section id="s-cardio" class="scr">
-    <div class="topbar"><button class="back" onclick="go('cert')">←</button><img class="ic-t" src="ic-cardio.png" alt=""><h1>유산소 인증</h1></div>
+    <div class="topbar"><button class="back" onclick="go('cert')">←</button><img class="ic-t" src="ic-cardio.png" alt=""><h1>유산소 운동하기</h1></div>
     <label>운동한 날짜</label>
     <div class="wksel hidden" id="cardio-wk"></div>
     <div id="cardio-days" class="daysel"></div>
@@ -737,7 +738,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 
   <!-- 4. 근력 -->
   <section id="s-strength" class="scr">
-    <div class="topbar"><button class="back" onclick="go('cert')">←</button><img class="ic-t" src="ic-strength.png" alt=""><h1>근력 인증</h1></div>
+    <div class="topbar"><button class="back" onclick="go('cert')">←</button><img class="ic-t" src="ic-strength.png" alt=""><h1>근력 운동하기</h1></div>
     <label>운동한 날짜</label>
     <div class="wksel hidden" id="str-wk"></div>
     <div id="str-days" class="daysel"></div>
@@ -1030,7 +1031,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 
   <nav class="tabbar hidden" id="tabbar">
     <button data-t="home" onclick="go('home')"><img class="ic" src="tab-home.png" alt="">홈</button>
-    <button data-t="cert" onclick="go('cert')"><img class="ic" src="tab-cert.png" alt="">인증</button>
+    <button data-t="cert" onclick="go('cert')"><img class="ic" src="tab-exercise.png" alt="">운동</button>
     <button data-t="inbody" onclick="go('inbody')"><img class="ic" src="tab-fit.png" alt="">체력</button>
     <button data-t="reflect" onclick="go('reflect')"><img class="ic" src="tab-reflect.png" alt="">성찰</button>
     <button data-t="score" onclick="go('score')"><img class="ic" src="tab-score.png" alt="">기록</button>
@@ -1042,7 +1043,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.77.0';
+var PWA_VER = '0.78.0';
 var PWA_BUILD = '2026.09.03 23:42';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
@@ -1550,7 +1551,7 @@ var KN = {
          +'그래서 혜원핏의 한 주는 <b>유산소 2일 + 근력 2일</b>입니다. 같은 날 둘 다 하면 각각 인정되는 것도 이 때문입니다.']},
       {h:'내 운동은 어느 쪽?',
        p:['헷갈리면 이렇게 봅니다. <b>말을 이어서 할 수 있으면 유산소</b>, 말이 끊기고 근육이 타면 무산소. '
-         +'줄넘기 3분은 유산소에 가깝고, 전력 질주 20초는 무산소입니다. 타임마크로 찍는 근력 인증은 무산소, 걷기 앱 기록은 유산소로 올리면 됩니다.']}
+         +'줄넘기 3분은 유산소에 가깝고, 전력 질주 20초는 무산소입니다. 타임마크로 찍는 근력 운동은 무산소, 걷기 앱 기록은 유산소로 올리면 됩니다.']}
     ],
     퀴즈: [
       {q:'근력 운동은 유산소 운동이다.', a:false,
@@ -1615,7 +1616,7 @@ var KN = {
 
 KN.달리기앱 = {
   제목: '달리기 앱 제대로 쓰기',
-  부제: '유산소 인증은 앱 화면을 찍어 올립니다. 첫 주에 설정을 잡아 두면 4주가 편합니다.',
+  부제: '유산소 운동은 앱 화면을 찍어 올립니다. 첫 주에 설정을 잡아 두면 4주가 편합니다.',
   카드부제: '무엇을 켜고 무엇을 찍어야 하나 · 실내에서 거리가 0인 이유',
   본문: [
     {h:'무엇으로 재도 됩니다',
@@ -1624,7 +1625,7 @@ KN.달리기앱 = {
         '<b>달리기가 아니어도 됩니다.</b> 빠르게 걷기, 자전거도 유산소입니다. 앱에서 종목만 맞게 고르면 됩니다.']},
     {h:'시작 전에 두 가지만',
      p:['첫째, <b>위치(GPS)를 켜세요.</b> 이것이 꺼져 있으면 아무리 뛰어도 <b>거리가 0km</b>로 남습니다. '
-       +'인증할 거리가 없어서 다시 뛰어야 합니다.',
+       +'올릴 거리가 없어서 다시 뛰어야 합니다.',
         '둘째, <b>실내에서는 GPS가 잡히지 않습니다.</b> 러닝머신이나 아파트 복도에서 뛰면 거리가 안 나옵니다. '
        +'실내라면 러닝머신 화면을 찍거나, 앱에서 «실내 러닝»을 고르세요.']},
     {h:'무엇을 찍어야 하나',
@@ -1954,7 +1955,7 @@ function nowStamp(){
 }
 
 /* ═══════ 문의하기 ═══════ */
-var IQ_TYPES=['인증이 안 돼요','기록이 잘못됐어요','앱이 이상해요','평가·점수','기타'];
+var IQ_TYPES=['운동 기록이 안 올라가요','기록이 잘못됐어요','앱이 이상해요','평가·점수','기타'];
 var IQ={type:IQ_TYPES[0],shots:[]};   /* shots = [{b64,hash}] */
 function renderIqType(){
   var box=document.getElementById('iq-type'); if(!box)return;
@@ -2372,7 +2373,7 @@ function saveCardio(){
   if(!pnCheck('c'))return;
   if(!cardioNumCheck())return;
   if(!reflectCheck('c-reflect'))return;
-  progOpen('유산소 인증 제출');
+  progOpen('유산소 운동 제출');
   callP('submitCardio',[ST.student.학번,{imageBase64:cardioB64,date:ST.cardioDate,
     distanceKm:val('c-dist'),durationMin:val('c-dur'),summary:'페이스 '+val('c-pace')+' · '+val('c-kcal')+'kcal',source:'앱',
     reflect:val('c-reflect'),rpe:PICK.c.rpe,sat:PICK.c.sat,partner:pnValue('c'),
@@ -2769,7 +2770,7 @@ function saveStrength(){
     toast('타임마크 사진이 아니에요. 다시 찍거나 김진호 선생님께 확인 요청을 눌러주세요');return;
   }
   if(!pnCheck('s'))return;
-  progOpen('근력 인증 제출');
+  progOpen('근력 운동 제출');
   callP('submitStrength',[ST.student.학번,{imageBase64:strB64,date:ST.strDate,summary:rows.join(', '),reflect:val('st-reflect'),
     rpe:PICK.s.rpe,sat:PICK.s.sat,check:strCheck,exception:strException,partner:pnValue('s')}],
     function(r){progDone(strB64?'제출했어요 · 선생님 확인을 기다려요':'기록만 저장했어요',function(){
@@ -3081,7 +3082,7 @@ function pickRpe(k,v){PICK[k].rpe=(PICK[k].rpe===v?null:v);renderRpe(k);}
 function pickSat(k,v){PICK[k].sat=(PICK[k].sat===v?null:v);renderSat(k);}
 function resetPick(k){PICK[k]={rpe:null,sat:null};renderRpe(k);renderSat(k);}
 /* ---------- 운동 파트너 ----------
-   인증 화면 맨 위에서 먼저 고른다. 저장값은 '혼자' 또는 '이름1, 이름2'.
+   운동 화면 맨 위에서 먼저 고른다. 저장값은 '혼자' 또는 '이름1, 이름2'.
    한 번 적은 친구는 getMyPartners 로 다시 내려와 태그로 바로 보인다. */
 var PN={c:{mode:'',names:[]}, s:{mode:'',names:[]}};
 var PN_RECENT=[];
@@ -3290,7 +3291,7 @@ function renderWeek(w,demo){
     +'<div><b>'+(w.총시간||0)+'분</b><span>운동 시간</span>'+(p?dvBadge(w.총시간,p.총시간,'분',0,true):'')+'</div></div>'
     +(일?'<div class="dl">'+일+'</div>':'<p class="muted" style="margin:0">이번 주 기록이 아직 없어요.</p>')
     +비교
-    +(demo?'<p class="cap" style="margin:10px 0 0;color:var(--warning)">※ 아직 기록이 없어서 <b>예시</b>를 보여드려요. 운동을 인증하면 내 기록으로 바뀝니다.</p>':'')
+    +(demo?'<p class="cap" style="margin:10px 0 0;color:var(--warning)">※ 아직 기록이 없어서 <b>예시</b>를 보여드려요. 운동을 올리면 내 기록으로 바뀝니다.</p>':'')
     +'</div>';
 }
 /* 요약을 문장으로 만들어 성찰 입력창에 넣어준다 */
@@ -3363,7 +3364,7 @@ function loadMyRecords(){
         +(r.사진?'<a class="cap" style="background:var(--cardio-tint);color:var(--cardio);padding:4px 9px;border-radius:8px;text-decoration:none;white-space:nowrap" href="'+r.사진+'" target="_blank" rel="noopener">📷 사진</a>':'')
         +'</div>';
     });
-    document.getElementById('my-records').innerHTML=html||'<p class="muted" style="padding:6px 0">아직 인증한 기록이 없습니다.</p>';
+    document.getElementById('my-records').innerHTML=html||'<p class="muted" style="padding:6px 0">아직 올린 기록이 없습니다.</p>';
   });
 }
 

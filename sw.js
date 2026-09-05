@@ -1,7 +1,7 @@
 /* 그로핏 PWA 서비스워커 | 버전 올리면 캐시 갱신·자동 새로고침 */
-var CACHE = 'grofit-v0.77.0';
+var CACHE = 'grofit-v0.78.0';
 var ASSETS = ['./', './index.html',
-  './tab-home.png', './tab-cert.png', './tab-fit.png', './tab-reflect.png', './tab-score.png', './tab-notice.png', './ic-cardio.png', './ic-strength.png',
+  './tab-home.png', './tab-cert.png', './tab-exercise.png', './tab-fit.png', './tab-reflect.png', './tab-score.png', './tab-notice.png', './ic-cardio.png', './ic-strength.png',
   './jinho.png', './ex-squat.png', './ex-squat-knee.png', './ex-squat-back.png', './ex-squat-wall.png', './ex-plank.png', './ex-legraise.png',
   './st-verygood.png','./st-good.png','./st-nice.png','./st-peace.png','./st-regret.png','./st-frustration.png',
   './splash-locke.jpg','./ic-flex.png','./ic-body.png'];
