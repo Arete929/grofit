@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.70.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.71.0 -->
+<!--   [0.71.0] ★주차별 근력 «필수 운동» — STR_WEEK 에 주차별로 정해 두면 그 주에는 그 운동이 이름 고정(readonly)으로 뜨고, 세트·횟수만 적으면 된다. 1주차 = 스쿼트 + 크런치. 정해 두지 않은 주차는 예전대로 상체·하체·유연성 세 칸. 추가 운동은 ＋로 얼마든지. 필수 칸에는 자세 그림(ex-squat.png)과 한 줄 요령을 함께 보여 준다. -->
 <!--   [0.70.0] 1주차 지식단단에 «달리기 앱 제대로 활용하기» 추가(유산소를 앱 화면으로 인증하니 첫 주에 가장 쓸모 있다) → 1주차만 3편. 지식 편수를 2편으로 못 박아 두었던 곳(제목·목차·번호·«두 편입니다»)을 편수에 맞춰 자동으로 만들도록 고쳤다. -->
 <!--   [0.69.0] 늦은 제출 표기를 «-N%p» 에서 «N일 초과»로 바꿨다. 점수는 선생님이 '초과일급간' 시트로 정한다(GAS 0.71.0). -->
 <!--   [0.68.0] ★지난 주차 기록도 올릴 수 있다 — 인증 화면 위에 «1주차~이번 주차» 칩(renderWkSel). 마감 지난 주차를 고르면 초과일과 깎이는 %p 를 미리 알려 준다(renderLateWarn). 기록 카드에 «N일 늦음», 내 점수에 «늦은 제출 차감» 표시. 차감은 서버가 초과일에 비례해 계산(0.70.0).
@@ -128,6 +129,10 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .partlab.p1{background:#E8F1FC;color:#2E6DB4}
 .partlab.p2{background:#FDEEDF;color:#C4711A}
 .partlab.p3{background:#EAF6E2;color:#4A8A00}
+/* [0.71.0] 필수 운동 — 이름 고정 칸과 자세 그림 */
+.exrow .s-name[readonly]{background:var(--bg);font-weight:800;color:var(--ink)}
+.exrow .exfig{display:block;width:100%;max-height:190px;object-fit:contain;background:#fff;
+  border:1px solid var(--line);border-radius:10px;margin:8px 0 2px}
 .exrow.fixed{border-color:var(--line2)}
 /* 횟수 / 시간 토글 — 플랭크처럼 버티는 운동은 분·초로 적는다 */
 .usel{display:inline-flex;border:1px solid var(--line2);border-radius:6px;overflow:hidden;
@@ -714,8 +719,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       <div id="str-check"></div>
     </div>
     <div class="card">
-      <h2>운동 내용 <span class="cap">· 상체 · 하체 · 유연성 필수</span></h2>
-      <div class="guidebox">
+      <h2>운동 내용 <span class="cap" id="str-req-lab">· 상체 · 하체 · 유연성 필수</span></h2>
+      <div class="guidebox" id="str-guidebox">
         <b>💪 3가지는 이렇게 구성하세요</b>
         <ol><li><b>상체</b> 운동 — 예) 무릎대고 팔굽혀펴기</li>
             <li><b>하체</b> 운동 — 예) 스쿼트</li>
@@ -995,7 +1000,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.70.0';
+var PWA_VER = '0.71.0';
 var PWA_BUILD = '2026.09.03 23:42';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
@@ -1079,7 +1084,7 @@ function go(name, skipLoad){
   });
   if(name==='home' && !skipLoad) loadHome();
   if(name==='cardio'){renderDayPicker('cardio');renderRpe('c');renderSat('c');renderPn('c');loadPartners();}
-  if(name==='strength'){renderDayPicker('str');renderRpe('s');renderSat('s');renderPn('s');loadPartners();}
+  if(name==='strength'){renderDayPicker('str');renderStrGuide();syncStrRows();renderRpe('s');renderSat('s');renderPn('s');loadPartners();}
   if(name==='inbody'){loadFitness();loadMyStamps();}
   if(name==='inbody-graph')loadFitChart();
   if(name==='reflect'){loadReflect();loadMyStamps();renderReflectQ();}
@@ -2459,6 +2464,45 @@ function askException(){
   setChk('wait','🙋 <b>김진호 선생님 확인 요청으로 제출합니다</b><br><span class="cap">사유: '+esc(why)
     +'<br>김진호 선생님이 확인한 뒤 인정 여부가 정해집니다.</span>');
 }
+/* [0.71.0] 주차별 «필수 운동». 여기 적어 둔 주차는 운동 이름이 고정되고, 학생은 세트·횟수만 적는다.
+   적어 두지 않은 주차는 아래 STR_PARTS(상체·하체·유연성 자유 입력)로 돌아간다. */
+var STR_WEEK = {
+  1: [{k:'하체', c:'p2', name:'스쿼트', img:'ex-squat.png',
+       note:'<b>무릎이 발끝을 넘지 않게</b> 엉덩이를 뒤로 빼며 의자에 앉듯 내려갑니다. 등은 곧게 펴고, 발은 어깨너비로.'},
+      {k:'코어', c:'p3', name:'크런치',
+       note:'누워서 무릎을 세우고 <b>허리는 바닥에 붙인 채</b> 어깨만 살짝 들어 올립니다. 손으로 목을 당기지 말고 시선은 위로.'}]
+};
+function strParts(){ return STR_WEEK[nowWeekNo()] || STR_PARTS; }
+/* 필수 칸이 이번 주 것과 다르면 다시 만든다 */
+function syncStrRows(){
+  var want = strParts().map(function(p){return p.k;}).join(',');
+  var have = [].map.call(document.querySelectorAll('#str-list .exrow[data-part]'),
+                         function(r){return r.getAttribute('data-part');}).join(',');
+  if(want !== have) resetStrRows();
+}
+/* 화면 위 안내문을 이번 주 필수 운동에 맞춰 쓴다 */
+function renderStrGuide(){
+  var ps = strParts(), fixed = ps[0] && ps[0].name;
+  var lab = document.getElementById('str-req-lab');
+  if(lab) lab.textContent = '· ' + ps.map(function(p){return p.name || p.k;}).join(' · ') + ' 필수';
+  var box = document.getElementById('str-guidebox');
+  if(!box) return;
+  if(fixed){
+    box.innerHTML = '<b>💪 이번 주 필수 운동은 '
+      + ps.map(function(p){return '«'+p.name+'»';}).join(' · ') + ' 입니다</b>'
+      + '<p>운동 이름은 이미 적혀 있어요. <b>세트와 횟수만</b> 채우면 됩니다.</p>'
+      + '<p>더 한 운동이 있으면 아래 <b>＋ 운동 추가</b>로 얼마든지 넣으세요. 스트레칭도 좋고, 하고 싶은 운동도 좋습니다.</p>';
+  } else {
+    box.innerHTML = '<b>💪 3가지는 이렇게 구성하세요</b>'
+      + '<ol><li><b>상체</b> 운동 — 예) 무릎대고 팔굽혀펴기</li>'
+      + '<li><b>하체</b> 운동 — 예) 스쿼트</li>'
+      + '<li><b>유연성</b> 운동 — 예) 앉아 앞으로 굽히기</li></ol>'
+      + '<p><b>운동 이름은 «어떤 동작을 했는지» 알 수 있게 구체적으로</b> 적어주세요.</p>'
+      + '<p class="exex"><span class="bad">✗ 근력운동, 상체운동, 스트레칭, 유연성, 운동함</span>'
+      + '<span class="good">✓ 무릎대고 팔굽혀펴기 · 덤벨 숄더프레스 · 스쿼트 · 런지 · 플랭크 · 앉아 앞으로 굽히기</span></p>'
+      + '<p>세 칸을 모두 채워야 저장됩니다. 더 했으면 ＋로 추가하세요.</p>';
+  }
+}
 /* 근력은 상체·하체·유연성 3종목 필수 → 개수 상수 대신 STR_PARTS 로 관리 */
 /* 근력 3종목은 부위가 고정 — 상체 · 하체 · 유연성 각 1개씩 필수 */
 var STR_PARTS=[{k:'상체',c:'p1',ph:'상체 운동 (예: 무릎대고 팔굽혀펴기)',
@@ -2479,9 +2523,13 @@ function addStrRow(part){
   if(part){ d.setAttribute('data-part',part.k);
     head='<span class="partlab '+part.c+'">'+part.k+'</span>'; }
   else { head='<span class="strno">＋</span>'; }
+  var fixName=(part&&part.name)?part.name:'';
   d.innerHTML='<div class="exname">'+head
-      +'<input class="s-name" placeholder="'+(part?part.ph:'운동명 (예: 플랭크)')+'"></div>'
+      +'<input class="s-name" placeholder="'+(part?(part.ph||part.name||''):'운동명 (예: 플랭크)')+'"'
+      +(fixName?' value="'+fixName+'" readonly':'')+'></div>'
     +((part&&part.note)?'<p class="exnote">'+part.note+'</p>':'')
+    +((part&&part.img)?'<img class="exfig" src="'+part.img+'" alt="'+fixName+' 자세" '
+      +'onerror="this.style.display=\'none\'">':'')
     +'<div class="exnum">'
       +'<label>무게<input class="s-wt" inputmode="decimal" placeholder="kg"><span class="unit">kg</span></label>'
       +'<label>세트<input class="s-set" inputmode="numeric" placeholder="0"><span class="unit">세트</span></label>'
@@ -2527,7 +2575,7 @@ function strRepText(row){
 /* 상체·하체·유연성 고정칸을 미리 만들어 둔다 */
 function resetStrRows(){
   document.getElementById('str-list').innerHTML='';
-  STR_PARTS.forEach(function(p){addStrRow(p);});
+  strParts().forEach(function(p){addStrRow(p);});
 }
 /* 비어 있는 첫 필수칸으로 커서 보내기 */
 function focusEmptyStr(){
@@ -2563,9 +2611,13 @@ function saveStrength(){
   var N=String.fromCharCode(10);
   // 근력은 상체·하체·유연성 각 1가지씩 필수
   if(빠진.length){
-    alert('근력은 '+STR_PARTS.map(function(p){return p.k;}).join(' · ')+' 운동을 각각 1가지씩 해야 해요.'+N+N
-      +'아직 안 쓴 칸: '+빠진.join(' · ')+N+N
-      +'예) 상체 = 푸시업 / 하체 = 스쿼트 / 유연성 = 앞으로 굽히기');
+    var ps=strParts(), fixed=ps[0]&&ps[0].name;
+    alert(fixed
+      ? ('이번 주 필수 운동은 '+ps.map(function(p){return p.name;}).join(' · ')+' 입니다.'+N+N
+         +'세트와 횟수를 채워 주세요.'+N+'아직 안 쓴 칸: '+빠진.join(' · '))
+      : ('근력은 '+ps.map(function(p){return p.k;}).join(' · ')+' 운동을 각각 1가지씩 해야 해요.'+N+N
+         +'아직 안 쓴 칸: '+빠진.join(' · ')+N+N
+         +'예) 상체 = 푸시업 / 하체 = 스쿼트 / 유연성 = 앞으로 굽히기'));
     focusEmptyStr(); return;
   }
   if(미완.length){
