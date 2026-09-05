@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 코드명: 혜원핏 학생 웹 설명서 | help.html | @version 2.8.0
+<!-- 코드명: 혜원핏 학생 웹 설명서 | help.html | @version 4.0.1
      수정요약: [2.0.1] 좁은 화면에서 표 글자·여백을 줄여 읽기 편하게.
      [2.0.0] 화면별 자세한 설명 6개(홈·인증·체력·성찰·기록·공지) 추가. 같은 날 유산소+근력을 각각 인정하도록
      규칙 변경 반영. 몰아서 하기=△, 앱 새로 시작, 추석 연휴 안내 추가.
@@ -119,6 +119,24 @@ footer{text-align:center;color:var(--mut2);font-size:12.5px;padding:24px 0 8px}
 .top{position:fixed;right:14px;bottom:14px;background:var(--p);color:#fff;text-decoration:none;
   width:44px;height:44px;border-radius:50%;text-align:center;line-height:44px;font-size:18px;
   box-shadow:0 6px 18px rgba(0,0,0,.22)}
+
+/* [4.0.0] 실제 앱 화면 · 개조식 목록 */
+.shot{margin:14px 0 10px;text-align:center}
+.shot img{width:100%;max-width:280px;border:1px solid var(--line);border-radius:14px;
+  box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.shot figcaption{font-size:12px;color:var(--mut2);margin-top:6px}
+.two{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+.two .shot{flex:0 0 260px;margin:4px 0 0}
+.two .txt{flex:1;min-width:230px}
+ul.k{margin:8px 0 0;padding-left:0;list-style:none}
+ul.k li{position:relative;padding-left:15px;margin-bottom:7px;font-size:15px;line-height:1.6}
+ul.k li:before{content:'';position:absolute;left:1px;top:9px;width:5px;height:5px;border-radius:50%;background:var(--p)}
+ul.k li b{color:var(--pd)}
+.box ul.k li:before{background:currentColor;opacity:.5}
+.qrbox{text-align:center;margin:12px 0}
+.qrbox img{width:150px;height:150px}
+.qrbox .url{display:block;margin-top:8px;font-weight:800;color:#fff;font-size:14px}
+@media(max-width:560px){.two{gap:10px}.two .shot{flex:1 1 100%}.shot img{max-width:260px}}
 </style>
 </head>
 <body>
@@ -129,7 +147,7 @@ footer{text-align:center;color:var(--mut2);font-size:12.5px;padding:24px 0 8px}
     <div>
       <p class="t1">2026학년도 3학년 2학기 · 체육 수행평가</p>
       <h1>혜원핏 사용설명서</h1>
-      <p class="t2">설치부터 운동 · 성찰까지, 이것만 보면 됩니다</p>
+      <p class="t2">꼭 필요한 것만 · 실제 화면으로</p>
     </div>
   </div>
 </header>
@@ -139,411 +157,181 @@ footer{text-align:center;color:var(--mut2);font-size:12.5px;padding:24px 0 8px}
 <nav class="toc">
   <b>목차</b>
   <ol>
-    <li><a href="#why">왜 이걸 하나요?</a></li>
-    <li><a href="#score">수행평가 일정과 배점</a></li>
-    <li><a href="#install">앱 설치하기</a></li>
-    <li><a href="#login">로그인</a></li>
-    <li><a href="#screen">화면 둘러보기</a></li>
-    <li><a href="#goal">주간 목표와 4주 도장판</a></li>
-    <li><a href="#cardio">유산소 운동하기</a></li>
-    <li><a href="#strength">근력 운동하기</a></li>
-    <li><a href="#reflect">성찰 쓰기</a></li>
+    <li><a href="#now">한눈에</a></li>
+    <li><a href="#install">앱 깔기</a></li>
+    <li><a href="#home">홈 화면</a></li>
+    <li><a href="#cardio">유산소</a></li>
+    <li><a href="#strength">근력</a></li>
     <li><a href="#fit">체력측정</a></li>
-    <li><a href="#essay">감상문</a></li>
+    <li><a href="#write">성찰 · 감상문</a></li>
     <li><a href="#faq">자주 묻는 질문</a></li>
   </ol>
 </nav>
 
-<section id="why">
-  <h2><span class="n">1</span>왜 이걸 하나요?</h2>
-  <p class="sub">재는 것으로 끝나면, 아무것도 달라지지 않습니다</p>
-  <div class="box ok"><b>성취기준 [9체01-09]</b><br>
-    신체적 여가 활동과 운동처방을 위한 전 과정(계획·실행·평가)을 스스로 선택하고 실천한다.</div>
-  <div class="grid2">
-    <div class="mini"><b>① 측정</b><span>내 체력을 숫자로 안다</span></div>
-    <div class="mini"><b>② 처방</b><span>부족한 걸 정해 계획한다</span></div>
-    <div class="mini"><b>③ 실천</b><span>4주 동안 직접 해본다</span></div>
-    <div class="mini"><b>④ 재측정</b><span>달라진 걸 확인한다</span></div>
-  </div>
-  <p>1학기에 <b>운동처방 원리와 SMART 목표</b>를 이론으로 배웠습니다. 2학기에는 그 원리로
-     내 몸에 맞는 운동을 스스로 처방하고 4주간 실천해 봅니다.
-     시험을 위한 지식이 아니라 <b>평생 쓰는 방법</b>을 익히는 것입니다.</p>
-  <div class="box tip"><b>“건전한 신체에 건전한 정신이 깃든다”</b><br>
-    몸과 마음의 건강은 저절로 오지 않고 애써 구해야 한다는 뜻입니다. — 유베날리스 · 존 로크</div>
-</section>
-
-<section id="score">
-  <h2><span class="n">2</span>수행평가 일정과 배점</h2>
-  <p class="sub">2학기 수행평가는 100점 — 운동처방일지 40점 + 빅발리볼 60점</p>
-
-  <div class="box ok"><b>운동 기간 · 9월 7일(월) ~ 10월 4일(일) · 4주</b></div>
+<section id="now">
+  <h2><span class="n">1</span>한눈에</h2>
   <table>
-    <tr><th class="c">주차</th><th class="c">기간</th><th class="c">주차</th><th class="c">기간</th></tr>
-    <tr><td class="c">1주차</td><td class="c">9/7(월) ~ 9/13(일)</td><td class="c">3주차</td><td class="c">9/21(월) ~ 9/27(일)</td></tr>
-    <tr><td class="c">2주차</td><td class="c">9/14(월) ~ 9/20(일)</td><td class="c">4주차</td><td class="c">9/28(월) ~ 10/4(일)</td></tr>
+    <tbody>
+      <tr><th>기간</th><td><b>9/7(월) ~ 10/4(일)</b> · 4주</td></tr>
+      <tr><th>주 목표</th><td><b>주 4일</b> — 유산소 2일 + 근력 2일</td></tr>
+      <tr><th>마감</th><td>매주 <b>일요일 밤 10시</b></td></tr>
+      <tr><th>배점</th><td><b>40점</b> · 운동 달성 + 제출</td></tr>
+      <tr><th>끝나고</th><td>10/4 뒤 <b>감상문</b></td></tr>
+    </tbody>
   </table>
-
-  <table>
-    <tr><th>영역</th><th class="c">배점</th><th>내용</th></tr>
-    <tr><td><b>운동처방일지</b></td><td class="c"><b>40점</b></td><td>혜원핏 앱으로 4주간 운동 · 측정 · 성찰</td></tr>
-    <tr><td>빅발리볼</td><td class="c">60점</td><td>실기 30 · 노트 15 · 리그전 15</td></tr>
-  </table>
-
-  <h3 style="font-size:16px;margin:18px 0 6px">마감이 두 가지입니다</h3>
-  <div class="box ok"><b>일지 마감 · 10월 4일(일) 22:00</b><br>여기까지가 4주입니다. 그 뒤에 감상문을 쓰면 끝납니다. 감상문 제출일은 따로 안내합니다.</div>
-  <div class="box tip"><b>주간 마감 · 매주 일요일 22:00</b><br>
-    그 주에 한 운동은 <b>일요일 밤 10시까지</b> 올려야 그 주 기록으로 들어갑니다.</div>
-
-  <h3 style="font-size:16px;margin:18px 0 6px">40점은 이렇게 정해집니다</h3>
-  <p>수업시간에 제시된 제출 조건을 지켜 작성한 <b>비율</b>로 점수가 나옵니다. <b>5%마다 2점</b> 차이입니다.</p>
-  <table>
-    <tr><th class="c">작성률</th><th class="c">점수</th><th class="c">작성률</th><th class="c">점수</th></tr>
-    <tr><td class="c">100%</td><td class="c"><b>40점</b></td><td class="c">60%</td><td class="c">24점</td></tr>
-    <tr><td class="c">90%</td><td class="c">36점</td><td class="c">50%</td><td class="c">20점</td></tr>
-    <tr><td class="c">80%</td><td class="c">32점</td><td class="c">25%</td><td class="c">10점</td></tr>
-    <tr><td class="c">70%</td><td class="c">28점</td><td class="c">미제출</td><td class="c">8점</td></tr>
-  </table>
-  <p class="sub" style="margin-top:8px">내 작성률과 예상 점수는 앱 <b>[기록]</b> 탭에서 언제든 볼 수 있습니다.</p>
-</section>
-
-<section id="install">
-  <h2><span class="n">3</span>앱 설치하기</h2>
-  <p class="sub">스토어에서 받지 않습니다 — 주소로 들어가 설치합니다</p>
-
-  <div class="box warn"><b>⚠ 반드시 이 브라우저로 여세요</b><br>
-    <b>안드로이드 = 크롬</b> &nbsp;·&nbsp; <b>아이폰 = 사파리</b><br>
-    카톡·밴드에서 링크를 바로 누르면 설치가 안 됩니다. 주소를 복사해 브라우저에 붙여넣으세요.</div>
-
-  <div class="qr">
-    <img src="qr.png" alt="설치 QR" onerror="this.style.display='none'">
-    <br><a class="url" href="https://arete929.github.io/grofit/">arete929.github.io/grofit</a>
-  </div>
-
-  <ol class="steps">
-    <li><b>주소로 들어가기</b><span>QR을 찍거나 위 주소를 브라우저에 입력합니다.</span></li>
-    <li><b>색 먼저 고르기</b><span>로그인 화면 아래 🎨 에서 6가지 중 고르세요. 고른 색이 홈 화면 아이콘 색이 됩니다.</span></li>
-    <li><b>홈 화면에 추가</b><span>안드로이드 : 위쪽 «설치» 버튼<br>아이폰 : 사파리 아래 공유(↥) → «홈 화면에 추가»</span></li>
-  </ol>
-
-  <div class="box tip"><b>설치한 뒤 색을 바꾸면?</b><br>
-    앱 안 색만 바뀌고 홈 화면 아이콘은 그대로입니다. 아이콘 색까지 바꾸려면 아이콘을 지우고 다시 설치하세요.</div>
-</section>
-
-<section id="login">
-  <h2><span class="n">4</span>로그인</h2>
-  <p class="sub">학번 4자리 + 학생코드</p>
-  <div class="box ok"><b>학생코드는 새로 받는 게 아닙니다</b><br>
-    <b>[다했어요]에서 쓰던 학생코드</b>를 그대로 입력하세요. 생년월일이 아닙니다.</div>
-  <ul>
-    <li>한 번 로그인하면 다음부터 자동으로 열립니다.</li>
-    <li>코드가 기억나지 않으면 <b>김진호 선생님</b>께 물어보세요.</li>
-    <li>안내는 <b>다했어요 알림장</b>과 <b>학급 밴드톡</b>에도 올라갑니다.</li>
+  <ul class="k">
+    <li>같은 날 유산소 + 근력 = <b>가장 좋음</b> (각각 인정)</li>
+    <li>몰아서 하기 = 인정되지만 <b>권장 안 함</b></li>
+    <li>추석에도 운동합니다.</li>
+    <li>늦게 올리면 <b>«N일 초과»</b>로 남습니다.</li>
   </ul>
 </section>
 
-<section id="screen">
-  <h2><span class="n">5</span>화면 둘러보기</h2>
-  <p class="sub">아래쪽 여섯 개 버튼으로 이동합니다</p>
-  <div class="tabs">
-    <div><b>홈</b>이번 주 현황<br>4주 도장판</div>
-    <div><b>운동</b>유산소 · 근력<br>올리는 곳</div>
-    <div><b>체력</b>측정 입력<br>변화 그래프</div>
-    <div><b>성찰</b>주간 성찰<br>선생님 코멘트</div>
-    <div><b>기록</b>날짜별 기록<br>점수 확인</div>
-    <div><b>공지</b>선생님 공지<br>확인 표시</div>
+<section id="install">
+  <h2><span class="n">2</span>앱 깔기</h2>
+  <div class="qrbox">
+    <img src="qr.png" alt="설치 QR" onerror="this.style.display='none'">
+    <a class="url" href="https://arete929.github.io/grofit/">arete929.github.io/grofit</a>
   </div>
-  <p class="sub">앱을 켜면 로크 문구가 잠깐 뜨고 사라집니다. 기다리기 싫으면 화면을 누르면 바로 넘어갑니다.</p>
-
-  <div class="box warn"><b>기록할 때는 앱을 늘 새로 시작하세요.</b><br>
-    백그라운드에 띄워 둔 채로 계속 쓰면 <b>바뀐 내용이 반영되지 않습니다.</b>
-    앱을 완전히 닫았다가 아이콘으로 다시 여세요.</div>
-
-  <h3 style="font-size:17px;margin:20px 0 4px">화면마다 무엇이 있나</h3>
-
-  <div class="scr">
-    <h3><span class="tab">홈</span>이번 주와 4주가 한눈에</h3>
-    <p class="lead">앱을 켜면 처음 보이는 화면입니다. 지금 무엇이 모자란지 여기서 다 보입니다.</p>
-    <dl>
-      <dt>맨 위</dt><dd>내 학번·이름 · <b>몇 주차</b>인지 · 마감까지 <b>며칠</b> 남았는지</dd>
-      <dt>동그라미</dt><dd>이번 주 <b>운동한 날 / 목표 4일</b>. 옆에 유산소 n/2 · 근력 n/2</dd>
-      <dt>♥ 마음 한 줄</dt><dd>운동 링 바로 아래 분홍 카드. 그 주의 <b>마음단단</b> 한 편(1분)과 성찰 질문. 다 읽고 «읽었어요»를 누르면 한 줄로 접힙니다</dd>
-      <dt>읽을거리</dt><dd>그 주의 <b>지식단단 두세 편</b>(1주차는 달리기 앱 쓰는 법까지 세 편). 편마다 OX 퀴즈가 있고, 다 읽고 <b>«읽었어요»</b>를 누르면 회색이 됩니다. 지난 주 글은 화면 아래에서 다시 볼 수 있습니다</dd>
-      <dt>4주 도장판</dt><dd>주차별 일곱 칸. 운동한 날에 점이 찍히고, 달성한 주는 <b>✓</b>로 채워집니다</dd>
-    </dl>
-    <p class="note">진행 중인 주에는 <b>«유산소 1번 더»</b> 처럼 무엇을 더 하면 달성인지 나옵니다.
-      아직 선생님 확인 전인 날은 <b>회색</b>으로 «선생님 확인 중»이라고 표시됩니다.</p>
-  </div>
-
-  <div class="scr">
-    <h3><span class="tab">운동</span>운동하고 올리는 곳</h3>
-    <p class="lead">유산소와 근력 중에 고르면 각각의 입력 화면으로 들어갑니다.</p>
-    <dl>
-      <dt>날짜 고르기</dt><dd>위 칩으로 <b>지난 주차</b>도 고를 수 있어 빠뜨린 기록을 나중에 채울 수 있습니다. <b>앞날은 못 고릅니다</b></dd>
-      <dt>늦은 제출</dt><dd>각 주차 마감은 <b>그 주 일요일 밤 10시</b>입니다. 마감을 넘겨 올리면 도장은 찍히지만 <b>«N일 초과»로 기록됩니다</b>. 초과한 날수를 모두 더해 점수가 달라지니, 되도록 그 주 안에 올리세요. 날짜를 고를 때 며칠 초과인지 미리 알려 줍니다</dd>
-      <dt>누구와</dt><dd>혼자 / 같이. 같이 했으면 친구 이름을 적습니다. 다음부터 태그로 나옵니다</dd>
-      <dt>사진</dt><dd>유산소는 운동 앱 캡처, 근력은 <b>타임마크</b> 사진</dd>
-      <dt>기록 적기</dt><dd>거리 · 시간을 <b>직접</b> 적습니다. 비워두면 저장되지 않습니다</dd>
-      <dt>근력 필수 운동</dt><dd>주마다 <b>정해진 필수 운동</b>이 이름이 채워진 채로 뜹니다(1주차는 <b>스쿼트 · 플랭크 · 레그 레이즈</b>). 이름 옆 <b>«방법»</b>을 누르면 자세 그림 · 하는 순서 · 주의할 점 · <b>시연 영상</b>이 펼쳐집니다. 세트와 횟수만 적으면 되고, 더 한 운동은 <b>＋ 운동 추가</b>로 넣습니다</dd>
-      <dt>오늘의 성찰</dt><dd>한 줄이라도 <b>반드시</b> 써야 저장됩니다</dd>
-    </dl>
-    <p class="note">제출하면 게이지가 차오르고 «제출했어요»가 뜹니다.
-      아래에 <b>«마지막 업로드 · 날짜 시각»</b>이 남아, 언제 냈는지 다시 들어와도 보입니다.</p>
-  </div>
-
-  <div class="scr">
-    <h3><span class="tab">체력</span>재고 · 넣고 · 변화 보기</h3>
-    <p class="lead">매주 첫 체육시간에 잰 것을 여기에 넣습니다. 여섯 회차가 쌓입니다.</p>
-    <dl>
-      <dt>회차</dt><dd>방학 전 · 개학 후 · 1주차 ~ 4주차</dd>
-      <dt>넣는 값</dt><dd>악력(좌·우) · 팔굽혀펴기 · 앉았다일어나기 · 앞으로굽히기 · 뒤로젖히기 (발끝에 못 미치면 칸 옆 <b>− 버튼</b>으로 마이너스 값) ·
-        인바디(신장 · 체중 · 체지방률 · 골격근량 · 내장지방 · 둘레)</dd>
-      <dt>자동 계산</dt><dd>BMI는 넣지 않아도 <b>앱이 계산</b>합니다. WHR은 <b>허리·엉덩이 둘레</b>로 계산하거나, 인바디 결과지의 <b>WHR 값을 그대로</b> 넣어도 됩니다 (위의 두 버튼 중 하나를 고르세요)</dd>
-      <dt>변화 그래프</dt><dd>항목마다 선그래프. 저장하면 <b>바로 반영</b>되고, 눌러서 <b>크게</b> 볼 수 있습니다</dd>
-    </dl>
-    <p class="note">같은 회차를 다시 넣으면 <b>덮어씁니다.</b> 잘못 넣었으면 다시 넣으면 됩니다.
-      감상문 쓸 때 이 그래프를 그대로 보고 쓰면 됩니다.</p>
-  </div>
-
-  <div class="scr">
-    <h3><span class="tab">성찰</span>일주일을 돌아보는 곳</h3>
-    <p class="lead">주차마다 한 편씩, 모두 네 편을 씁니다.</p>
-    <dl>
-      <dt>이번 주 내 운동</dt><dd>며칠 했는지 · 유산소 몇 일 · 총 거리와 시간이 <b>위에 정리되어</b> 나옵니다</dd>
-      <dt>지난주와 비교</dt><dd>2주차부터는 지난주보다 늘었는지 줄었는지 배지로 보입니다</dd>
-      <dt>선생님 코멘트</dt><dd>답이 달리면 <b>진호 캐릭터가 말풍선</b>으로 이야기합니다</dd>
-    </dl>
-    <p class="note">성찰 칸 위에 <b>김진호 선생님 말풍선</b>으로 그 주의 <b>성찰 질문</b>이 떠 있습니다. 마음 한 줄을 읽고 그 질문에 답하듯 쓰면 훨씬 쉽습니다.</p>
-  </div>
-
-  <div class="scr">
-    <h3><span class="tab">기록</span>내가 낸 것 전부 · 점수</h3>
-    <p class="lead">지금까지 올린 것이 날짜순으로 쌓입니다.</p>
-    <dl>
-      <dt>기록 카드</dt><dd>날짜 · 종류 · 거리/시간 · 내용 · <b>올린 사진</b> · 함께한 친구</dd>
-      <dt>올린 시각</dt><dd>카드마다 <b>🕒 저장 시각</b>이 붙습니다. 마감을 넘긴 기록에는 <b>⏰ N일 초과</b>가 함께 표시됩니다</dd>
-      <dt>점수</dt><dd>지금까지의 작성률과 예상 점수</dd>
-    </dl>
-    <p class="note">인정되지 않은 기록도 목록에는 남습니다. <b>«미인정»</b>이라고 적혀 있으면
-      주간 달성에 들어가지 않은 것입니다.</p>
-  </div>
-
-  <div class="scr">
-    <h3><span class="tab">공지</span>선생님 이야기 · 문의하기</h3>
-    <p class="lead">새 공지가 있으면 앱을 켤 때 팝업으로 먼저 뜹니다.</p>
-    <dl>
-      <dt>확인했어요</dt><dd>눌러야 팝업이 닫힙니다. <b>누가 읽었는지 선생님이 봅니다</b></dd>
-      <dt>다시 보기</dt><dd>확인한 공지도 이 탭에 그대로 남아 있습니다</dd>
-      <dt>문의하기</dt><dd>맨 위 <b>«🙋 김진호 선생님께 문의하기»</b> — 유형을 고르고 내용을 쓰고
-        <b>사진을 최대 5장</b>까지 같이 보냅니다</dd>
-      <dt>답변</dt><dd>선생님이 답을 쓰면 <b>«내가 보낸 문의»</b> 아래에 바로 보입니다</dd>
-    </dl>
-    <p class="note">같은 사진을 두 번 넣으면 <b>자동으로 걸러집니다.</b>
-      화면을 캡처해서 붙이면 훨씬 빨리 해결됩니다.</p>
-  </div>
+  <ul class="k">
+    <li><b>갤럭시</b> — <b>브라우저</b>로 열기 → 메뉴 → <b>앱 설치</b> (또는 홈 화면에 추가)</li>
+    <li><b>아이폰</b> — 사파리로 열기 → 공유(￪) → <b>홈 화면에 추가</b></li>
+    <li>카카오톡·인스타 안에서 열면 설치가 안 됩니다. <b>브라우저로</b> 여세요.</li>
+    <li>로그인 = <b>학번 + 학생코드</b> (다했어요와 같은 코드)</li>
+    <li><b>타임마크</b> 앱도 깔기 (근력 사진용 · 무료)</li>
+  </ul>
 </section>
 
-<section id="goal">
-  <h2><span class="n">6</span>주간 목표와 4주 도장판</h2>
-  <p class="sub">주 4일 — 유산소 2일 + 근력 2일</p>
-  <div class="box ok"><b>한 주에 서로 다른 네 날.</b> 유산소 2일과 근력 2일을 채워야 그 주가 «달성»입니다.</div>
-  <table>
-    <tr><th>그 주에 한 것</th><th class="c">판정</th></tr>
-    <tr><td>월 유산소 · 화 근력 · 수 유산소 · 목 근력</td><td class="c"><span class="pill g">✓ 달성</span></td></tr>
-    <tr><td>월 유산소 · 수 근력 · 금 유산소 · 토 근력</td><td class="c"><span class="pill g">✓ 달성</span></td></tr>
-    <tr><td>월·화·수·목 또는 목·금·토·일 <b>몰아서</b> 4일</td><td class="c"><span class="pill a">△ 인정되지만 권장 안 함</span></td></tr>
-    <tr><td>유산소만 4일</td><td class="c"><span class="pill r">✗ 미달 (근력 0일)</span></td></tr>
-    <tr><td>이틀만 나가서 매번 유산소+근력</td><td class="c"><span class="pill r">✗ 미달 (2일뿐)</span></td></tr>
-    <tr><td>유산소 2일 · 근력 1일 (3일)</td><td class="c"><span class="pill r">✗ 미달 (4일 아님)</span></td></tr>
-  </table>
-  <div class="box ok"><b>같은 날 유산소와 근력을 함께 하면 가장 좋습니다.</b><br>
-    <b>운동한 날</b>은 하루로 세지만 <b>유산소 1일 · 근력 1일이 각각</b> 올라갑니다.
-    네 번 나가서 매번 둘 다 하면 가장 빨리 채워집니다.</div>
-  <div class="box warn"><b>몰아서 하면 일수는 채워져도 효과가 떨어집니다.</b><br>
-    근육은 쉬는 동안 자랍니다. <b>하루 걸러 하루씩</b> 하세요.
-    <b>추석 연휴에도 운동은 그대로 합니다.</b></div>
-  <p><b>홈 화면의 4주 도장판</b>에서 주차별로 달성했는지, 이번 주에 무엇을 더 하면 되는지 바로 보입니다.
-     진행 중인 주에는 «유산소 1번 더» · «근력 1번 더» 처럼 남은 조건이 나옵니다.</p>
+<section id="home">
+  <h2><span class="n">3</span>홈 화면</h2>
+  <div class="two">
+    <figure class="shot"><img src="shot-home.jpg" alt="홈 화면"><figcaption>홈 화면</figcaption></figure>
+    <div class="txt"><ul class="k">
+      <li>동그라미 = 이번 주 <b>운동한 날 / 4일</b></li>
+      <li>그 옆 = 유산소 n/2 · 근력 n/2</li>
+      <li>분홍 카드 = <b>이번 주 마음 한 줄</b> (1분)</li>
+      <li>초록 카드 = <b>이번 주 읽을거리</b></li>
+      <li>아래 <b>4주 도장판</b> — 달성한 주는 ✓</li>
+      <li>회색 점 = <b>선생님 확인 중</b></li>
+    </ul></div>
+  </div>
+  <div class="box tip"><b>기록하기 전에 앱을 껐다 켜세요.</b><br>
+    켜 둔 채로 쓰면 쓰던 내용이 사라질 수 있습니다.</div>
 </section>
 
 <section id="cardio">
-  <h2><span class="n">7</span>유산소 운동하기</h2>
-  <p class="sub">운동 앱 기록 화면을 캡처해서 올립니다</p>
-  <p><b>쓸 수 있는 앱</b> — 삼성헬스 · 애플 피트니스 · 나이키 런클럽(NRC).
-     «아침시간 함께걷기 챌린지»와 같은 방식입니다.</p>
-  <ol class="steps">
-    <li><b>운동한 날짜 고르기</b><span>날짜 줄 옆에 <b>몇 주차</b>인지 배지로 뜹니다. 지난 주차를 채워 넣을 때는 위의 주차 칩을 누르세요.</span></li>
-    <li><b>캡처한 사진 올리기</b><span>기록을 눌러 들어가 <b>날짜가 보이는 화면</b>을 캡처하세요.</span></li>
-    <li><b>거리 · 시간 직접 적기</b><span>사진을 보면서 <b>직접</b> 적습니다. 앱이 대신 채워주지 않아요. 비워 두면 저장되지 않습니다.</span></li>
-    <li><b>오늘의 성찰 쓰고 제출</b></li>
-    <li><b>김진호 선생님이 보고 인정</b><span>올린 사진과 적은 기록을 선생님이 직접 확인합니다.</span></li>
-  </ol>
-  <div class="box ok"><b>인정 여부는 김진호 선생님이 정합니다.</b><br>
-    사진과 적은 기록이 다르면 인정되지 않습니다. 매주 일요일 마감 뒤에 확인합니다.</div>
-  <div class="box tip"><b>왜 직접 적나요?</b><br>
-    3.39km를 27분에 뛰었다는 걸 눈으로 보고 손으로 적으면 그 숫자가 기억에 남습니다.
-    자동으로 채워지면 남지 않아요. 내 몸에 맞게 운동을 처방하려면 먼저 내가 무엇을 얼마나 했는지 알아야 합니다.<br>
-    실수로 잘못 적은 건 괜찮습니다 — <b>일부러 늘려 적는 것</b>이 문제입니다.</div>
-  <p>제출하면 도장판에 <b>「선생님 확인 중」</b>으로 회색 표시가 뜹니다. 선생님이 확인하면 <b>도장이 찍힙니다.</b></p>
-  <div class="box ok"><b>이 세 가지가 한 화면에 보이면 됩니다</b><br>
-    <b>① 거리 · ② 시간 · ③ 날짜</b><br>
-    앱마다 생김새는 달라도 이 셋만 보이면 됩니다. 유산소 화면에서
-    <b>«🖼 어떤 화면을 올리나요 · 예시 보기»</b>를 누르면 앱별 예시 그림이 나옵니다.</div>
-  <div class="box warn"><b>이런 화면은 안 됩니다</b>
-    <ul style="margin:6px 0 0">
-      <li>지도만 나온 화면</li>
-      <li>한 주 합계 화면</li>
-      <li>걸음 수만 나온 화면</li>
-      <li>남의 기록을 찍은 사진</li>
-    </ul>
+  <h2><span class="n">4</span>유산소</h2>
+  <p class="sub">삼성헬스 · 애플 피트니스 · 나이키 런클럽 중 <b>하나</b>를 정해 4주 내내 사용</p>
+  <div class="two">
+    <figure class="shot"><img src="shot-cardio.jpg" alt="유산소 운동하기 화면"><figcaption>유산소 운동하기</figcaption></figure>
+    <div class="txt"><ul class="k">
+      <li>날짜 고르기 → 사진 올리기 → 거리·시간 <b>직접 적기</b> → 성찰 한 줄</li>
+      <li>사진에 <b>거리 · 시간 · 날짜</b> 세 가지가 보여야 합니다.</li>
+      <li>앱에서 <b>«예시 보기»</b>를 누르면 어떤 화면인지 나옵니다.</li>
+      <li>달리기 아니어도 됩니다. <b>빠르게 걷기 · 자전거</b>도 유산소.</li>
+    </ul></div>
   </div>
-  <h3 style="font-size:16px;margin:20px 0 6px">앱을 쓰기 전에 두 가지</h3>
-  <p><b>위치(GPS)를 켜세요.</b> 꺼져 있으면 아무리 뛰어도 거리가 <b>0km</b>로 남습니다.<br>
-     <b>실내에서는 GPS가 잡히지 않습니다.</b> 러닝머신이라면 러닝머신 화면을 찍거나 앱에서 «실내 러닝»을 고르세요.</p>
-  <p><b>자동 일시정지</b>를 켜 두면 신호등에서 멈출 때마다 시간이 멈춥니다. 30분을 나갔는데 21분으로 남을 수 있어요.
-     끄는 편이 실제와 가깝습니다. 자세한 것은 <b>1주차 읽을거리 «달리기 앱 제대로 쓰기»</b>에 있습니다.</p>
-  <div class="box tip"><b>날짜가 보이는 화면으로 캡처하세요.</b><br>
-    운동이 끝난 직후 화면에는 날짜가 없을 수 있습니다. 기록 목록에서 그 운동을 눌러 들어가면 날짜·요일이 나옵니다.</div>
+  <ul class="k">
+    <li><b>GPS를 켜세요.</b> 꺼져 있으면 거리가 0km.</li>
+    <li>실내는 GPS가 안 잡힙니다. 러닝머신 화면을 찍으세요.</li>
+    <li><span class="pill r">✗</span> 지도만 나온 화면 · 한 주 합계 · 걸음 수만</li>
+  </ul>
 </section>
 
 <section id="strength">
-  <h2><span class="n">8</span>근력 운동하기</h2>
-  <p class="sub">사진은 반드시 타임마크 앱으로</p>
-  <ol class="steps">
-    <li><b>타임마크(Timemark) 앱 설치</b><span>무료 · 스토어에서 검색</span></li>
-    <li><b>템플릿 → «사진 코드» 선택</b><span>한 번만 골라두면 계속 그 형식으로 찍힙니다.</span></li>
-    <li><b>운동하는 중에 촬영</b><span>사진에 날짜와 사진 코드가 함께 새겨집니다.</span></li>
-  </ol>
-  <div class="box warn"><b>이런 사진은 인정되지 않아요</b>
-    <ul style="margin:6px 0 0">
-      <li>일반 카메라로 찍은 사진</li>
-      <li>사진 코드가 없는 템플릿</li>
-      <li><b>코드가 안 보이게 잘라낸 사진</b></li>
-      <li>다른 날짜가 찍힌 사진</li>
-      <li>전에 냈던 사진 다시 내기</li>
-      <li>친구가 보내준 사진</li>
-    </ul>
+  <h2><span class="n">5</span>근력</h2>
+  <p class="sub">사진은 반드시 <b>타임마크</b> 앱으로</p>
+  <div class="two">
+    <figure class="shot"><img src="shot-strength.jpg" alt="근력 운동하기 화면"><figcaption>근력 운동하기</figcaption></figure>
+    <div class="txt"><ul class="k">
+      <li>주마다 <b>필수 운동 3가지</b> — 이름은 이미 적혀 있습니다.</li>
+      <li><b>세트와 횟수</b>만 채우면 됩니다.</li>
+      <li>플랭크처럼 버티는 운동은 <b>시간</b>으로.</li>
+      <li>이름 옆 <b>«방법»</b> = 그림 · 순서 · 주의 · <b>영상</b></li>
+      <li>더 한 운동은 아래 <b>선택 운동</b>에.</li>
+    </ul></div>
   </div>
-  <p>올린 사진은 <b>김진호 선생님이 직접 확인</b>합니다. 사진 코드 · 날짜 · 전에 낸 사진인지를 하나씩 봅니다.
-     <b>같은 사진을 두 번 내면 앱이 자동으로 찾아냅니다.</b></p>
-  <p class="sub">사진 없이 제출하면 기록은 남지만 «운동한 것»으로 인정되지 않습니다.</p>
 
-  <h3 style="font-size:16px;margin:20px 0 6px">무엇을 적나요</h3>
-  <p>필수 운동은 <b>이름이 이미 적혀 있습니다.</b> <b>세트와 횟수</b>만 채우면 돼요.
-     플랭크·사이드 플랭크처럼 버티는 운동은 <b>시간(분·초)</b>으로 적습니다.
-     모두 맨몸 운동이라 <b>무게 칸은 없습니다.</b></p>
-  <p>더 한 운동이 있으면 <b>＋ 운동 추가</b>로 넣으세요. 추가 칸에는 무게도 적을 수 있습니다.</p>
-
-  <h3 style="font-size:16px;margin:20px 0 6px">4주 운동 계획</h3>
-  <p>주마다 <b>필수 운동 세 가지</b>가 정해져 있습니다. 앱에는 <b>그 주 것만</b> 뜨고, 운동 이름이 이미 적혀 있어
-     <b>세트와 횟수만</b> 채우면 됩니다. 플랭크처럼 버티는 운동은 시간으로 적어요.</p>
   <table>
     <thead><tr><th class="c">주</th><th>상체</th><th>하체</th><th>코어</th></tr></thead>
     <tbody>
       <tr><td class="c"><b>1주</b></td><td>웨이브 니 푸시업</td><td>스쿼트</td><td>레그 레이즈</td></tr>
       <tr><td class="c"><b>2주</b></td><td>암 워킹</td><td>리버스 런지</td><td>플랭크</td></tr>
-      <tr><td class="c"><b>3주</b></td><td>스탠다드 / 내로우 푸시업</td><td>와이드 스쿼트</td><td>사이드 플랭크</td></tr>
+      <tr><td class="c"><b>3주</b></td><td>스탠다드 푸시업</td><td>와이드 스쿼트</td><td>사이드 플랭크</td></tr>
       <tr><td class="c"><b>4주</b></td><td>베어 크롤</td><td>크로스 백 런지</td><td>힐 터치</td></tr>
     </tbody>
   </table>
-  <p>모두 <b>기구 없이 맨몸</b>으로 하는 운동입니다. 매트나 수건 한 장이면 충분해요.
-     운동 이름 옆 <b>«방법»</b>을 누르면 하는 순서 · 주의할 점 · <b>시연 영상</b>이 펼쳐집니다.</p>
-  <div class="box"><b>매주 마무리 스트레칭</b><br>
-    앉아 앞으로 굽히기 30초 × 3 · 엎드려 뒤로 젖히기 20초 × 3<br>
-    체력측정에서 재는 동작과 <b>같은 동작</b>입니다. 매주 하면 4주 뒤 기록이 늘어요.</div>
-  <p>여기 없는 운동을 더 했다면 <b>＋ 운동 추가</b>로 얼마든지 넣으세요.</p>
+  <ul class="k">
+    <li>모두 <b>맨몸 운동</b>. 기구 필요 없음.</li>
+    <li>매주 마무리 — 앉아 앞으로 굽히기 · 엎드려 뒤로 젖히기</li>
+  </ul>
 
-  <h3 style="font-size:16px;margin:18px 0 6px">운동 이름은 구체적으로</h3>
-  <p><span class="bad">✗ 근력운동 · 상체운동 · 스트레칭 · 유연성 · 운동함</span><br>
-     이렇게 쓰면 무엇을 했는지 알 수 없어 인정이 어렵습니다.</p>
-  <div class="grid2">
-    <div class="mini"><b>상체</b><span class="good">무릎대고 팔굽혀펴기 · 벽 팔굽혀펴기 · 플랭크 · 덤벨 숄더프레스 · 수건 당기기</span></div>
-    <div class="mini"><b>하체</b><span class="good">스쿼트 · 런지 · 브릿지 · 발뒤꿈치 들기 · 벽에 기대 앉기</span></div>
-    <div class="mini"><b>유연성</b><span class="good">앉아 앞으로 굽히기 · 엎드려 뒤로 젖히기 · 햄스트링 늘리기 · 어깨·가슴 늘리기 · 고양이-소 자세</span></div>
-    <div class="mini"><b>세 칸 모두 필수</b><span>상체 · 하체 · 유연성을 각각 1가지씩 채워야 저장됩니다. 더 했으면 ＋로 추가하세요.</span></div>
+  <div class="box warn"><b>이런 사진은 인정 안 됩니다</b>
+    <ul class="k" style="margin-top:6px">
+      <li>일반 카메라로 찍은 사진</li>
+      <li>사진 코드가 없거나 잘린 사진</li>
+      <li>다른 날짜 · 전에 낸 사진 · 친구 사진</li>
+    </ul>
   </div>
-  <div class="box tip"><b>유튜브를 따라 했다면</b><br>
-    <b>영상 제목과 채널 이름</b>을 정확히 적어주세요. 예)「10분 전신 스트레칭」· 채널 ○○○</div>
-</section>
-
-<section id="reflect">
-  <h2><span class="n">9</span>성찰 쓰기</h2>
-  <p class="sub">기록보다 중요한 것 — 스스로 돌아보기</p>
-  <p><b>오늘의 성찰</b> <span class="pill r">필수</span><br>
-     운동을 올릴 때마다 한두 줄 씁니다. <b>비우면 저장되지 않습니다.</b></p>
-  <p class="sub">예) “초반엔 힘들었는데 20분 넘으니 리듬이 잡혔다.”</p>
-  <p><b>운동자각도와 만족도</b>도 함께 고릅니다 — 매우 쉬움 / 쉬움 / 보통 / 힘듦 / 매우 힘듦</p>
-  <p><b>주간 성찰</b>은 매주 1번, 4주 동안 4번 씁니다. 그 주에 며칠 운동했는지 요약이 위에 나오니 보고 쓰면 됩니다.</p>
-  <div class="box ok"><b>김진호 선생님이 코멘트를 달아줍니다</b><br>
-    캐릭터가 말풍선으로 말해주는 형태로 내 앱 화면에 바로 보입니다.</div>
+  <p class="sub" style="margin:10px 0 0">타임마크 → <b>템플릿</b> → <b>사진 코드</b> 를 골라 두고 찍으세요.</p>
 </section>
 
 <section id="fit">
-  <h2><span class="n">10</span>체력측정</h2>
-  <p class="sub">매주 첫 번째 체육시간에 재고, 앱에 입력합니다</p>
-  <div class="grid2">
-    <div class="mini"><b>인바디</b><span>체성분검사</span></div>
-    <div class="mini"><b>근력</b><span>무릎대고 팔굽혀펴기 · 악력</span></div>
-    <div class="mini"><b>유연성</b><span>앉아 앞으로 굽히기</span></div>
-    <div class="mini"><b>총 6회</b><span>방학 전 · 개학 후 · 1~4주차</span></div>
+  <h2><span class="n">6</span>체력측정</h2>
+  <div class="two">
+    <figure class="shot"><img src="shot-fit.jpg" alt="체력측정 화면"><figcaption>체력측정</figcaption></figure>
+    <div class="txt"><ul class="k">
+      <li>회차 6개 — 방학 전 · 개학 후 · 1~4주차</li>
+      <li>악력 · 팔굽혀펴기 · 앉았다일어나기 · 유연성 · 인바디</li>
+      <li>BMI는 <b>앱이 계산</b>합니다.</li>
+      <li>발끝에 못 미치면 <b>− 버튼</b>으로 마이너스.</li>
+      <li>WHR은 둘레로 계산하거나 <b>값을 직접</b> 입력.</li>
+      <li>같은 회차를 다시 넣으면 <b>덮어씁니다.</b></li>
+      <li><b>변화 그래프</b>로 4주 변화를 봅니다.</li>
+    </ul></div>
   </div>
-  <p>숫자를 넣으면 <b>등급이 바로 나옵니다</b> (PAPS 학생건강체력평가 기준 · 중3 여학생).</p>
-  <p><b>[체력] 탭 → 체력 변화</b>에서 항목별 꺾은선 그래프를 볼 수 있고,
-     그래프를 누르면 <b>크게</b> 볼 수 있습니다. 배경의 색 띠가 5등급 구간입니다.</p>
-  <div class="box tip"><b>올라가야 좋은 것과 내려가야 좋은 것</b><br>
-    악력·근육량은 올라가야 향상, 체지방률·내장비만은 내려가야 향상입니다.</div>
 </section>
 
-<section id="essay">
-  <h2><span class="n">11</span>감상문</h2>
-  <p class="sub">4주 동안 쌓인 기록이 그대로 자료가 됩니다</p>
-  <p>4주를 마치면 감상문을 제출합니다. 이런 내용을 씁니다.</p>
-  <ul>
-    <li>4주간 운동을 돌아보며</li>
-    <li>체력측정 결과가 어떻게 변했는지</li>
-    <li>매주 쓴 성찰에서 내 생각이 어떻게 달라졌는지</li>
-    <li>가장 힘들었던 순간과 이겨낸 방법</li>
-    <li>앞으로 어떻게 운동을 이어갈 것인지</li>
+<section id="write">
+  <h2><span class="n">7</span>성찰 · 감상문</h2>
+  <ul class="k">
+    <li>성찰은 <b>주마다 한 편</b>, 모두 4편.</li>
+    <li>성찰 칸 위에 <b>그 주 질문</b>이 떠 있습니다. 그 질문에 답하듯 쓰면 쉽습니다.</li>
+    <li>선생님이 답을 달면 <b>말풍선</b>으로 보입니다.</li>
+    <li>운동을 올릴 때마다 <b>오늘의 성찰</b> 한두 줄 — 비우면 저장 안 됩니다.</li>
+    <li><b>감상문</b>은 10/4 이후. 체력 그래프를 보며 4주를 돌아보고 씁니다.</li>
   </ul>
-  <div class="box ok"><b>앱을 열어두고 쓰세요</b><br>
-    <b>성찰</b> 탭에 주차별 성찰과 선생님 코멘트, <b>체력</b> 탭에 6회차 변화 그래프,
-    <b>기록</b> 탭에 날짜별 운동 내역이 그대로 남아 있습니다.</div>
-  <p class="sub">제출 시기와 분량은 수업시간에 따로 안내합니다.</p>
 </section>
 
 <section id="faq" class="faq">
-  <h2><span class="n">12</span>자주 묻는 질문</h2>
+  <h2><span class="n">8</span>자주 묻는 질문</h2>
   <dl>
-    <dt>Q. 카톡으로 링크를 열었더니 설치 버튼이 없어요.</dt>
-    <dd>카톡 안에서 열면 설치가 안 됩니다. 주소를 복사해서 <b>크롬(안드로이드) · 사파리(아이폰)</b>에 붙여넣어 여세요.</dd>
+    <dt>Q. 사진을 깜빡했어요.</dt>
+    <dd>사진 없이 내면 기록은 남지만 <b>운동한 것으로 인정되지 않습니다.</b></dd>
 
-    <dt>Q. 지난 요일 운동을 지금 올려도 되나요?</dt>
-    <dd>됩니다. 같은 주 안이라면 지난 요일을 골라 올릴 수 있습니다. 다만 <b>일요일 22시</b>가 지나면 그 주 기록으로 안 들어갑니다.</dd>
+    <dt>Q. 지난 주 것을 안 올렸어요.</dt>
+    <dd>올릴 수 있습니다. 날짜 위 <b>주차 칩</b>에서 지난 주를 고르세요. 대신 <b>«N일 초과»</b>로 남습니다.</dd>
 
-    <dt>Q. 하루에 유산소랑 근력을 다 하면 2일로 쳐지나요?</dt>
-    <dd><b>운동한 날은 하루</b>지만 <b>유산소 1일 · 근력 1일이 각각</b> 올라갑니다. 오히려 가장 좋은 방법입니다.
-        다만 «주 4일»은 <b>서로 다른 네 날</b>이어야 하니, 이틀에 몰아서 하면 모자랍니다.</dd>
+    <dt>Q. 같은 날 유산소랑 근력을 다 했어요.</dt>
+    <dd>운동한 날은 하루지만 <b>유산소 1일 · 근력 1일이 각각</b> 올라갑니다. 가장 좋은 방법입니다.</dd>
 
-    <dt>Q. 사진 확인이 자꾸 실패해요.</dt>
-    <dd>타임마크 앱에서 <b>템플릿 → 사진 코드</b>를 골랐는지 확인하세요. 그래도 안 되면
-        <b>🙋 김진호 선생님께 확인 요청</b>으로 제출하면 선생님이 직접 확인합니다.</dd>
+    <dt>Q. 아파서 못 했어요.</dt>
+    <dd>김진호 선생님께 미리 말하세요. 공지 → <b>문의하기</b>로도 됩니다.</dd>
 
-    <dt>Q. 성찰을 안 쓰면 저장이 안 돼요.</dt>
-    <dd>맞습니다. <b>오늘의 성찰은 필수</b>입니다. 한 줄이라도 적어야 저장됩니다.</dd>
+    <dt>Q. 폰을 바꾸면 기록이 사라지나요?</dt>
+    <dd>아니요. 다시 로그인하면 그대로 있습니다.</dd>
 
-    <dt>Q. 앱을 지웠다 다시 깔면 기록이 사라지나요?</dt>
-    <dd>아니요. 기록은 선생님 시트에 저장되므로 다시 로그인하면 그대로 있습니다.</dd>
+    <dt>Q. 앱이 옛날 화면이에요.</dt>
+    <dd><b>앱을 껐다 켜세요.</b> 화면 맨 아래 버전이 바뀌면 최신입니다.</dd>
 
-    <dt>Q. 선생님이 앱을 고치면 저도 다시 깔아야 하나요?</dt>
-    <dd>아니요. <b>앱을 껐다 켜면</b> 자동으로 최신 상태가 됩니다. 다만 홈 화면 <b>아이콘 모양·색</b>을 바꾸는 경우에만 다시 설치가 필요합니다.</dd>
-
-    <dt>Q. 학생코드를 잊어버렸어요.</dt>
-    <dd>[다했어요]에서 쓰던 코드와 같습니다. 그래도 모르겠으면 김진호 선생님께 물어보세요.</dd>
+    <dt>Q. 학생코드를 잊었어요.</dt>
+    <dd>다했어요에서 쓰던 코드와 같습니다. 모르겠으면 선생님께.</dd>
   </dl>
 </section>
 
 <footer>
   혜원여자중학교 체육과 · 김진호 선생님<br>
-  혜원핏 사용설명서 v2.0.1 · 운동 기간 9/7(월)~10/4(일)
+  혜원핏 사용설명서 · 운동 기간 9/7(월)~10/4(일)
 </footer>
 
 </div>
