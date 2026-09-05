@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.81.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.82.0 -->
+<!--   [0.82.0] 로그인한 화면 맨 아래(탭바 바로 위)에 «혜원핏 v0.82.0 · 배포 시각 · 서버 v0.72.0» 한 줄 표시.
+        PWA_BUILD 는 배포할 때마다 실제 시각으로 갱신한다. -->
 <!--   [0.81.0] 근력 화면을 «이번 주 필수 운동»과 «➕ 선택 운동» 두 타일로 나눴다. ＋ 운동 추가는 선택 타일 안으로.
         저장 문자열도 «[필수·하체] …» / «[선택] …» 으로 갈라 적고, 필수·선택 개수를 따로 서버에 보낸다(나중에 집계용). -->
 <!--   [0.80.0] «운동한 날짜» 옆에 «1주차» 배지를 붙였다(고른 주차를 늘 알 수 있게).
@@ -557,6 +559,9 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 .list-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--divider)}
 .list-item:last-child{border-bottom:none}
 .ver{text-align:center;color:var(--muted2);font-size:11px;padding:8px 0 4px}
+/* [0.82.0] 로그인한 화면 맨 아래 — 탭바 높이만큼 띄워 가려지지 않게 */
+.appver{text-align:center;color:var(--muted2);font-size:10.5px;line-height:1.6;padding:12px 14px 0;
+  margin-bottom:calc(70px + env(safe-area-inset-bottom))}
 /* 저장시각 표기 (전역 규칙) */
 .savedat{margin:8px 0 0;font-size:12px;color:var(--muted2);text-align:right;min-height:17px}
 .savedat.just{color:var(--primary-dark);font-weight:700}
@@ -1051,6 +1056,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
     </div>
   </div>
 
+  <div class="appver hidden" id="app-ver"></div>
+
   <nav class="tabbar hidden" id="tabbar">
     <button data-t="home" onclick="go('home')"><img class="ic" src="tab-home.png" alt="">홈</button>
     <button data-t="cert" onclick="go('cert')"><img class="ic" src="tab-exercise.png" alt="">운동</button>
@@ -1065,9 +1072,16 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.81.0';
-var PWA_BUILD = '2026.09.03 23:42';
+var PWA_VER = '0.82.0';
+var PWA_BUILD = '2026.09.05 23:25';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
+/* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
+function paintAppVer(){
+  var el=document.getElementById('app-ver'); if(!el)return;
+  var c=ST.config||{};
+  el.innerHTML='혜원핏 <b>v'+PWA_VER+'</b> · '+PWA_BUILD+' 배포'
+    + (c.version?('<br>서버 v'+esc(c.version)+(c.배포시각?(' · '+esc(c.배포시각)):'')):'');
+}
 
 /* 테마(색+로고) — 관리자 설정값(테마 1~6)에 따라 전환 */
 var THEMES={
@@ -1143,7 +1157,9 @@ function go(name, skipLoad){
   document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on')});
   var el = document.getElementById('s-'+name); if(el) el.classList.add('on');
   var tb = document.getElementById('tabbar');
-  if(name==='login'){ tb.classList.add('hidden'); popClose(); } else { tb.classList.remove('hidden'); }
+  var av=document.getElementById('app-ver');
+  if(name==='login'){ tb.classList.add('hidden'); if(av)av.classList.add('hidden'); popClose(); }
+  else { tb.classList.remove('hidden'); if(av){av.classList.remove('hidden');paintAppVer();} }
   document.querySelectorAll('.tabbar button').forEach(function(b){
     b.classList.toggle('on', b.dataset.t===name);
   });
@@ -2121,6 +2137,7 @@ function doLogin(){
 /* 한 번에 받은 묶음으로 화면을 채운다 */
 function applyBundle(b){
   if(!b) return;
+  setTimeout(paintAppVer,0);        // [0.82.0] 서버 버전이 오면 맨 아랫줄을 다시 쓴다
   if(b.reads) ST.reads=b.reads;   // [0.67.0] 서버 읽음 기록
   if(b.config) ST.config=b.config;
   if(b.home){ paintHome(b.home); }
