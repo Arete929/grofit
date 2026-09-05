@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.73.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.74.0 -->
+<!--   [0.74.0] 필수 운동 칸의 «방법 ▾» 아코디언 — 펼치면 설명·운동 부위·자세 그림·수행 방법 단계·⚠주의·다른 방법·📺시연 영상(책 QR 주소)이 나온다. 그림을 늘 띄우던 것을 접어 넣어 입력 칸이 먼저 보이게 했다. 수행 방법 글은 단단프로젝트와 같은 순서·같은 내용이되 문장은 새로 썼다(그림을 일러스트로 바꾼 것과 같은 이유). -->
 <!--   [0.73.0] «이번 주 성찰 질문»을 김진호 선생님 캐릭터 말풍선으로 바꿨다(jinho.png · qBubble). 마음 한 줄 화면 · 읽을거리 화면 · 성찰 쓰는 화면 세 곳 모두 같은 모양. 선생님 코멘트 말풍선(.cmc)과 결을 맞췄다. -->
 <!--   [0.72.0] 1주차 필수 운동을 «스쿼트 · 플랭크 · 레그 레이즈» 셋으로. 자세 그림 3장(ex-squat/plank/legraise.png) 첨부. part.unit='time' 이면 그 칸은 처음부터 «시간(분·초)» 으로 열린다 — 플랭크는 횟수가 아니라 버틴 시간이라서. -->
 <!--   [0.71.0] ★주차별 근력 «필수 운동» — STR_WEEK 에 주차별로 정해 두면 그 주에는 그 운동이 이름 고정(readonly)으로 뜨고, 세트·횟수만 적으면 된다. 1주차 = 스쿼트 + 크런치. 정해 두지 않은 주차는 예전대로 상체·하체·유연성 세 칸. 추가 운동은 ＋로 얼마든지. 필수 칸에는 자세 그림(ex-squat.png)과 한 줄 요령을 함께 보여 준다. -->
@@ -136,6 +137,23 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .exrow .exfig{display:block;width:100%;max-height:240px;object-fit:contain;background:#fff;
   border:1px solid var(--line);border-radius:10px;margin:8px 0 2px}
 .exrow.fixed{border-color:var(--line2)}
+/* [0.74.0] «방법» 아코디언 */
+.exname .howbtn{flex:none;height:28px;padding:0 11px;border-radius:9px;border:1.5px solid var(--primary);
+  background:var(--primary-tint);color:var(--primary-dark);font-family:inherit;font-size:12px;font-weight:800;cursor:pointer}
+.exname .howbtn.on{background:var(--primary);border-color:var(--primary);color:#fff}
+.howbox{margin:9px 0 2px;padding:12px 13px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.howbox .hdesc{margin:0 0 6px;font-size:13.5px;line-height:1.65;color:var(--ink2)}
+.howbox .hbody{display:block;margin-bottom:2px;font-size:11.5px;color:var(--muted2)}
+.howbox .httl{display:block;margin:10px 0 6px;font-size:12px;font-weight:800;color:var(--primary-dark)}
+.howbox ol{margin:0;padding-left:20px}
+.howbox ol li{font-size:13.5px;line-height:1.7;margin-bottom:7px;color:var(--ink2)}
+.howbox ol li:last-child{margin-bottom:0}
+.howbox .hwarn{margin:10px 0 0;padding:9px 11px;border-radius:10px;background:#fff4f1;border:1px solid #f0b6a4;
+  font-size:12.5px;line-height:1.65;color:#8a3b28}
+.howbox .halt{margin:9px 0 0;padding:9px 11px;border-radius:10px;background:var(--bg);border:1px solid var(--line);
+  font-size:12.5px;line-height:1.65;color:var(--ink2)}
+.howbox .hvid{display:block;margin-top:11px;text-align:center;padding:12px;border-radius:11px;
+  background:var(--primary);color:#fff;font-weight:800;font-size:14px;text-decoration:none}
 /* 횟수 / 시간 토글 — 플랭크처럼 버티는 운동은 분·초로 적는다 */
 .usel{display:inline-flex;border:1px solid var(--line2);border-radius:6px;overflow:hidden;
   vertical-align:-2px;background:#fff}
@@ -1015,7 +1033,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.73.0';
+var PWA_VER = '0.74.0';
 var PWA_BUILD = '2026.09.03 23:42';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
@@ -2489,14 +2507,36 @@ function askException(){
 /* [0.71.0] 주차별 «필수 운동». 여기 적어 둔 주차는 운동 이름이 고정되고, 학생은 세트·횟수만 적는다.
    적어 두지 않은 주차는 아래 STR_PARTS(상체·하체·유연성 자유 입력)로 돌아간다. */
 var STR_WEEK = {
-  1: [{k:'하체', c:'p2', name:'스쿼트', img:'ex-squat.png',
-       note:'<b>무릎이 발끝을 넘지 않게</b> 엉덩이를 뒤로 빼며 의자에 앉듯 내려갑니다. 등은 곧게 펴고, 발은 어깨너비로.'},
-      {k:'코어', c:'p1', name:'플랭크', img:'ex-plank.png', unit:'time',
+  1: [{k:'하체', c:'p2', name:'스쿼트', img:'ex-squat.png', vid:'https://m.site.naver.com/1Q75J',
+       note:'<b>무릎이 발끝을 넘지 않게</b> 엉덩이를 뒤로 빼며 의자에 앉듯 내려갑니다. 등은 곧게 펴고, 발은 어깨너비로.',
+       desc:'무릎을 절반쯤 굽혔다 펴면서 허벅지와 엉덩이 근육을 기르는 운동입니다.',
+       body:'넙다리네갈래근(대퇴사두근) · 볼기근(둔근) · 넙다리뒤근육(햄스트링)',
+       steps:['발을 어깨너비로 벌리고 발끝은 정면을 향하게 하여 편하게 섭니다.',
+              '팔은 앞으로 곧게 뻗고, 허리와 등이 둥글게 말리지 않도록 편 채 천천히 내려갑니다.',
+              '무릎을 절반쯤 굽힌 곳에서 잠깐 멈췄다가, 발바닥으로 바닥을 밀며 올라옵니다.'],
+       warn:['<b>무릎 위치</b> — 무릎이 발끝보다 앞으로 나가면 체중이 무릎 관절에 몰립니다. 엉덩이를 뒤로 빼서 다리 근육이 힘을 나눠 받게 하세요.',
+             '<b>허리 곡선</b> — 허리와 어깨가 둥글게 말리면 허리가 아플 수 있습니다.'],
+       alt:'<b>월 스쿼트 홀드</b> — 벽에 등을 붙이고 무릎 각도를 90도로 유지하며 버팁니다. 허리와 엉덩이를 벽에 붙이고 배에 힘을 주세요. 관절이 불편하면 이 방법이 편합니다.'},
+      {k:'코어', c:'p1', name:'플랭크', img:'ex-plank.png', unit:'time', vid:'https://m.site.naver.com/1Q76B',
        note:'팔꿈치는 <b>어깨 바로 아래</b>, 머리부터 발뒤꿈치까지 <b>한 줄</b>로. 엉덩이가 처지거나 들리면 안 됩니다. '
-           +'<b>버틴 시간</b>을 분·초로 적으세요.'},
-      {k:'하복부', c:'p3', name:'레그 레이즈', img:'ex-legraise.png',
+           +'<b>버틴 시간</b>을 분·초로 적으세요.',
+       desc:'팔꿈치와 발끝을 바닥에 대고 몸을 곧게 유지하는 코어 운동입니다.',
+       body:'배가로근(복횡근) · 배곧은근(복직근) · 배빗근(복사근)',
+       steps:['바닥에 엎드려 팔꿈치를 어깨너비로 벌리고 <b>어깨 바로 아래</b>에 놓습니다. 무릎과 발끝으로 몸을 지탱합니다.',
+              '목 · 허리 · 엉덩이 · 다리가 <b>한 줄</b>이 되도록 자세를 유지합니다.',
+              '배와 등 사이에 알맞은 힘이 걸리도록 배에 <b>계속</b> 힘을 줍니다. 숨은 멈추지 말고 쉬세요.'],
+       warn:['<b>척추 중립</b> — 허리가 아래로 휘거나, 엉덩이와 목을 과하게 드는 자세는 몸에 무리를 줍니다. 옆에서 봤을 때 곧은 한 줄이어야 합니다.'],
+       alt:'<b>더 힘들게</b> — 플랭크 자세를 유지한 채 양쪽 다리를 번갈아 가며 들어 올립니다.'},
+      {k:'하복부', c:'p3', name:'레그 레이즈', img:'ex-legraise.png', vid:'https://m.site.naver.com/1Q7lU',
        note:'누워서 <b>허리를 바닥에 붙인 채</b> 양다리를 천천히 들어 올렸다 내립니다. '
-           +'허리가 뜨면 무릎을 살짝 굽히고, 발이 바닥에 닿기 직전에 멈추세요.'}]
+           +'허리가 뜨면 무릎을 살짝 굽히고, 발이 바닥에 닿기 직전에 멈추세요.',
+       desc:'등을 바닥에 대고 양다리를 들어 올렸다 내리는 하복부 운동입니다.',
+       body:'엉덩허리근(장요근) · 배곧은근(복직근) · 넙다리네갈래근(대퇴사두근)',
+       steps:['매트나 바닥에 등을 대고 편하게 누운 뒤, 손바닥이 바닥에 닿도록 엉덩이 옆에 놓습니다.',
+              '숨을 내쉬면서 배에 힘을 주고, 천천히 양다리를 들어 올립니다.',
+              '1~3초 자세를 유지하며 배 근육의 자극을 느낀 뒤, 천천히 다리를 내립니다.'],
+       warn:['<b>허리를 바닥에 붙이기</b> — 다리를 들고 내릴 때 허리가 바닥에서 떨어지지 않게 등을 바닥에 밀착시키세요. 허리 통증을 막아 줍니다.'],
+       alt:'<b>더 쉽게</b> — <b>무릎 접고 레그 레이즈</b>. 무릎을 굽히고 하면 허리에 걸리는 압력이 적어, 허리가 아프거나 복근이 약한 사람도 안전하게 할 수 있습니다.'}]
 };
 function strParts(){ return STR_WEEK[nowWeekNo()] || STR_PARTS; }
 /* 필수 칸이 이번 주 것과 다르면 다시 만든다 */
@@ -2517,6 +2557,7 @@ function renderStrGuide(){
     box.innerHTML = '<b>💪 이번 주 필수 운동은 '
       + ps.map(function(p){return '«'+p.name+'»';}).join(' · ') + ' 입니다</b>'
       + '<p>운동 이름은 이미 적혀 있어요. <b>세트와 횟수만</b> 채우면 됩니다. 플랭크처럼 버티는 운동은 <b>시간</b>으로 적어요.</p>'
+      + '<p>이름 옆 <b>«방법 ▾»</b>을 누르면 자세 그림 · 하는 순서 · 주의할 점 · <b>시연 영상</b>이 나옵니다.</p>'
       + '<p>더 한 운동이 있으면 아래 <b>＋ 운동 추가</b>로 얼마든지 넣으세요. 스트레칭도 좋고, 하고 싶은 운동도 좋습니다.</p>';
   } else {
     box.innerHTML = '<b>💪 3가지는 이렇게 구성하세요</b>'
@@ -2553,10 +2594,11 @@ function addStrRow(part){
   var tmode=!!(part&&part.unit==='time');       // [0.72.0] 플랭크처럼 버티는 운동은 처음부터 시간 칸으로
   d.innerHTML='<div class="exname">'+head
       +'<input class="s-name" placeholder="'+(part?(part.ph||part.name||''):'운동명 (예: 플랭크)')+'"'
-      +(fixName?' value="'+fixName+'" readonly':'')+'></div>'
+      +(fixName?' value="'+fixName+'" readonly':'')+'>'
+      +((part&&(part.steps||part.img||part.vid))?'<button type="button" class="howbtn" onclick="toggleHow(this)">방법 ▾</button>':'')
+    +'</div>'
     +((part&&part.note)?'<p class="exnote">'+part.note+'</p>':'')
-    +((part&&part.img)?'<img class="exfig" src="'+part.img+'" alt="'+fixName+' 자세" '
-      +'onerror="this.style.display=\'none\'">':'')
+    +howHTML(part)
     +'<div class="exnum">'
       +'<label>무게<input class="s-wt" inputmode="decimal" placeholder="kg"><span class="unit">kg</span></label>'
       +'<label>세트<input class="s-set" inputmode="numeric" placeholder="0"><span class="unit">세트</span></label>'
@@ -2570,6 +2612,29 @@ function addStrRow(part){
         +'</span></label>'
     +'</div>';
   list.appendChild(d);
+}
+/* [0.74.0] «방법» 아코디언 속 내용 — 설명 · 부위 · 그림 · 단계 · 주의 · 다른 방법 · 영상 */
+function howHTML(part){
+  if(!part || !(part.steps || part.img || part.vid)) return '';
+  var h='<div class="howbox hidden">';
+  if(part.desc) h+='<p class="hdesc">'+part.desc+'</p>';
+  if(part.body) h+='<span class="hbody">운동 부위 · '+esc(part.body)+'</span>';
+  if(part.img)  h+='<img class="exfig" src="'+part.img+'" alt="'+esc(part.name||'')+' 자세" onerror="this.style.display=\'none\'">';
+  if(part.steps&&part.steps.length){
+    h+='<b class="httl">수행 방법</b><ol>'+part.steps.map(function(t){return '<li>'+t+'</li>';}).join('')+'</ol>';
+  }
+  (part.warn||[]).forEach(function(t){ h+='<p class="hwarn">⚠ '+t+'</p>'; });
+  if(part.alt) h+='<p class="halt">'+part.alt+'</p>';
+  if(part.vid) h+='<a class="hvid" href="'+part.vid+'" target="_blank" rel="noopener">📺 시연 영상 보기</a>';
+  return h+'</div>';
+}
+/* 접었다 펴기 */
+function toggleHow(btn){
+  var box=btn.closest('.exrow').querySelector('.howbox');
+  if(!box)return;
+  var open=box.classList.toggle('hidden')===false;
+  btn.textContent=open?'방법 ▴':'방법 ▾';
+  btn.classList.toggle('on',open);
 }
 /* 횟수 / 시간 고르기 — 시간이면 분·초 두 칸으로 바뀐다 */
 function pickUnit(btn){
