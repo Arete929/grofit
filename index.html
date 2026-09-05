@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.82.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.83.0 -->
+<!--   [0.83.0] 읽기 편하게 두 가지 — ① word-break:keep-all 로 한글이 «스쿼/트» 처럼 낱말 중간에서 잘리지 않게 했다.
+        ② 안내 글은 마침표마다 줄을 바꿔 한 문장씩 보이게 했다(근력·유산소 안내 상자). -->
 <!--   [0.82.0] 로그인한 화면 맨 아래(탭바 바로 위)에 «혜원핏 v0.82.0 · 배포 시각 · 서버 v0.72.0» 한 줄 표시.
         PWA_BUILD 는 배포할 때마다 실제 시각으로 갱신한다. -->
 <!--   [0.81.0] 근력 화면을 «이번 주 필수 운동»과 «➕ 선택 운동» 두 타일로 나눴다. ＋ 운동 추가는 선택 타일 안으로.
@@ -109,6 +111,7 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;background:var(--canvas);color:var(--ink);
+  word-break:keep-all;overflow-wrap:break-word;   /* [0.83.0] 한글은 낱말 단위로 줄바꿈 */
   line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 .app{max-width:480px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;display:flex;flex-direction:column}
 .scr{display:none;flex:1;padding:16px 16px 96px}
@@ -195,7 +198,7 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .guidebox{background:var(--primary-tint);border:1px solid #cfe8a8;border-radius:13px;
   padding:12px 14px;margin-bottom:12px;font-size:13px;line-height:1.6;color:var(--ink2)}
 .guidebox b{color:var(--primary-dark)}
-.guidebox p{margin:5px 0 0;font-size:12.5px}
+.guidebox p{margin:7px 0 0;font-size:12.5px;line-height:1.8}
 .guidebox ol{margin:6px 0 0;padding-left:18px;font-size:12.5px;line-height:1.75}
 /* [0.50.0] 제출 진행 게이지 */
 #prog{position:fixed;inset:0;z-index:150;background:rgba(10,20,12,.55);
@@ -715,7 +718,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
     <div id="cardio-late" class="latewarn hidden"></div>
     <div class="guidebox">
       <b>📱 운동 앱 하나를 골라 쓰세요</b>
-      <p><b>삼성헬스 · 애플 피트니스 · 나이키 런클럽(NRC)</b> 중 <b>하나</b>를 정해 4주 동안 계속 사용하세요.<br>
+      <p><b>삼성헬스 · 애플 피트니스 · 나이키 런클럽(NRC)</b> 중<br>
+      <b>하나</b>를 정해 4주 동안 계속 사용하세요.<br>
       그 앱의 기록 화면을 캡처해서 올리면 됩니다.</p>
     </div>
     <button type="button" class="howbtn shotbtn" onclick="toggleShots(this)">🖼 어떤 화면을 올리나요? · 예시 보기</button>
@@ -773,8 +777,10 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
     <div class="card">
       <div class="tmnote" id="str-guide">
         <b>⏱ 타임마크 '사진 코드'로 찍은 사진만 됩니다</b>
-        <p class="cap" style="margin:4px 0 0">타임마크(Timemark) 앱 → <b>템플릿</b> → <b>사진 코드</b> 를 고르고 운동하는 모습을 찍으세요.<br>
-        사진에 <b>날짜와 사진 코드</b>가 보여야 하고, 날짜가 <b>위에서 고른 요일과 같아야</b> 인정됩니다.
+        <p class="cap" style="margin:4px 0 0">타임마크(Timemark) 앱 → <b>템플릿</b> → <b>사진 코드</b>를 고르세요.<br>
+        그대로 운동하는 모습을 찍으면 됩니다.<br>
+        사진에 <b>날짜와 사진 코드</b>가 보여야 합니다.<br>
+        날짜는 <b>위에서 고른 날과 같아야</b> 인정됩니다.<br>
         <b>한 번 낸 사진은 다시 못 씁니다.</b></p>
       </div>
       <div class="drop" id="str-drop" onclick="pick('str-file')">📷 운동 사진 업로드<br><span class="cap">탭하여 사진 선택</span></div>
@@ -794,14 +800,15 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
         <span class="good">✓ 무릎대고 팔굽혀펴기 · 덤벨 숄더프레스 · 스쿼트 · 런지 · 플랭크 · 앉아 앞으로 굽히기</span></p>
         <p>세 칸을 모두 채워야 저장됩니다. 더 했으면 ＋로 추가하세요.</p>
       </div>
-      <p class="cap" style="margin:-2px 0 10px"><b>세트</b>와 <b>횟수</b>를 채우면 됩니다.
+      <p class="cap" style="margin:-2px 0 10px"><b>세트</b>와 <b>횟수</b>를 채우면 됩니다.<br>
       플랭크처럼 버티는 운동은 <b>시간</b>을 눌러 <b>분 · 초</b>로 적으세요.</p>
       <div id="str-list"></div>
     </div>
     <div class="card">
       <h2>➕ 선택 운동 <span class="cap">· 안 적어도 괜찮아요</span></h2>
-      <p class="cap" style="margin:-4px 0 10px">필수 말고 <b>더 한 운동</b>이 있으면 여기에 적으세요.
-      스트레칭 · 줄넘기 · 덤벨 운동 무엇이든 좋습니다. 여기에는 <b>무게</b>도 적을 수 있어요.</p>
+      <p class="cap" style="margin:-4px 0 10px">필수 말고 <b>더 한 운동</b>이 있으면 여기에 적으세요.<br>
+      스트레칭 · 줄넘기 · 덤벨 운동 무엇이든 좋습니다.<br>
+      여기에는 <b>무게</b>도 적을 수 있어요.</p>
       <div id="str-opt"></div>
       <button class="btn sec sm" onclick="addStrRow()" style="margin-top:8px">＋ 운동 추가</button>
     </div>
@@ -1072,8 +1079,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.82.0';
-var PWA_BUILD = '2026.09.05 23:25';
+var PWA_VER = '0.83.0';
+var PWA_BUILD = '2026.09.05 23:27';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2736,18 +2743,19 @@ function renderStrGuide(){
   if(fixed){
     box.innerHTML = '<b>💪 이번 주 필수 운동은 '
       + ps.map(function(p){return '«'+p.name+'»';}).join(' · ') + ' 입니다</b>'
-      + '<p>운동 이름은 이미 적혀 있어요. <b>세트와 횟수만</b> 채우면 됩니다. 플랭크처럼 버티는 운동은 <b>시간</b>으로 적어요.</p>'
-      + '<p>이름 옆 <b>«방법 ▾»</b>을 누르면 자세 그림 · 하는 순서 · 주의할 점 · <b>시연 영상</b>이 나옵니다.</p>'
-      + '<p>더 한 운동이 있으면 아래 <b>＋ 운동 추가</b>로 얼마든지 넣으세요. 스트레칭도 좋고, 하고 싶은 운동도 좋습니다.</p>';
+      + '<p>운동 이름은 이미 적혀 있어요.<br><b>세트와 횟수만</b> 채우면 됩니다.<br>'
+      + '플랭크처럼 버티는 운동은 <b>시간</b>으로 적어요.</p>'
+      + '<p>이름 옆 <b>«방법 ▾»</b>을 누르면<br>자세 그림 · 하는 순서 · 주의할 점 · <b>시연 영상</b>이 나옵니다.</p>'
+      + '<p>더 한 운동은 아래 <b>➕ 선택 운동</b>에 넣으세요.</p>';
   } else {
     box.innerHTML = '<b>💪 3가지는 이렇게 구성하세요</b>'
       + '<ol><li><b>상체</b> 운동 — 예) 무릎대고 팔굽혀펴기</li>'
       + '<li><b>하체</b> 운동 — 예) 스쿼트</li>'
       + '<li><b>유연성</b> 운동 — 예) 앉아 앞으로 굽히기</li></ol>'
-      + '<p><b>운동 이름은 «어떤 동작을 했는지» 알 수 있게 구체적으로</b> 적어주세요.</p>'
+      + '<p><b>운동 이름은 구체적으로</b> 적어주세요.<br>«어떤 동작을 했는지» 알 수 있게요.</p>'
       + '<p class="exex"><span class="bad">✗ 근력운동, 상체운동, 스트레칭, 유연성, 운동함</span>'
       + '<span class="good">✓ 무릎대고 팔굽혀펴기 · 덤벨 숄더프레스 · 스쿼트 · 런지 · 플랭크 · 앉아 앞으로 굽히기</span></p>'
-      + '<p>세 칸을 모두 채워야 저장됩니다. 더 했으면 ＋로 추가하세요.</p>';
+      + '<p>세 칸을 모두 채워야 저장됩니다.<br>더 했으면 아래 <b>➕ 선택 운동</b>에 넣으세요.</p>';
   }
 }
 /* 근력은 상체·하체·유연성 3종목 필수 → 개수 상수 대신 STR_PARTS 로 관리 */
