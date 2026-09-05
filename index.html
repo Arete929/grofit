@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.72.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.73.0 -->
+<!--   [0.73.0] «이번 주 성찰 질문»을 김진호 선생님 캐릭터 말풍선으로 바꿨다(jinho.png · qBubble). 마음 한 줄 화면 · 읽을거리 화면 · 성찰 쓰는 화면 세 곳 모두 같은 모양. 선생님 코멘트 말풍선(.cmc)과 결을 맞췄다. -->
 <!--   [0.72.0] 1주차 필수 운동을 «스쿼트 · 플랭크 · 레그 레이즈» 셋으로. 자세 그림 3장(ex-squat/plank/legraise.png) 첨부. part.unit='time' 이면 그 칸은 처음부터 «시간(분·초)» 으로 열린다 — 플랭크는 횟수가 아니라 버틴 시간이라서. -->
 <!--   [0.71.0] ★주차별 근력 «필수 운동» — STR_WEEK 에 주차별로 정해 두면 그 주에는 그 운동이 이름 고정(readonly)으로 뜨고, 세트·횟수만 적으면 된다. 1주차 = 스쿼트 + 크런치. 정해 두지 않은 주차는 예전대로 상체·하체·유연성 세 칸. 추가 운동은 ＋로 얼마든지. 필수 칸에는 자세 그림(ex-squat.png)과 한 줄 요령을 함께 보여 준다. -->
 <!--   [0.70.0] 1주차 지식단단에 «달리기 앱 제대로 활용하기» 추가(유산소를 앱 화면으로 인증하니 첫 주에 가장 쓸모 있다) → 1주차만 3편. 지식 편수를 2편으로 못 박아 두었던 곳(제목·목차·번호·«두 편입니다»)을 편수에 맞춰 자동으로 만들도록 고쳤다. -->
@@ -208,6 +209,19 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .cmc:not(.nochar) .cmc-say:after{content:'';position:absolute;left:-8px;top:22px;
   border:6px solid transparent;border-right-color:#fff;border-left:0}
 .cmc-who{display:block;margin-top:6px;font-size:11.5px;font-weight:700;color:var(--primary-dark)}
+/* [0.73.0] 이번 주 성찰 질문 — 진호 선생님 말풍선 */
+.qbub{display:flex;align-items:flex-start;gap:8px;margin:12px 0}
+.qbub .ch{width:62px;flex:none;align-self:flex-end}
+.qbub .ch img{width:100%;display:block}
+.qbub .say{position:relative;flex:1;background:var(--primary-tint);border:1.5px solid var(--primary);
+  border-radius:16px;padding:12px 14px}
+.qbub .say:before{content:'';position:absolute;left:-11px;bottom:16px;
+  border:6px solid transparent;border-right-color:var(--primary);border-left:0}
+.qbub .say:after{content:'';position:absolute;left:-8px;bottom:16px;
+  border:6px solid transparent;border-right-color:var(--primary-tint);border-left:0}
+.qbub .lab{display:block;font-size:11.5px;font-weight:800;color:var(--primary-dark);margin-bottom:5px}
+.qbub .q{margin:0;font-size:14.5px;font-weight:700;line-height:1.65;color:var(--ink)}
+.qbub .who{display:block;margin-top:7px;font-size:11.5px;font-weight:700;color:var(--primary-dark)}
 /* 선생님 코멘트 말풍선 (캐릭터 스티커) */
 .tbub{display:flex;align-items:flex-start;gap:10px}
 .tbub-st{width:76px;height:76px;flex:none;object-fit:contain}
@@ -1001,7 +1015,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.72.0';
+var PWA_VER = '0.73.0';
 var PWA_BUILD = '2026.09.03 23:42';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 
@@ -1817,7 +1831,7 @@ function renderMind(){
   m.본문.forEach(function(s){ h+=s.p.map(function(t){return '<p>'+t+'</p>';}).join(''); });
   if(m.인용)h+='<div class="pull">'+esc(m.인용)+'</div>';
   h+='</div>';
-  h+='<div class="rdq"><b>이번 주 성찰 질문</b><p>'+esc(m.질문)+'</p></div>';
+  h+=qBubble(w, m.질문);
   document.getElementById('mv-body').innerHTML=h;
   var at=readDone(w,'마음');
   document.getElementById('mv-done').textContent=at?'다 읽었어요 ✓':'읽었어요';
@@ -1861,7 +1875,7 @@ function renderReading(){
       h+='</div>';
     }
   });
-  h+='<div class="rdq"><b>이번 주 성찰 질문</b><p>'+esc(R.마음.질문)+'</p></div>';
+  h+=qBubble(w, R.마음.질문);
   document.getElementById('rv-body').innerHTML=h;
   var at=readDone(w,'지식');
   document.getElementById('rv-done').textContent=at?'다 읽었어요 ✓':'읽었어요';
@@ -1892,11 +1906,18 @@ function markRead(kind){
   toast(kind==='마음'?'✅ 읽음 표시했어요 — 성찰 질문을 기억해 두세요':'✅ 읽음 표시했어요 — 성찰 쓸 때 참고하세요');
   if(ST.student)call('markReading',[ST.student.학번,w,kind],function(r){ if(r&&r.reads)ST.reads=r.reads; });
 }
+/* [0.73.0] 진호 선생님이 묻는 말풍선 — 세 화면이 같이 쓴다 */
+function qBubble(week, q, lab){
+  return '<div class="qbub"><span class="ch"><img src="jinho.png" alt="김진호 선생님"></span>'
+    + '<div class="say"><span class="lab">'+esc(lab || (week+'주차 성찰 질문'))+'</span>'
+    + '<p class="q">'+esc(q)+'</p>'
+    + '<span class="who">김진호 선생님</span></div></div>';
+}
 /* 성찰 화면 위에 이번 주 질문 */
 function renderReflectQ(){
   var el=document.getElementById('rf-q'); if(!el)return;
   var w=curWeekNo(), R=weekReading(w);
-  el.innerHTML='<div class="rdq" style="margin-bottom:10px"><b>'+w+'주차 성찰 질문 · 마음단단</b><p>'+esc(R.마음.질문)+'</p></div>';
+  el.innerHTML=qBubble(w, R.마음.질문, w+'주차 성찰 질문 · 마음단단');
 }
 
 function nowStamp(){
