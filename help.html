@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 코드명: 혜원핏 학생 웹 설명서 | help.html | @version 4.0.1
+<!-- 코드명: 혜원핏 학생 웹 설명서 | help.html | @version 4.2.0
      수정요약: [2.0.1] 좁은 화면에서 표 글자·여백을 줄여 읽기 편하게.
      [2.0.0] 화면별 자세한 설명 6개(홈·인증·체력·성찰·기록·공지) 추가. 같은 날 유산소+근력을 각각 인정하도록
      규칙 변경 반영. 몰아서 하기=△, 앱 새로 시작, 추석 연휴 안내 추가.
@@ -120,6 +120,18 @@ footer{text-align:center;color:var(--mut2);font-size:12.5px;padding:24px 0 8px}
   width:44px;height:44px;border-radius:50%;text-align:center;line-height:44px;font-size:18px;
   box-shadow:0 6px 18px rgba(0,0,0,.22)}
 
+.bigwarn{background:#fff4e0;border:2.5px solid var(--amb);border-radius:16px;padding:16px 18px;
+  margin:0 0 18px;text-align:center}
+.bigwarn b{display:block;font-size:19px;font-weight:800;color:var(--amb);line-height:1.4}
+.bigwarn p{margin:8px 0 0;font-size:14.5px;line-height:1.65;color:var(--ink2)}
+/* [4.1.0] 설정 화면 여러 장 가로로 */
+.tmshots{display:flex;gap:10px;overflow-x:auto;padding:4px 0 6px;margin-top:10px}
+.tmshots figure{flex:0 0 150px;margin:0;text-align:center}
+.tmshots img{width:100%;border:1px solid var(--line);border-radius:10px}
+.tmshots figcaption{font-size:11.5px;color:var(--mut2);margin-top:5px;line-height:1.45}
+.step3{display:flex;gap:8px;align-items:center;background:var(--pt);border:1px solid #cfe8ad;
+  border-radius:12px;padding:10px 12px;margin:10px 0;font-weight:700;font-size:15px;flex-wrap:wrap}
+.step3 span{background:#fff;border-radius:8px;padding:4px 10px;color:var(--pd)}
 /* [4.0.0] 실제 앱 화면 · 개조식 목록 */
 .shot{margin:14px 0 10px;text-align:center}
 .shot img{width:100%;max-width:280px;border:1px solid var(--line);border-radius:14px;
@@ -154,6 +166,12 @@ ul.k li b{color:var(--pd)}
 
 <div class="wrap">
 
+<div class="bigwarn">
+  <b>🔄 기록하기 전에 앱을 껐다 새로 여세요</b>
+  <p>켜 둔 채로 오래 쓰면 쓰던 내용이 사라질 수 있습니다.<br>
+     운동을 올리기 전에 <b>앱을 완전히 닫았다가</b> 다시 여세요.</p>
+</div>
+
 <nav class="toc">
   <b>목차</b>
   <ol>
@@ -161,6 +179,7 @@ ul.k li b{color:var(--pd)}
     <li><a href="#install">앱 깔기</a></li>
     <li><a href="#home">홈 화면</a></li>
     <li><a href="#cardio">유산소</a></li>
+    <li><a href="#timemark">타임마크 설정</a></li>
     <li><a href="#strength">근력</a></li>
     <li><a href="#fit">체력측정</a></li>
     <li><a href="#write">성찰 · 감상문</a></li>
@@ -194,11 +213,24 @@ ul.k li b{color:var(--pd)}
     <a class="url" href="https://arete929.github.io/grofit/">arete929.github.io/grofit</a>
   </div>
   <ul class="k">
-    <li><b>갤럭시</b> — <b>브라우저</b>로 열기 → 메뉴 → <b>앱 설치</b> (또는 홈 화면에 추가)</li>
-    <li><b>아이폰</b> — 사파리로 열기 → 공유(￪) → <b>홈 화면에 추가</b></li>
     <li>카카오톡·인스타 안에서 열면 설치가 안 됩니다. <b>브라우저로</b> 여세요.</li>
     <li>로그인 = <b>학번 + 학생코드</b> (다했어요와 같은 코드)</li>
-    <li><b>타임마크</b> 앱도 깔기 (근력 사진용 · 무료)</li>
+  </ul>
+
+  <h3 style="font-size:16px;margin:18px 0 6px">갤럭시</h3>
+  <ul class="k">
+    <li><b>브라우저</b>(삼성 인터넷·크롬)로 위 주소 열기</li>
+    <li>메뉴 → <b>앱 설치</b> 또는 <b>현재 페이지 추가 → 홈 화면</b></li>
+    <li>«앱스 화면에 추가할까요?» → <b>추가</b></li>
+    <li>«안전하지 않은 앱 차단됨»이 뜨면<br><b>세부정보 더보기 → 무시하고 설치하기</b></li>
+    <li>홈 화면에 초록 로고가 생기면 끝</li>
+  </ul>
+
+  <h3 style="font-size:16px;margin:18px 0 6px">아이폰</h3>
+  <ul class="k">
+    <li><b>사파리</b>로 위 주소 열기 (크롬 말고 사파리)</li>
+    <li>아래 <b>공유(￪)</b> → <b>홈 화면에 추가</b> → 추가</li>
+  </ul>
   </ul>
 </section>
 
@@ -215,8 +247,6 @@ ul.k li b{color:var(--pd)}
       <li>회색 점 = <b>선생님 확인 중</b></li>
     </ul></div>
   </div>
-  <div class="box tip"><b>기록하기 전에 앱을 껐다 켜세요.</b><br>
-    켜 둔 채로 쓰면 쓰던 내용이 사라질 수 있습니다.</div>
 </section>
 
 <section id="cardio">
@@ -238,9 +268,39 @@ ul.k li b{color:var(--pd)}
   </ul>
 </section>
 
+<section id="timemark">
+  <h2><span class="n">5</span>타임마크 설정</h2>
+  <p class="sub">근력 사진 전용 · 무료 · 처음 한 번만 설정</p>
+  <div class="step3">
+    <b>사진에 꼭 보여야 합니다</b>
+    <span>① 이름</span><span>② 시간</span><span>③ 사진 코드</span>
+  </div>
+  <ul class="k">
+    <li>스토어에서 <b>타임마크(Timemark)</b> 검색해 설치</li>
+    <li>업종 고르는 화면 → 오른쪽 위 <b>스킵</b></li>
+    <li>권한은 <b>카메라만 허용</b>하면 됩니다 (위치·알림은 «허용 안 함»으로도 됨)</li>
+    <li>아래 <b>템플릿</b> → <b>«사진 코드»</b> 고르기</li>
+    <li><b>편집하다</b> → <b>이름</b> 켜고 <b>«학번 + 이름»</b> 적기 (예: 3277김체육)</li>
+    <li><b>시간</b>과 <b>사진 코드</b>도 켜져 있어야 합니다</li>
+    <li>주소 · 지도 · 날씨 · 해발은 <b>꺼도 됩니다</b></li>
+    <li><b>완성</b>을 누르면 설정 끝. 다음부터는 그대로 찍기만 하면 됩니다</li>
+  </ul>
+  <div class="tmshots">
+    <figure><img src="tm-1-job.jpg" alt="업종 선택"><figcaption>① 업종은 <b>스킵</b></figcaption></figure>
+    <figure><img src="tm-2-perm.jpg" alt="카메라 권한"><figcaption>② 카메라 <b>허용</b></figcaption></figure>
+    <figure><img src="tm-3-template.jpg" alt="템플릿 선택"><figcaption>③ 템플릿 → <b>사진 코드</b></figcaption></figure>
+    <figure><img src="tm-4-edit.jpg" alt="템플릿 편집"><figcaption>④ <b>이름</b> 켜고 학번·이름</figcaption></figure>
+    <figure><img src="tm-5-done.jpg" alt="완성 화면"><figcaption>⑤ 이렇게 나오면 끝</figcaption></figure>
+  </div>
+</section>
+
 <section id="strength">
-  <h2><span class="n">5</span>근력</h2>
-  <p class="sub">사진은 반드시 <b>타임마크</b> 앱으로</p>
+  <h2><span class="n">6</span>근력</h2>
+  <p class="sub">사진은 반드시 <b>타임마크</b> 앱으로 (설정은 앞 장 참고)</p>
+  <div class="step3">
+    <b>사진에 꼭 보여야 합니다</b>
+    <span>① 이름</span><span>② 시간</span><span>③ 사진 코드</span>
+  </div>
   <div class="two">
     <figure class="shot"><img src="shot-strength.jpg" alt="근력 운동하기 화면"><figcaption>근력 운동하기</figcaption></figure>
     <div class="txt"><ul class="k">
@@ -269,15 +329,15 @@ ul.k li b{color:var(--pd)}
   <div class="box warn"><b>이런 사진은 인정 안 됩니다</b>
     <ul class="k" style="margin-top:6px">
       <li>일반 카메라로 찍은 사진</li>
-      <li>사진 코드가 없거나 잘린 사진</li>
+      <li><b>이름 · 시간 · 사진 코드</b> 중 하나라도 없거나 잘린 사진</li>
       <li>다른 날짜 · 전에 낸 사진 · 친구 사진</li>
     </ul>
   </div>
-  <p class="sub" style="margin:10px 0 0">타임마크 → <b>템플릿</b> → <b>사진 코드</b> 를 골라 두고 찍으세요.</p>
+  <p class="sub" style="margin:10px 0 0">한 번 설정해 두면 다음부터는 그대로 찍기만 하면 됩니다.</p>
 </section>
 
 <section id="fit">
-  <h2><span class="n">6</span>체력측정</h2>
+  <h2><span class="n">7</span>체력측정</h2>
   <div class="two">
     <figure class="shot"><img src="shot-fit.jpg" alt="체력측정 화면"><figcaption>체력측정</figcaption></figure>
     <div class="txt"><ul class="k">
@@ -293,7 +353,7 @@ ul.k li b{color:var(--pd)}
 </section>
 
 <section id="write">
-  <h2><span class="n">7</span>성찰 · 감상문</h2>
+  <h2><span class="n">8</span>성찰 · 감상문</h2>
   <ul class="k">
     <li>성찰은 <b>주마다 한 편</b>, 모두 4편.</li>
     <li>성찰 칸 위에 <b>그 주 질문</b>이 떠 있습니다. 그 질문에 답하듯 쓰면 쉽습니다.</li>
@@ -304,7 +364,7 @@ ul.k li b{color:var(--pd)}
 </section>
 
 <section id="faq" class="faq">
-  <h2><span class="n">8</span>자주 묻는 질문</h2>
+  <h2><span class="n">9</span>자주 묻는 질문</h2>
   <dl>
     <dt>Q. 사진을 깜빡했어요.</dt>
     <dd>사진 없이 내면 기록은 남지만 <b>운동한 것으로 인정되지 않습니다.</b></dd>
