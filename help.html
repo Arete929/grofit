@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 코드명: 혜원핏 학생 웹 설명서 | help.html | @version 4.2.0
+<!-- 코드명: 혜원핏 학생 웹 설명서 | help.html | @version 4.3.0
      수정요약: [2.0.1] 좁은 화면에서 표 글자·여백을 줄여 읽기 편하게.
      [2.0.0] 화면별 자세한 설명 6개(홈·인증·체력·성찰·기록·공지) 추가. 같은 날 유산소+근력을 각각 인정하도록
      규칙 변경 반영. 몰아서 하기=△, 앱 새로 시작, 추석 연휴 안내 추가.
@@ -124,6 +124,12 @@ footer{text-align:center;color:var(--mut2);font-size:12.5px;padding:24px 0 8px}
   margin:0 0 18px;text-align:center}
 .bigwarn b{display:block;font-size:19px;font-weight:800;color:var(--amb);line-height:1.4}
 .bigwarn p{margin:8px 0 0;font-size:14.5px;line-height:1.65;color:var(--ink2)}
+/* [4.3.0] 스토어 설치 QR 두 개 */
+.stores{display:flex;gap:12px;margin:12px 0 4px}
+.st{flex:1;text-align:center;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px 10px}
+.st img{width:100%;max-width:130px;display:block;margin:0 auto 8px;border-radius:8px}
+.st b{display:block;font-size:14.5px;color:var(--ink);margin-bottom:4px}
+.st a{display:inline-block;font-size:12.5px;font-weight:700;color:var(--pd);text-decoration:underline}
 /* [4.1.0] 설정 화면 여러 장 가로로 */
 .tmshots{display:flex;gap:10px;overflow-x:auto;padding:4px 0 6px;margin-top:10px}
 .tmshots figure{flex:0 0 150px;margin:0;text-align:center}
@@ -275,8 +281,20 @@ ul.k li b{color:var(--pd)}
     <b>사진에 꼭 보여야 합니다</b>
     <span>① 이름</span><span>② 시간</span><span>③ 사진 코드</span>
   </div>
+  <div class="stores">
+    <div class="st">
+      <img src="qr-tm-and.png" alt="갤럭시 타임마크 설치 QR" onerror="this.style.display='none'">
+      <b>갤럭시</b>
+      <a href="https://play.google.com/store/apps/details?id=com.oceangalaxy.camera.new">Play 스토어에서 설치</a>
+    </div>
+    <div class="st">
+      <img src="qr-tm-ios.png" alt="아이폰 타임마크 설치 QR" onerror="this.style.display='none'">
+      <b>아이폰</b>
+      <a href="https://apps.apple.com/kr/app/id6446071834">App Store에서 설치</a>
+    </div>
+  </div>
   <ul class="k">
-    <li>스토어에서 <b>타임마크(Timemark)</b> 검색해 설치</li>
+    <li>위 QR을 찍거나, 스토어에서 <b>타임마크</b>를 검색해 설치</li>
     <li>업종 고르는 화면 → 오른쪽 위 <b>스킵</b></li>
     <li>권한은 <b>카메라만 허용</b>하면 됩니다 (위치·알림은 «허용 안 함»으로도 됨)</li>
     <li>아래 <b>템플릿</b> → <b>«사진 코드»</b> 고르기</li>
