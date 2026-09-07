@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.91.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.91.1 -->
+<!--   [0.91.1] 도장판에서 날짜를 누르면 그날 기록이 «그 주차 카드 바로 아래»에 펼쳐진다(전엔 항상 4주차 아래).
+        #cal-detail 을 고른 주차의 .wrow 안으로 옮기고, 닫으면 원래 자리로 돌려놓는다. -->
 <!--   [0.91.0] 제출을 두 번 누르면 똑같은 기록이 2건 생기던 것 — ① 보내는 중(PG.busy)엔 다시 눌러도 나가지 않는다.
         ② 서버(0.73.0)가 «중복» 이라 답하면 «이미 제출된 기록이에요 · 한 번만 저장됩니다» 로 알려준다. -->
 <!--   [0.90.0] ★긴급 — 유산소·근력·성찰·문의 «제출»이 전부 «네트워크 오류»로 막히던 버그를 고쳤다.
@@ -591,6 +593,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 /* 날짜 클릭 시 펼쳐지는 그날의 기록 */
 #cal-detail{overflow:hidden;max-height:0;transition:max-height .25s ease}
 #cal-detail.open{max-height:900px;margin-top:12px}
+.wrow #cal-detail.open{margin-top:10px}          /* [0.91.1] 주차 카드 안에 들어갔을 때 */
 .dayrec{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
 .dayrec .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .dayrec .it{padding:8px 0;border-top:1px solid var(--divider)}
@@ -1133,8 +1136,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.91.0';
-var PWA_BUILD = '2026.09.07 18:08';
+var PWA_VER = '0.91.1';
+var PWA_BUILD = '2026.09.07 22:37';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2317,7 +2320,16 @@ function renderCal(h){
       +'<span class="wb '+bc+'">'+bt+'</span></div>'
       +'<div class="wcells">'+cells+'</div></div>';
   }
+  /* [0.91.1] 기록 펼침 상자가 주차 카드 안에 들어가 있으면 innerHTML 로 지워지기 전에 밖으로 빼 둔다 */
+  var det=document.getElementById('cal-detail');
+  if(det&&box.contains(det)) box.parentNode.insertBefore(det, box.nextSibling);
   box.innerHTML=html;
+  /* [0.91.1] 고른 날짜가 있으면 그 주차 카드 바로 아래로 옮긴다 */
+  if(det&&ST.calDay){
+    var dsel=Math.floor((parseYmd(ST.calDay)-parseYmd(start))/86400000/7);
+    var row=box.children[dsel];
+    if(row) row.appendChild(det);
+  }
 
   var last=parseYmd(start); last.setDate(last.getDate()+7*totalW-1);
   if(hdr)hdr.textContent=fmtMd(parseYmd(start))+' ~ '+fmtMd(last);
