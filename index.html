@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.97.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.98.0 -->
+<!--   [0.98.0] 안 읽은 공지가 여러 개면 한 장씩 넘기지 않고 한 팝업 안에 «타일»로 아래로 이어 붙여 보여준다.
+        맨 아래 «확인했습니다» 한 번으로 전부 읽음 처리(markNoticesRead · GAS 0.81.0). 개인 공지가 위쪽에 온다. -->
 <!--   [0.97.0] 진호 이모티콘 3종 추가 — 꺼이꺼이(sob)·대성통곡(wail)·안돼(no). 코멘트·공지·인사·문의 답변에서 모두 쓸 수 있다. -->
 <!--   [0.96.0] «오늘의 인사» — 홈 맨 위에 뜨는 짧은 인사 띠(전체 공통·날짜별, GAS 0.80.0).
         공지 팝업과 달리 화면을 막지 않는다. ✕ 를 누르면 그날은 안 뜨고(폰에만 기억) 다음 날 새 인사. -->
@@ -636,6 +638,14 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 .dhelp .ex svg{width:100%;height:auto;border-radius:8px;display:block}
 .dhelp .ex figcaption{font-size:11px;color:var(--muted2);margin-top:4px}
 .bubble.bad{background:#fdecec;color:#a33}                                       /* [0.92.0] 미인정 사유 */
+/* [0.98.0] 공지 타일 — 여러 개면 아래로 이어 붙인다 */
+.ntile{border:1px solid var(--line);border-radius:14px;padding:12px 13px;margin-bottom:10px;background:#fff}
+.ntile:last-child{margin-bottom:0}
+.ntile.me{border-color:var(--primary);background:var(--primary-tint)}
+.ntile .th{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.ntile .th b{font-size:15px}
+.ntile .th .dt{margin-left:auto;font-size:11.5px;color:var(--muted2)}
+.ntile .bd{font-size:14px;color:var(--ink2);line-height:1.65;white-space:pre-wrap}
 .pchip{display:inline-block;background:#EAF1FF;color:#2F5FB3;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:800}
 .wrow #cal-detail.open{margin-top:10px}          /* [0.91.1] 주차 카드 안에 들어갔을 때 */
 .dayrec{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
@@ -1141,9 +1151,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
         <span class="chip warn" id="pop-cnt">새 공지</span>
         <span class="cap" id="pop-date"></span>
       </div>
-      <h2 id="pop-title" style="font-size:19px;margin:8px 0 6px"></h2>
-      <div id="pop-body" style="white-space:pre-wrap;font-size:14px;color:var(--ink2);max-height:46vh;overflow:auto"></div>
-      <button class="btn" style="margin-top:16px" onclick="popConfirm()" id="pop-btn">확인했어요</button>
+      <div id="pop-body" style="max-height:58vh;overflow:auto;margin-top:8px"></div>
+      <button class="btn" style="margin-top:16px" onclick="popConfirm()" id="pop-btn">확인했습니다</button>
     </div>
   </div>
 
@@ -1192,8 +1201,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.97.0';
-var PWA_BUILD = '2026.09.08 00:27';
+var PWA_VER = '0.98.0';
+var PWA_BUILD = '2026.09.08 00:32';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -3919,31 +3928,40 @@ function showUnread(list){
   POP=(list||[]).filter(function(n){return !n.읽음 && n.공지ID;}).reverse();  // 오래된 것부터
   POPi=0; showPop();
 }
+/* [0.98.0] 안 읽은 공지를 한 팝업 안에 타일로 쌓아 보여준다 — 개인 공지가 위 */
 function showPop(){
   var box=document.getElementById('nt-pop');
   /* [0.51.1] 로그인 안 했거나 로그인 화면이면 띄우지 않는다 */
   var lg=document.getElementById('s-login');
   if(!ST.student || (lg&&lg.classList.contains('on'))){box.classList.add('hidden');return;}
-  if(POPi>=POP.length){box.classList.add('hidden');return;}
-  var n=POP[POPi];
-  document.getElementById('pop-cnt').textContent=(n.개별?'💬 나에게 온 공지 ':'새 공지 ')+(POPi+1)+'/'+POP.length;
-  document.getElementById('pop-date').textContent=n.날짜||'';
-  document.getElementById('pop-title').textContent=n.제목||'';
-  document.getElementById('pop-body').innerHTML=noticeBodyHTML(n);                 // [0.92.0] 개인 공지는 진호 말풍선
-  document.getElementById('pop-btn').textContent=(n.개별?'확인했습니다':'확인했어요')+((POPi+1<POP.length)?' · 다음':'');
+  if(!POP.length){box.classList.add('hidden');return;}
+  var mine=POP.filter(function(n){return n.개별;}), rest=POP.filter(function(n){return !n.개별;});
+  var list=mine.concat(rest);
+  document.getElementById('pop-cnt').textContent=(POP.length>1)?('새 소식 '+POP.length+'개'):(mine.length?'💬 나에게 온 공지':'새 공지');
+  document.getElementById('pop-date').textContent=mine.length?('선생님 코멘트 '+mine.length+'개'):'';
+  document.getElementById('pop-body').innerHTML=list.map(function(n){
+    return '<div class="ntile'+(n.개별?' me':'')+'">'
+      +'<div class="th">'+(n.개별?'<span class="pchip">개인</span>':'')+'<b>'+esc(n.제목||'')+'</b>'
+      +'<span class="dt">'+esc(n.날짜||'')+'</span></div>'
+      +'<div class="bd">'+noticeBodyHTML(n)+'</div></div>';
+  }).join('');
+  document.getElementById('pop-btn').textContent='확인했습니다'+(POP.length>1?(' · '+POP.length+'개'):'');
   box.classList.remove('hidden');
 }
 /* [0.50.0] 확인한 공지는 공지 탭에 «읽음»으로 남는다 — 팝업이 끝나면 목록 갱신 */
+/* [0.98.0] 한 번에 전부 읽음 처리 */
 function popConfirm(){
   if(!ST.student){popClose();return;}
-  var n=POP[POPi];
-  if(!n){document.getElementById('nt-pop').classList.add('hidden');return;}
-  document.getElementById('pop-btn').disabled=true;
-  call('markNoticeRead',[ST.student.학번,n.공지ID],function(){
-    document.getElementById('pop-btn').disabled=false;
-    POPi++; showPop();
-    if(POPi>=POP.length && ST.student) loadNoticesStudent();
-    if(POPi>=POP.length)toast('공지를 모두 확인했어요');
+  var ids=POP.map(function(n){return n.공지ID;}).filter(Boolean);
+  if(!ids.length){popClose();return;}
+  var btn=document.getElementById('pop-btn'); btn.disabled=true; btn.textContent='확인하는 중…';
+  call('markNoticesRead',[ST.student.학번,ids],function(){
+    btn.disabled=false;
+    (ST.notices||[]).forEach(function(n){ if(ids.indexOf(n.공지ID)>=0)n.읽음=true; });
+    POP=[]; POPi=0;
+    document.getElementById('nt-pop').classList.add('hidden');
+    loadNoticesStudent();
+    toast(ids.length>1?('공지 '+ids.length+'개를 확인했어요'):'확인했어요');
   });
 }
 
