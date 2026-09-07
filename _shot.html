@@ -3915,7 +3915,7 @@ function mock(fn,args){
 /* ---------- 초기화 ---------- */
 (function(){
   // 서비스워커 등록 + 새 버전 배포 시 자동 새로고침
-  if('serviceWorker' in navigator){
+  if(false){
     navigator.serviceWorker.register('sw.js').then(function(reg){
       reg.update();                                   // 열자마자 새 버전 확인
       document.addEventListener('visibilitychange',function(){ if(!document.hidden)reg.update(); }); // 앱 다시 열 때마다
@@ -3973,3 +3973,61 @@ function mock(fn,args){
 </script>
 </body>
 </html>
+
+<script>
+/* ── 캡처용: 서버 호출을 가짜 데이터로 ── */
+(function(){
+  var HOME={
+    config:{평가명:'운동처방일지',학년도:'2026',기간_시작일:'2026-09-07',기간_종료일:'2026-10-04',
+      제출_마감일:'2026-10-04',총_주차수:4,주간_목표일수:4,유산소_최소일수:2,근력_최소일수:2,
+      배점_총점:40,version:'0.72.0',배포시각:'2026.09.06 00:10',학생_테마선택:'on',근력사진_검사:'code'},
+    현재주차:1,
+    이번주:{완료일수:2,목표일수:4,유산소일수:1,유산소필수:2,근력일수:1,근력필수:2,충족:false},
+    주차현황:[], 최근기록:[],
+    운동일자:{'2026-09-07':{c:true},'2026-09-08':{s:true}}
+  };
+  var FIT={회차목록:['방학 전','개학 후','1주차','2주차','3주차','4주차'],savedAt:'2026.09.06 00:05:00',
+    기록:[{회차:'방학 전',있음:true,악력_왼손:22,악력_오른손:24,팔굽혀펴기:14,앉았다일어나기:28,
+           앞으로굽히기_1차:8,앞으로굽히기_2차:9,뒤로젖히기_1차:32,뒤로젖히기_2차:34,
+           신장:161,체중:52,체지방률:26,골격근량:19,내장비만:4,허리둘레:68,엉덩이둘레:90,
+           판정:{악력최고:24,앞으로굽히기최고:9,뒤로젖히기최고:34,BMI:20.1,WHR:0.76}},
+          {회차:'개학 후',있음:true,악력_왼손:23,악력_오른손:25,팔굽혀펴기:16,앉았다일어나기:30,
+           앞으로굽히기_1차:10,앞으로굽히기_2차:11,뒤로젖히기_1차:34,뒤로젖히기_2차:35,
+           신장:161,체중:51.5,체지방률:25,골격근량:19.4,내장비만:4,허리둘레:67,엉덩이둘레:90,
+           판정:{악력최고:25,앞으로굽히기최고:11,뒤로젖히기최고:35,BMI:19.9,WHR:0.74}},
+          {회차:'1주차',있음:false},{회차:'2주차',있음:false},{회차:'3주차',있음:false},{회차:'4주차',있음:false}]};
+  var DATA={
+    studentBundle:{ok:true,home:HOME,notices:[],stamps:{},config:HOME.config,reads:{}},
+    getStudentHome:HOME,
+    getNotices:[{공지ID:'n1',날짜:'2026-09-07',제목:'1주차 시작!',내용:'주 4일 · 유산소 2일 + 근력 2일이에요. 화이팅! 💪',읽음:true}],
+    getFitness:FIT,
+    getWeekSummary:{주차:1,시작일:'2026-09-07',종료일:'2026-09-13',운동일수:2,유산소일수:1,근력일수:1,
+      목표일수:4,유산소필수:2,근력필수:2,달성:false,총거리:6.4,총시간:52,
+      기록:[{날짜:'2026-09-07',종류:'유산소',거리:3.2,시간:26},{날짜:'2026-09-08',종류:'근력',내용:'스쿼트'}]},
+    getReflections:[],
+    getMyScore:{운동달성률:50,정시성:100,성취율:65,점수:26,달성주차:2,총주차:4,급간배점:40,
+      늦은건수:0,총초과일:0,지각차감:0},
+    getMyExercises:[{날짜:'2026-09-08',주차:1,종류:'근력',내용:'[필수·상체] 웨이브 니 푸시업 3세트×10회',
+      인정:'검토',파트너:'혼자',저장시각:'2026.09.08 20:14:02',초과일:0},
+      {날짜:'2026-09-07',주차:1,종류:'유산소',거리:3.2,시간:26,인정:'인정',파트너:'혼자',
+       저장시각:'2026.09.07 19:40:11',초과일:0}],
+    getMyPartners:[], getMyInquiries:[], getMySaveStamps:{}
+  };
+  window.call=function(fn,args,cb){ setTimeout(function(){ cb && cb(DATA[fn]!==undefined?DATA[fn]:{ok:true}); },0); };
+  window.callP=function(fn,args,cb){ window.call(fn,args,cb); };
+  window.checkNotices=function(){};
+  /* 로그인한 상태로 만들기 */
+  window.addEventListener('load',function(){
+    setTimeout(function(){
+      try{
+        ST.student={학번:'3277',이름:'김진호',반:'2'};
+        applyBundle(DATA.studentBundle);
+        var scr=(location.hash||'#home').slice(1);
+        go(scr);
+        var sp=document.getElementById('splash'); if(sp)sp.style.display='none';
+        document.body.setAttribute('data-shot-ready','1');
+      }catch(e){ document.body.setAttribute('data-shot-err', e.message); }
+    },250);
+  });
+})();
+</script>
