@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.95.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.96.0 -->
+<!--   [0.96.0] «오늘의 인사» — 홈 맨 위에 뜨는 짧은 인사 띠(전체 공통·날짜별, GAS 0.80.0).
+        공지 팝업과 달리 화면을 막지 않는다. ✕ 를 누르면 그날은 안 뜨고(폰에만 기억) 다음 날 새 인사. -->
 <!--   [0.95.0] 유산소 «✍️ 오늘의 성찰과 사진일기» — 그날을 기억할 사진 1장(선택)을 성찰과 함께 남긴다(GAS 0.79.0 · 31열 일기사진).
         앱 안 도움말(무엇을 찍나·예시 3컷) 포함. 도장판 펼침·기록 탭에 폴라로이드로 보이고, 기록 탭 «📷 나의 사진일기»로 모아 본다. -->
 <!--   [0.94.0] ★규칙 문구 정정 — 같은 날 유산소+근력은 «유산소만» 인정(GAS 0.78.0). 주 4일은 서로 다른 4일. -->
@@ -612,6 +614,12 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 #cal-detail{overflow:hidden;max-height:0;transition:max-height .25s ease}
 #cal-detail.open{max-height:900px;margin-top:12px}
 .latewarn.dup{background:#FFF6D9;border-color:#F2D77A;color:#7A5A00}            /* [0.92.0] 덮어쓰기 경고 */
+/* [0.96.0] 오늘의 인사 띠 */
+.grbar{display:flex;gap:10px;align-items:flex-start;background:#FFFBEA;border:1px solid #F0DFA8;border-radius:16px;padding:13px 14px;margin-bottom:12px}
+.grbar .em{font-size:28px;line-height:1.1;flex:none}
+.grbar .em img{width:34px;height:34px;object-fit:contain;display:block}
+.grbar .tx{flex:1;font-size:14px;line-height:1.65;color:#5A4A12;white-space:pre-wrap}
+.grbar .x{flex:none;width:28px;height:28px;border-radius:50%;border:1px solid #E6D28C;background:#fff;color:#8A7524;font-size:14px;cursor:pointer;line-height:1}
 /* [0.95.0] 사진일기 */
 .drop.diary{border-style:dashed;background:#FFFDF5;border-color:#EBD9A6;color:#7A5A00;margin-top:6px}
 .diaryimg{width:100%;border-radius:10px;margin-top:10px;display:block}
@@ -728,6 +736,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       </div>
       <img id="hm-logo" class="hm-logo" alt="혜원핏" src="icon5-mask-512.png">
     </div>
+    <div id="greet-bar"></div>
     <div class="card">
       <div class="gauge">
         <div id="g-week"></div>
@@ -1182,8 +1191,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.95.0';
-var PWA_BUILD = '2026.09.07 23:55';
+var PWA_VER = '0.96.0';
+var PWA_BUILD = '2026.09.08 00:07';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2258,6 +2267,23 @@ function applyBundle(b){
     showUp('saved-strength', s.strength || L['근력']   || '', false);
   }
   if(b.notices){ ST.notices=b.notices; showUnread(b.notices); }
+  if(b.greet!==undefined) renderGreet(b.greet);            // [0.96.0]
+}
+/* [0.96.0] 오늘의 인사 — 홈 맨 위 띠. ✕ 를 누르면 그날은 안 뜬다(이 폰에만 기억) */
+function greetSeen(key){ try{ return localStorage.getItem('grofit_greet')===key; }catch(e){ return false; } }
+function renderGreet(g){
+  var box=document.getElementById('greet-bar'); if(!box)return;
+  ST.greet=g;
+  if(!g||!g.있음||greetSeen(g.날짜)){ box.innerHTML=''; return; }
+  var em=/^(verygood|good|nice|peace|regret|frustration)$/.test(g.이모지)
+    ? '<img src="st-'+g.이모지+'.png" alt="">' : esc(g.이모지||'👋');
+  box.innerHTML='<div class="grbar"><span class="em">'+em+'</span>'
+    +'<span class="tx">'+esc(g.문구)+'</span>'
+    +'<button class="x" onclick="closeGreet()" aria-label="닫기">✕</button></div>';
+}
+function closeGreet(){
+  try{ if(ST.greet&&ST.greet.날짜) localStorage.setItem('grofit_greet',ST.greet.날짜); }catch(e){}
+  var box=document.getElementById('greet-bar'); if(box)box.innerHTML='';
 }
 
 /* ---------- 홈 ---------- */
