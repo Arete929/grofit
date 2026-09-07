@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.96.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.97.0 -->
+<!--   [0.97.0] 진호 이모티콘 3종 추가 — 꺼이꺼이(sob)·대성통곡(wail)·안돼(no). 코멘트·공지·인사·문의 답변에서 모두 쓸 수 있다. -->
 <!--   [0.96.0] «오늘의 인사» — 홈 맨 위에 뜨는 짧은 인사 띠(전체 공통·날짜별, GAS 0.80.0).
         공지 팝업과 달리 화면을 막지 않는다. ✕ 를 누르면 그날은 안 뜨고(폰에만 기억) 다음 날 새 인사. -->
 <!--   [0.95.0] 유산소 «✍️ 오늘의 성찰과 사진일기» — 그날을 기억할 사진 1장(선택)을 성찰과 함께 남긴다(GAS 0.79.0 · 31열 일기사진).
@@ -1191,8 +1192,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.96.0';
-var PWA_BUILD = '2026.09.08 00:07';
+var PWA_VER = '0.97.0';
+var PWA_BUILD = '2026.09.08 00:27';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2275,7 +2276,7 @@ function renderGreet(g){
   var box=document.getElementById('greet-bar'); if(!box)return;
   ST.greet=g;
   if(!g||!g.있음||greetSeen(g.날짜)){ box.innerHTML=''; return; }
-  var em=/^(verygood|good|nice|peace|regret|frustration)$/.test(g.이모지)
+  var em=/^(verygood|good|nice|peace|regret|frustration|sob|wail|no)$/.test(g.이모지)
     ? '<img src="st-'+g.이모지+'.png" alt="">' : esc(g.이모지||'👋');
   box.innerHTML='<div class="grbar"><span class="em">'+em+'</span>'
     +'<span class="tx">'+esc(g.문구)+'</span>'
@@ -3982,7 +3983,7 @@ function recExtraHTML(r){
 }
 /* 공지 내용 앞의 [스티커:키] 를 떼어낸다 */
 function parseStk(txt){
-  var m=String(txt||'').match(/^\[스티커:(verygood|good|nice|peace|regret|frustration)\]\s*/);
+  var m=String(txt||'').match(/^\[스티커:(verygood|good|nice|peace|regret|frustration|sob|wail|no)\]\s*/);
   return m?{stk:m[1],text:String(txt).slice(m[0].length)}:{stk:'',text:String(txt||'')};
 }
 function noticeBodyHTML(n){
@@ -3999,7 +4000,7 @@ function comicHTML(txt,stk){
 
 /* 선생님 코멘트 속 :키: 를 캐릭터 이모티콘 그림으로 */
 function emoHtml(s){
-  return esc(s).replace(/:(verygood|good|nice|peace|regret|frustration):/g,function(m,k){
+  return esc(s).replace(/:(verygood|good|nice|peace|regret|frustration|sob|wail|no):/g,function(m,k){
     return '<img class="emo" src="st-'+k+'.png" alt="">';});
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
