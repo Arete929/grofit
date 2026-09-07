@@ -1,4 +1,9 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.89.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.90.0 -->
+<!--   [0.90.0] ★긴급 — 유산소·근력·성찰·문의 «제출»이 전부 «네트워크 오류»로 막히던 버그를 고쳤다.
+        까닭: callP()가 사진 올라가는 %를 보여주려고 xhr.upload 에 감시를 붙였는데, 감시가 붙으면
+        브라우저가 보내기 전에 OPTIONS 로 서버에 미리 허락을 묻는다(CORS 프리플라이트).
+        구글 앱스 스크립트는 OPTIONS 에 허락 헤더를 주지 않아 요청이 출발도 못 하고 onerror 로 떨어졌다.
+        고침: upload 감시를 떼고, 진행 막대는 이미 있던 progWait() 로 채운다(화면 느낌은 그대로). -->
 <!--   [0.89.0] «기록하기 전에 앱을 껐다 새로 여세요» 를 운동 고르기·유산소·근력 화면 맨 위에 큼직하게 넣었다.
         근력 사진 요건도 «이름 · 시간 · 사진 코드» 세 가지로 바꿨다(타임마크 템플릿에 이름을 넣기로). -->
 <!--   [0.88.0] ★주차를 바꿔도 운동 칸이 1주차 그대로이던 버그 수정.
@@ -1126,8 +1131,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.89.1';
-var PWA_BUILD = '2026.09.06 23:31';
+var PWA_VER = '0.90.0';
+var PWA_BUILD = '2026.09.07 17:44';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2522,15 +2527,18 @@ function progFail(msg){
   document.getElementById('pg-sub').textContent=msg||'실패했어요. 다시 시도해 주세요.';
   setTimeout(function(){document.getElementById('prog').classList.add('hidden');},1500);
 }
-/* 업로드 진행률을 알 수 있는 통신 (XHR) — 사진이 큰 인증에 쓴다 */
+/* 제출용 통신 (XHR) — 사진이 큰 인증에 쓴다
+   ★[0.90.0] xhr.upload 에 감시(onprogress 등)를 붙이면 브라우저가 보내기 전에 OPTIONS 로
+     허락을 묻는다(CORS 프리플라이트). 구글 앱스 스크립트는 OPTIONS 에 허락 헤더를 주지 않아
+     요청이 아예 출발하지 못하고 onerror 로 떨어졌다 → 「네트워크 오류」.
+     그래서 upload 감시를 붙이지 않는다. 진행 막대는 progWait() 로 채운다.
+     ※ 여기에 xhr.upload.* 를 다시 붙이면 제출이 통째로 다시 막힌다. 붙이지 말 것. */
 function callP(fn,args,cb){
   var xhr=new XMLHttpRequest();
   xhr.open('POST',API_BASE,true);
   xhr.setRequestHeader('Content-Type','text/plain;charset=utf-8');
-  xhr.upload.onprogress=function(e){
-    if(e.lengthComputable)progSet(4+(e.loaded/e.total)*76,'사진과 기록을 올리는 중…');
-  };
-  xhr.upload.onload=function(){progWait();};
+  progSet(6,'사진과 기록을 올리는 중…');
+  progWait('사진과 기록을 올리는 중…');
   xhr.onload=function(){
     var x=null; try{x=JSON.parse(xhr.responseText);}catch(err){}
     if(x&&x.authFail){logout();return;}
