@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.90.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.91.0 -->
+<!--   [0.91.0] 제출을 두 번 누르면 똑같은 기록이 2건 생기던 것 — ① 보내는 중(PG.busy)엔 다시 눌러도 나가지 않는다.
+        ② 서버(0.73.0)가 «중복» 이라 답하면 «이미 제출된 기록이에요 · 한 번만 저장됩니다» 로 알려준다. -->
 <!--   [0.90.0] ★긴급 — 유산소·근력·성찰·문의 «제출»이 전부 «네트워크 오류»로 막히던 버그를 고쳤다.
         까닭: callP()가 사진 올라가는 %를 보여주려고 xhr.upload 에 감시를 붙였는데, 감시가 붙으면
         브라우저가 보내기 전에 OPTIONS 로 서버에 미리 허락을 묻는다(CORS 프리플라이트).
@@ -1131,8 +1133,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.90.0';
-var PWA_BUILD = '2026.09.07 17:44';
+var PWA_VER = '0.91.0';
+var PWA_BUILD = '2026.09.07 18:08';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2109,8 +2111,8 @@ function sendInquiry(){
     photos:IQ.shots.map(function(x){return {base64:x.b64,mime:'image/jpeg'}})
   }],function(r){
     if(!r||!r.ok){ progFail((r&&r.msg)||'보내지 못했어요'); return; }
-    progDone('보냈어요',function(){
-      var m='✅ 문의를 보냈어요'+savedMsg(r);
+    progDone(r.중복제출?'이미 보낸 문의예요':'보냈어요',function(){
+      var m=(r.중복제출?'✅ 이미 보낸 문의예요 · 한 번만 접수됩니다':'✅ 문의를 보냈어요')+savedMsg(r);
       if(r.중복)m+=' (같은 사진 '+r.중복+'장 제외)';
       toast(m);
       document.getElementById('iq-text').value='';
@@ -2478,9 +2480,10 @@ function saveCardio(){
     distanceKm:val('c-dist'),durationMin:val('c-dur'),summary:'페이스 '+val('c-pace')+' · '+val('c-kcal')+'kcal',source:'앱',
     reflect:val('c-reflect'),rpe:PICK.c.rpe,sat:PICK.c.sat,partner:pnValue('c'),
     aiDistanceKm:(cardioAI?cardioAI.km:''),aiDurationMin:(cardioAI?cardioAI.min:'')}],
-    function(r){progDone('제출했어요 · 선생님 확인을 기다려요',function(){
+    function(r){progDone(r&&r.중복?'이미 제출된 기록이에요':'제출했어요 · 선생님 확인을 기다려요',function(){
       showUp('saved-cardio',r&&r.savedAt,true);
-      toast('✅ 제출 완료 · 김진호 선생님이 확인하면 도장이 찍혀요'+savedMsg(r));
+      toast(r&&r.중복?'✅ 이미 제출된 기록이에요 · 한 번만 저장됩니다'+savedMsg(r)
+                    :'✅ 제출 완료 · 김진호 선생님이 확인하면 도장이 찍혀요'+savedMsg(r));
       resetCardio();resetPick('c');pnReset('c');loadPartners();go('home');});});
 }
 /* [0.54.0] 거리·시간은 학생이 직접 적는다 — 비어 있으면 저장하지 않는다 */
@@ -2495,7 +2498,7 @@ function focusEl(id){ var e=document.getElementById(id); if(!e)return;
   e.scrollIntoView({block:'center',behavior:'smooth'}); setTimeout(function(){e.focus();},220); }
 
 /* [0.50.0] 제출 진행 게이지 — 사진 올라가는 만큼 실제로 채워진다 */
-var PG={timer:null,pct:0};
+var PG={timer:null,pct:0,busy:false};
 function progOpen(title){
   PG.pct=0; if(PG.timer){clearInterval(PG.timer);PG.timer=null;}
   document.getElementById('pg-title').textContent=title||'제출하는 중';
@@ -2534,18 +2537,24 @@ function progFail(msg){
      그래서 upload 감시를 붙이지 않는다. 진행 막대는 progWait() 로 채운다.
      ※ 여기에 xhr.upload.* 를 다시 붙이면 제출이 통째로 다시 막힌다. 붙이지 말 것. */
 function callP(fn,args,cb){
+  /* [0.91.0] 이미 보내는 중이면 다시 나가지 않는다 — 두 번 눌러 기록이 2건 생기는 것을 막는다 */
+  if(PG.busy){ toast('보내는 중이에요 · 잠시만 기다려 주세요'); return; }
+  PG.busy=true;
   var xhr=new XMLHttpRequest();
   xhr.open('POST',API_BASE,true);
   xhr.setRequestHeader('Content-Type','text/plain;charset=utf-8');
   progSet(6,'사진과 기록을 올리는 중…');
   progWait('사진과 기록을 올리는 중…');
   xhr.onload=function(){
+    PG.busy=false;
     var x=null; try{x=JSON.parse(xhr.responseText);}catch(err){}
     if(x&&x.authFail){logout();return;}
     if(!x){progFail('응답을 읽지 못했어요');return;}
     cb&&cb(x);
   };
-  xhr.onerror=function(){progFail('네트워크 오류 · 연결을 확인하세요');};
+  xhr.onerror=function(){PG.busy=false;progFail('네트워크 오류 · 연결을 확인하세요');};
+  xhr.ontimeout=function(){PG.busy=false;progFail('시간이 너무 걸려요 · 다시 시도해 주세요');};
+  xhr.timeout=180000;
   xhr.send(JSON.stringify({action:fn,token:localStorage.getItem('grofit_token')||'',args:args||[]}));
 }
 
@@ -3066,8 +3075,9 @@ function saveStrength(){
   callP('submitStrength',[ST.student.학번,{imageBase64:strB64,date:ST.strDate,summary:rows.join(', '),
     reqCount:reqN,optCount:optN,reflect:val('st-reflect'),
     rpe:PICK.s.rpe,sat:PICK.s.sat,check:strCheck,exception:strException,partner:pnValue('s')}],
-    function(r){progDone(strB64?'제출했어요 · 선생님 확인을 기다려요':'기록만 저장했어요',function(){
+    function(r){progDone(r&&r.중복?'이미 제출된 기록이에요':(strB64?'제출했어요 · 선생님 확인을 기다려요':'기록만 저장했어요'),function(){
       showUp('saved-strength',r&&r.savedAt,true);
+      if(r&&r.중복){ toast('✅ 이미 제출된 기록이에요 · 한 번만 저장됩니다'+savedMsg(r)); }
       toast(strB64?('✅ 제출 완료 · 김진호 선생님이 확인하면 도장이 찍혀요'+savedMsg(r)):'📝 기록만 저장됨 · 사진이 없어 인정되지 않아요');
       strB64=null;strCheck=null;strException=null;
       document.getElementById('str-check').innerHTML='';resetStrRows();resetPick('s');pnReset('s');loadPartners();

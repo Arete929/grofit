@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- 코드명: 혜원핏 학생 웹 설명서 | help.html | @version 4.4.1
+<!-- 코드명: 혜원핏 학생 웹 설명서 | help.html | @version 4.5.0
+     수정요약: [4.5.0] 근력 — 사진에 얼굴은 안 나와도 된다고 명시. FAQ — 저장 버튼 두 번 눌렀을 때(한 번만 저장됨).
      수정요약: [2.0.1] 좁은 화면에서 표 글자·여백을 줄여 읽기 편하게.
      [2.0.0] 화면별 자세한 설명 6개(홈·인증·체력·성찰·기록·공지) 추가. 같은 날 유산소+근력을 각각 인정하도록
      규칙 변경 반영. 몰아서 하기=△, 앱 새로 시작, 추석 연휴 안내 추가.
@@ -150,6 +151,7 @@ ul.k{margin:8px 0 0;padding-left:0;list-style:none}
 ul.k li{position:relative;padding-left:15px;margin-bottom:7px;font-size:15px;line-height:1.6}
 ul.k li:before{content:'';position:absolute;left:1px;top:9px;width:5px;height:5px;border-radius:50%;background:var(--p)}
 ul.k li b{color:var(--pd)}
+ul.k li.okline{color:var(--pd)} ul.k li.okline:before{background:var(--p)!important;opacity:1!important}
 .box ul.k li:before{background:currentColor;opacity:.5}
 .qrbox{text-align:center;margin:12px 0}
 .qrbox img{width:150px;height:150px}
@@ -349,6 +351,7 @@ ul.k li b{color:var(--pd)}
     <ul class="k" style="margin-top:6px">
       <li>일반 카메라로 찍은 사진</li>
       <li><b>이름 · 시간 · 사진 코드</b> 중 하나라도 없거나 잘린 사진</li>
+      <li class="okline">✔ <b>얼굴은 안 나와도 됩니다.</b> 운동하는 자세가 보이면 충분합니다.</li>
       <li>다른 날짜 · 전에 낸 사진 · 친구 사진</li>
     </ul>
   </div>
@@ -399,6 +402,9 @@ ul.k li b{color:var(--pd)}
 
     <dt>Q. 폰을 바꾸면 기록이 사라지나요?</dt>
     <dd>아니요. 다시 로그인하면 그대로 있습니다.</dd>
+
+    <dt>Q. 저장 버튼을 두 번 눌렀어요.</dt>
+    <dd>같은 기록은 <b>한 번만 저장</b>됩니다. 보내는 중에는 막대가 다 찰 때까지 기다려 주세요.</dd>
 
     <dt>Q. 앱이 옛날 화면이에요.</dt>
     <dd><b>앱을 껐다 켜세요.</b> 화면 맨 아래 버전이 바뀌면 최신입니다.</dd>
