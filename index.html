@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.98.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.99.0 -->
+<!--   [0.99.0] 마스터코드로 들어오면 화면 맨 위에 «마스터코드로 보는 중» 띠가 뜬다(선생님 확인용).
+        이 상태에서는 공지·읽을거리를 읽음으로 남기지 않는다 — 학생이 자기 코드로 들어오면 새 것으로 다시 보여야 하니까. -->
 <!--   [0.98.0] 안 읽은 공지가 여러 개면 한 장씩 넘기지 않고 한 팝업 안에 «타일»로 아래로 이어 붙여 보여준다.
         맨 아래 «확인했습니다» 한 번으로 전부 읽음 처리(markNoticesRead · GAS 0.81.0). 개인 공지가 위쪽에 온다. -->
 <!--   [0.97.0] 진호 이모티콘 3종 추가 — 꺼이꺼이(sob)·대성통곡(wail)·안돼(no). 코멘트·공지·인사·문의 답변에서 모두 쓸 수 있다. -->
@@ -618,6 +620,11 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 #cal-detail.open{max-height:900px;margin-top:12px}
 .latewarn.dup{background:#FFF6D9;border-color:#F2D77A;color:#7A5A00}            /* [0.92.0] 덮어쓰기 경고 */
 /* [0.96.0] 오늘의 인사 띠 */
+/* [0.99.0] 마스터코드 둘러보기 띠 */
+.peekbar{position:fixed;top:0;left:0;right:0;z-index:70;background:#4B3BB5;color:#fff;
+  font-size:12.5px;font-weight:700;text-align:center;padding:6px 10px;letter-spacing:-.2px}
+.peekbar.hidden{display:none}
+body.peek{padding-top:30px}
 .grbar{display:flex;gap:10px;align-items:flex-start;background:#FFFBEA;border:1px solid #F0DFA8;border-radius:16px;padding:13px 14px;margin-bottom:12px}
 .grbar .em{font-size:28px;line-height:1.1;flex:none}
 .grbar .em img{width:34px;height:34px;object-fit:contain;display:block}
@@ -1196,13 +1203,14 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
     <button data-t="notice" onclick="go('notice')"><img class="ic" src="tab-notice.png" alt="">공지</button>
   </nav>
 </div>
+<div class="peekbar hidden" id="peekbar">🔑 <b>마스터코드로 보는 중</b> · 읽음 표시가 남지 않아요</div>
 <div class="toast" id="toast"></div>
 
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.98.0';
-var PWA_BUILD = '2026.09.08 00:32';
+var PWA_VER = '0.99.0';
+var PWA_BUILD = '2026.09.08 00:43';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2090,6 +2098,7 @@ function oxPick(k,i,pick){
 
 /* ── 읽음 표시: 폰 + 서버 ── */
 function markRead(kind){
+  if(isPeek()){ toast('🔑 둘러보기 중이라 읽음으로 남지 않아요'); return; }   // [0.99.0]
   kind=(kind==='마음')?'마음':'지식';
   var w=readWeekNo(), at=nowStamp();
   try{localStorage.setItem(readKey(w,kind),at);}catch(e){}
@@ -2233,10 +2242,19 @@ function call(fn,args,cb){
    .then(function(x){ if(x&&x.authFail){logout();return;} cb&&cb(x); })
    .catch(function(e){toast('네트워크 오류 · 연결을 확인하세요');});
 }
+/* [0.99.0] 마스터코드 둘러보기 표시 — 새로고침해도 유지되게 폰에 기억 */
+function setPeek(on){
+  try{ on?localStorage.setItem('grofit_peek','1'):localStorage.removeItem('grofit_peek'); }catch(e){}
+  ST.peek=!!on;
+  var b=document.getElementById('peekbar'); if(b)b.classList.toggle('hidden',!on);
+  document.body.classList.toggle('peek',!!on);
+}
+function isPeek(){ if(ST.peek!==undefined)return !!ST.peek; try{ return localStorage.getItem('grofit_peek')==='1'; }catch(e){ return false; } }
 function logout(){
   if(!confirm('로그아웃할까요? 다시 쓰려면 학번과 학생코드를 입력해야 합니다.'))return;
   /* 토큰·학생정보만 지우고 고른 테마(grofit_theme)는 그대로 둔다 */
   localStorage.removeItem('grofit_token');localStorage.removeItem('grofit_student');
+  setPeek(false);                                            // [0.99.0]
   ST.student=null;ST.home=null;ST.myRecords=null;ST.fitness=null;ST.calDay=null;
   popClose();
   go('login');toast('로그아웃했습니다');
@@ -2255,6 +2273,7 @@ function doLogin(){
     if(btn){ btn.disabled=false; btn.textContent=btn.dataset.t||'로그인'; }
     if(!res||!res.ok){toast(res&&res.msg||'로그인 실패');return;}
     ST.student=res.student;
+    setPeek(!!res.master);                                   // [0.99.0]
     if(res.token)localStorage.setItem('grofit_token',res.token);
     localStorage.setItem('grofit_student',JSON.stringify(res.student));
     toast(res.student.이름+'님 환영합니다');
@@ -3909,6 +3928,7 @@ function loadNoticesStudent(){
     document.getElementById('nt-list').innerHTML=html||'<p class="muted" style="padding:0 4px">등록된 공지가 없습니다.</p>';});
 }
 function readOne(id){
+  if(isPeek()){ toast('🔑 둘러보기 중이라 읽음으로 남지 않아요'); return; }   // [0.99.0]
   call('markNoticeRead',[ST.student.학번,id],function(){toast('확인 완료');loadNoticesStudent();});
 }
 
@@ -3954,6 +3974,10 @@ function popConfirm(){
   if(!ST.student){popClose();return;}
   var ids=POP.map(function(n){return n.공지ID;}).filter(Boolean);
   if(!ids.length){popClose();return;}
+  if(isPeek()){                                              // [0.99.0] 둘러보기 — 읽음으로 남기지 않는다
+    POP=[];POPi=0; document.getElementById('nt-pop').classList.add('hidden');
+    toast('🔑 둘러보기 중이라 읽음으로 남지 않아요'); return;
+  }
   var btn=document.getElementById('pop-btn'); btn.disabled=true; btn.textContent='확인하는 중…';
   call('markNoticesRead',[ST.student.학번,ids],function(){
     btn.disabled=false;
