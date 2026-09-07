@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.94.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.95.0 -->
+<!--   [0.95.0] 유산소 «✍️ 오늘의 성찰과 사진일기» — 그날을 기억할 사진 1장(선택)을 성찰과 함께 남긴다(GAS 0.79.0 · 31열 일기사진).
+        앱 안 도움말(무엇을 찍나·예시 3컷) 포함. 도장판 펼침·기록 탭에 폴라로이드로 보이고, 기록 탭 «📷 나의 사진일기»로 모아 본다. -->
 <!--   [0.94.0] ★규칙 문구 정정 — 같은 날 유산소+근력은 «유산소만» 인정(GAS 0.78.0). 주 4일은 서로 다른 4일. -->
 <!--   [0.93.0] ① 근력: 세트 수를 적는 대신 «＋ 세트 추가»로 세트마다 횟수(또는 시간)를 적는다. 저장 형식 «3세트×12/10/8회» / «3세트×90/80/70초»(1세트면 «12회»·«1분 30초» 그대로).
         ② 문의 답변에 진호 이모티콘(:good:)이 그림으로 보인다. -->
@@ -610,6 +612,20 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 #cal-detail{overflow:hidden;max-height:0;transition:max-height .25s ease}
 #cal-detail.open{max-height:900px;margin-top:12px}
 .latewarn.dup{background:#FFF6D9;border-color:#F2D77A;color:#7A5A00}            /* [0.92.0] 덮어쓰기 경고 */
+/* [0.95.0] 사진일기 */
+.drop.diary{border-style:dashed;background:#FFFDF5;border-color:#EBD9A6;color:#7A5A00;margin-top:6px}
+.diaryimg{width:100%;border-radius:10px;margin-top:10px;display:block}
+.dgone{margin-top:6px;height:28px;padding:0 12px;border-radius:8px;border:1px solid var(--line2);background:#fff;color:var(--muted);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.polar{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 8px 10px;margin-top:8px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.polar img{width:100%;border-radius:8px;display:block}
+.polar .cap2{font-size:12.5px;color:var(--ink2);line-height:1.55;margin:8px 2px 0;white-space:pre-wrap}
+.polar .dt{font-size:11px;color:var(--muted2);margin:6px 2px 0}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+@media(max-width:360px){.dgrid{grid-template-columns:1fr}}
+.dhelp .ex{display:flex;gap:8px;margin-top:8px}
+.dhelp .ex figure{flex:1;margin:0;text-align:center}
+.dhelp .ex svg{width:100%;height:auto;border-radius:8px;display:block}
+.dhelp .ex figcaption{font-size:11px;color:var(--muted2);margin-top:4px}
 .bubble.bad{background:#fdecec;color:#a33}                                       /* [0.92.0] 미인정 사유 */
 .pchip{display:inline-block;background:#EAF1FF;color:#2F5FB3;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:800}
 .wrow #cal-detail.open{margin-top:10px}          /* [0.91.1] 주차 카드 안에 들어갔을 때 */
@@ -823,8 +839,16 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       <div class="sat" id="c-sat"></div>
     </div>
     <div class="card">
-      <h2>오늘의 성찰 <span class="chip bad">필수</span></h2>
-      <textarea id="c-reflect" rows="3" maxlength="300" placeholder="오늘 운동은 어땠나요? (예: 초반엔 힘들었는데 20분 넘으니 리듬이 잡혔다)"></textarea>
+      <h2>✍️ 오늘의 성찰과 사진일기 <span class="chip bad">성찰 필수</span></h2>
+      <button type="button" class="howbtn shotbtn" onclick="toggleDiaryHelp(this)">📸 사진일기가 뭔가요? · 도움말</button>
+      <div class="howbox hidden" id="diary-help"></div>
+      <div class="drop diary" id="diary-drop" onclick="pick('diary-file')">📸 오늘의 사진 한 장 넣기 <span class="chip">선택</span><br><span class="cap">그날을 기억할 사진 · 안 넣어도 저장됩니다</span></div>
+      <input type="file" id="diary-file" accept="image/*" class="hidden" onchange="onDiaryImg(this)">
+      <div id="diary-box" class="hidden">
+        <img id="diary-prev" class="diaryimg">
+        <button type="button" class="dgone" onclick="clearDiary()">✕ 사진 빼기</button>
+      </div>
+      <textarea id="c-reflect" rows="3" maxlength="300" placeholder="오늘 운동은 어땠나요? (예: 초반엔 힘들었는데 20분 넘으니 리듬이 잡혔다)" style="margin-top:10px"></textarea>
       <p class="cap" style="text-align:right;margin:6px 0 0"><span id="c-reflect-n">0</span>/300자</p>
     </div>
     <div class="row"><button class="btn sec" onclick="resetCardio()">다시</button><button class="btn" onclick="saveCardio()">저장하기</button></div>
@@ -1023,6 +1047,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
     </div>
     <div class="card">
       <h2>내가 올린 운동 기록</h2>
+      <div id="my-diary-bar" style="margin-bottom:10px"></div>
       <div id="my-records"></div>
     </div>
     <button class="btn sec" onclick="logout()" style="margin-top:2px">로그아웃</button>
@@ -1157,8 +1182,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.94.0';
-var PWA_BUILD = '2026.09.07 23:49';
+var PWA_VER = '0.95.0';
+var PWA_BUILD = '2026.09.07 23:55';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2522,10 +2547,47 @@ function onCardioImg(inp){readImg(inp,function(b64){cardioB64=b64;
   document.getElementById('cardio-ai').textContent='· 사진을 보고 적어 주세요';
   var d=document.getElementById('c-dist'); if(d)d.focus();
 });}
+/* [0.95.0] 사진일기 — 그날을 기억할 사진 1장(선택). 기록 사진과 별개 */
+var diaryB64=null;
+function onDiaryImg(inp){ readImg(inp,function(b64){ diaryB64=b64;
+  document.getElementById('diary-prev').src=b64;
+  document.getElementById('diary-box').classList.remove('hidden');
+  document.getElementById('diary-drop').classList.add('hidden');
+});}
+function clearDiary(){ diaryB64=null;
+  var b=document.getElementById('diary-box'); if(b)b.classList.add('hidden');
+  var d=document.getElementById('diary-drop'); if(d)d.classList.remove('hidden');
+  var f=document.getElementById('diary-file'); if(f)f.value='';
+}
+function toggleDiaryHelp(btn){
+  var box=document.getElementById('diary-help'), open=box.classList.contains('hidden');
+  if(open&&!box.innerHTML) box.innerHTML=diaryHelpHTML();
+  box.classList.toggle('hidden',!open);
+  btn.textContent=open?'📸 도움말 닫기':'📸 사진일기가 뭔가요? · 도움말';
+}
+function diaryHelpHTML(){
+  var pic=function(t,bg,inner){
+    return '<figure><svg viewBox="0 0 100 80"><rect width="100" height="80" rx="6" fill="'+bg+'"/>'+inner+'</svg><figcaption>'+t+'</figcaption></figure>';
+  };
+  return '<div class="dhelp">'
+    +'<p><b>그날의 운동을 기억할 사진 한 장</b>이에요.<br>'
+    +'뛴 길 · 하늘 · 운동 끝난 풍경처럼 <b>그날이 떠오르는 사진</b>이면 됩니다.</p>'
+    +'<div class="ex">'
+    + pic('하늘 · 노을','#BFD9F2','<circle cx="72" cy="24" r="11" fill="#FFD98A"/><path d="M0 58 L26 42 L48 56 L70 40 L100 60 L100 80 L0 80Z" fill="#8FB98A"/>')
+    + pic('뛴 길','#DDEBD4','<path d="M40 80 L46 46 L54 46 L60 80Z" fill="#C9B79C"/><rect x="47" y="52" width="6" height="6" fill="#fff"/><rect x="47" y="64" width="6" height="6" fill="#fff"/><circle cx="20" cy="20" r="9" fill="#FFE08A"/>')
+    + pic('운동 끝, 물 한 잔','#F3EEE4','<rect x="38" y="26" width="24" height="40" rx="4" fill="#9CC7E8"/><rect x="38" y="40" width="24" height="26" rx="3" fill="#5FA8DC"/><rect x="44" y="18" width="12" height="8" rx="2" fill="#7FB6DE"/>')
+    +'</div>'
+    +'<ul style="margin:10px 0 0;padding-left:16px;font-size:13px;line-height:1.7">'
+    +'<li><b>얼굴은 안 나와도 됩니다.</b></li>'
+    +'<li><b>안 넣어도 저장됩니다</b> — 성찰 글만 있으면 돼요.</li>'
+    +'<li>운동 앱 캡처(기록 사진)와는 <b>다른 사진</b>이에요.</li>'
+    +'<li>4주 뒤 <b>감상문</b> 쓸 때 돌아보는 재료가 됩니다.</li>'
+    +'</ul></div>';
+}
 /* [0.54.0] 자동 분석을 뺐다 — 학생이 자기 손으로 적는 것에 뜻을 둔다.
    대신 선생님이 사진을 보고 인정 여부를 정한다(관리자 «검토»).      */
 var cardioAI=null;
-function resetCardio(){cardioB64=null;cardioAI=null;['c-dist','c-dur','c-pace','c-kcal','c-reflect'].forEach(function(id){document.getElementById(id).value=''});
+function resetCardio(){cardioB64=null;cardioAI=null;clearDiary();['c-dist','c-dur','c-pace','c-kcal','c-reflect'].forEach(function(id){document.getElementById(id).value=''});
   countReflect('c-reflect','c-reflect-n');
   document.getElementById('cardio-prev').classList.add('hidden');document.getElementById('cardio-result').classList.add('hidden');}
 function saveCardio(){
@@ -2534,7 +2596,7 @@ function saveCardio(){
   if(!reflectCheck('c-reflect'))return;
   if(!dupConfirm('cardio'))return;                            // [0.92.0]
   progOpen('유산소 운동 제출');
-  callP('submitCardio',[ST.student.학번,{imageBase64:cardioB64,date:ST.cardioDate,
+  callP('submitCardio',[ST.student.학번,{imageBase64:cardioB64,diaryBase64:diaryB64,date:ST.cardioDate,
     distanceKm:val('c-dist'),durationMin:val('c-dur'),summary:'페이스 '+val('c-pace')+' · '+val('c-kcal')+'kcal',source:'앱',
     reflect:val('c-reflect'),rpe:PICK.c.rpe,sat:PICK.c.sat,partner:pnValue('c'),
     aiDistanceKm:(cardioAI?cardioAI.km:''),aiDurationMin:(cardioAI?cardioAI.min:'')}],
@@ -3742,8 +3804,21 @@ function loadScore(){
   });
   loadMyRecords();
 }
+/* [0.95.0] 사진일기 모아 보기 */
+var DIARY_ON=false;
+function toggleDiaryAll(){ DIARY_ON=!DIARY_ON; loadMyRecords(); }
+function diaryGridHTML(list){
+  var d=(list||[]).filter(function(r){return r.일기사진;});
+  if(!d.length)return '<p class="muted" style="padding:6px 0">아직 사진일기가 없어요.<br>유산소를 올릴 때 사진 한 장을 넣어 보세요 📸</p>';
+  return '<div class="dgrid">'+d.map(function(r){return polarHTML(r);}).join('')+'</div>';
+}
 function loadMyRecords(){
   call('getMyExercises',[ST.student.학번],function(list){
+    ST.myRecords=list||[];
+    var bar=document.getElementById('my-diary-bar');
+    if(bar) bar.innerHTML='<button type="button" class="howbtn shotbtn" onclick="toggleDiaryAll()">'
+      +(DIARY_ON?'📋 기록 목록으로 돌아가기':'📷 나의 사진일기 모아 보기')+'</button>';
+    if(DIARY_ON){ document.getElementById('my-records').innerHTML=diaryGridHTML(list); return; }
     var html='';(list||[]).forEach(function(r){
       var chip=kindChip(r.종류);
       var sub=(r.종류==='유산소' && (r.거리||r.시간))?((r.거리?r.거리+'km ':'')+(r.시간?r.시간+'분':'')):'';
@@ -3863,8 +3938,18 @@ function val(id){return document.getElementById(id).value.trim();}
 function setv(id,v){if(v!=null&&v!=='')document.getElementById(id).value=v;}
 /* [0.52.0] 선생님 코멘트 = 캐릭터가 말풍선으로 말하는 만화 형태 */
 /* [0.92.0] 기록 하나에 붙는 선생님 코멘트(진호 말풍선) + 미인정 사유 */
+/* [0.95.0] 사진일기 폴라로이드 — 사진 + 그날 성찰 + 날짜 */
+function driveImg(url){
+  var m=String(url||'').match(/[-\w]{25,}/);
+  return m?('https://drive.google.com/thumbnail?id='+m[0]+'&sz=w800'):String(url||'');
+}
+function polarHTML(r){
+  if(!r.일기사진)return '';
+  return '<div class="polar"><img src="'+driveImg(r.일기사진)+'" alt="사진일기" loading="lazy" onerror="this.parentNode.style.display=&quot;none&quot;">'
+    +(r.성찰?'<p class="cap2">'+esc(r.성찰)+'</p>':'')+'<p class="dt">'+esc(r.날짜)+'</p></div>';
+}
 function recExtraHTML(r){
-  var h='';
+  var h=polarHTML(r);                                   // [0.95.0]
   if(r.인정==='미인정') h+='<div class="bubble bad" style="margin-top:6px">❌ 인정되지 않았어요'+(r.미인정사유?' · '+esc(r.미인정사유):'')+'<br><span class="cap">같은 날짜로 다시 올리면 이전 기록을 덮어써요.</span></div>';
   if(r.코멘트||r.스티커) h+=comicHTML(r.코멘트||'',r.스티커||'');
   return h;
