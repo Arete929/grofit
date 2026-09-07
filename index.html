@@ -1,4 +1,8 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.99.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.00.0 -->
+<!--   [1.00.0] 앱을 켤 때 «존 로크 화면 → 홈 → 또 존 로크 → 홈» 으로 두 번 돌던 것 고침.
+        새 판이 올라온 직후 서비스워커가 바뀌면 곧바로 location.reload() 를 불러서 생긴 일이다.
+        이제 ① 켠 지 8초 안에는 새로고침하지 않고 ② 화면을 보고 있지 않거나 ③ 쓰던 글이 있으면 미룬다.
+        미뤄 둔 새로고침은 앱을 다시 열 때(백그라운드 → 화면) 조용히 한다. HTML 은 늘 새로 받으므로 늦어도 문제가 없다. -->
 <!--   [0.99.0] 마스터코드로 들어오면 화면 맨 위에 «마스터코드로 보는 중» 띠가 뜬다(선생님 확인용).
         이 상태에서는 공지·읽을거리를 읽음으로 남기지 않는다 — 학생이 자기 코드로 들어오면 새 것으로 다시 보여야 하니까. -->
 <!--   [0.98.0] 안 읽은 공지가 여러 개면 한 장씩 넘기지 않고 한 팝업 안에 «타일»로 아래로 이어 붙여 보여준다.
@@ -1209,8 +1213,8 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.99.0';
-var PWA_BUILD = '2026.09.08 00:43';
+var PWA_VER = '1.00.0';
+var PWA_BUILD = '2026.09.08 01:48';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2739,6 +2743,27 @@ function callP(fn,args,cb){
   xhr.send(JSON.stringify({action:fn,token:localStorage.getItem('grofit_token')||'',args:args||[]}));
 }
 
+/* [1.00.0] 새 판이 올라왔을 때 «언제» 새로고침할지
+   전에는 서비스워커가 바뀌는 즉시 location.reload() 를 불렀다. 그래서 앱을 켠 직후에 새 판을 만나면
+   시작 화면 → 홈 → 새로고침 → 시작 화면 → 홈 으로 두 번 돌았다.
+   HTML 은 늘 새로 받으므로(네트워크 우선) 급히 새로고침할 까닭이 없다. 조용해질 때까지 미룬다. */
+var SW_NEW=false, SW_DONE=false, BOOT_AT=Date.now();
+function typingNow(){                       // 쓰던 글이 있으면 절대 새로고침하지 않는다
+  var el=document.querySelectorAll('textarea, input[type=text], input:not([type])');
+  for(var i=0;i<el.length;i++){ if(String(el[i].value||'').trim()) return true; }
+  if(typeof cardioB64!=='undefined'&&cardioB64) return true;
+  if(typeof strB64!=='undefined'&&strB64) return true;
+  if(typeof diaryB64!=='undefined'&&diaryB64) return true;
+  return false;
+}
+function swRefresh(){
+  if(!SW_NEW||SW_DONE) return;
+  if(Date.now()-BOOT_AT<8000) return;       // 막 켠 직후에는 미룬다(시작 화면 두 번 방지)
+  if(document.hidden) return;               // 화면을 보고 있을 때만
+  if(typeof PG!=='undefined'&&PG.busy) return;   // 제출하는 중이면 미룬다
+  if(typingNow()) return;
+  SW_DONE=true; location.reload();
+}
 /* [0.49.0] 시작 스플래시 — 1.8초 뒤 스르르 사라진다. 탭하면 바로 넘어감 */
 var BOOT_DONE=false;
 function bootOut(){
@@ -4072,12 +4097,12 @@ function mock(fn,args){
   // 서비스워커 등록 + 새 버전 배포 시 자동 새로고침
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').then(function(reg){
-      reg.update();                                   // 열자마자 새 버전 확인
+      setTimeout(function(){ reg.update(); }, 3000);   // [1.00.0] 켜자마자 말고 3초 뒤에 확인 — 시작 화면과 겹치지 않게
       document.addEventListener('visibilitychange',function(){ if(!document.hidden)reg.update(); }); // 앱 다시 열 때마다
       setInterval(function(){ reg.update(); }, 30*60*1000);   // 켜둔 채로도 30분마다
     });
-    var refreshing=false;
-    navigator.serviceWorker.addEventListener('controllerchange',function(){if(refreshing)return;refreshing=true;location.reload();});
+    navigator.serviceWorker.addEventListener('controllerchange',function(){ SW_NEW=true; swRefresh(); });
+    document.addEventListener('visibilitychange',function(){ if(!document.hidden) setTimeout(swRefresh,400); });
   }
   resetStrRows();
   // 체력측정 입력 → 등급 즉시 판정
