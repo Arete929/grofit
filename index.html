@@ -1,4 +1,7 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.91.1 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.92.0 -->
+<!--   [0.92.0] ① 날짜를 고를 때 그 날 같은 종류 기록이 있으면 «다시 올리면 덮어씁니다» 노란 띠 + 저장 전 확인창. 서버가 덮어쓰면 그렇게 알려준다.
+        ② 이미 올린 사진이면 서버가 거절 → 그 이유를 빨간 막대로 보여준다. ③ 선생님이 하루 기록에 단 코멘트 = 진호 캐릭터 + 만화 말풍선(도장판·기록 탭).
+        ④ 개인 공지(코멘트·미인정 사유)는 «개인 공지» 표시 + 만화 말풍선 + «확인했습니다» 를 눌러야 닫힘. ⑤ 미인정 기록에 사유 표시. -->
 <!--   [0.91.1] 도장판에서 날짜를 누르면 그날 기록이 «그 주차 카드 바로 아래»에 펼쳐진다(전엔 항상 4주차 아래).
         #cal-detail 을 고른 주차의 .wrow 안으로 옮기고, 닫으면 원래 자리로 돌려놓는다. -->
 <!--   [0.91.0] 제출을 두 번 누르면 똑같은 기록이 2건 생기던 것 — ① 보내는 중(PG.busy)엔 다시 눌러도 나가지 않는다.
@@ -593,6 +596,9 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 /* 날짜 클릭 시 펼쳐지는 그날의 기록 */
 #cal-detail{overflow:hidden;max-height:0;transition:max-height .25s ease}
 #cal-detail.open{max-height:900px;margin-top:12px}
+.latewarn.dup{background:#FFF6D9;border-color:#F2D77A;color:#7A5A00}            /* [0.92.0] 덮어쓰기 경고 */
+.bubble.bad{background:#fdecec;color:#a33}                                       /* [0.92.0] 미인정 사유 */
+.pchip{display:inline-block;background:#EAF1FF;color:#2F5FB3;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:800}
 .wrow #cal-detail.open{margin-top:10px}          /* [0.91.1] 주차 카드 안에 들어갔을 때 */
 .dayrec{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
 .dayrec .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
@@ -766,6 +772,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
     <div class="wksel hidden" id="cardio-wk"></div>
     <div id="cardio-days" class="daysel"></div>
     <div id="cardio-late" class="latewarn hidden"></div>
+    <div id="cardio-dup" class="latewarn dup hidden"></div>
     <div class="guidebox">
       <b>📱 운동 앱 하나를 골라 쓰세요</b>
       <p><b>삼성헬스 · 애플 피트니스 · 나이키 런클럽(NRC)</b> 중<br>
@@ -822,6 +829,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
     <div class="wksel hidden" id="str-wk"></div>
     <div id="str-days" class="daysel"></div>
     <div id="str-late" class="latewarn hidden"></div>
+    <div id="str-dup" class="latewarn dup hidden"></div>
     <div class="card">
       <h2>누구와 운동했나요?</h2>
       <p class="cap" style="margin:-4px 0 10px">먼저 골라주세요. 함께한 친구는 다음부터 태그로 바로 나와요</p>
@@ -1136,8 +1144,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.91.1';
-var PWA_BUILD = '2026.09.07 22:37';
+var PWA_VER = '0.92.0';
+var PWA_BUILD = '2026.09.07 23:22';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2376,7 +2384,8 @@ function toggleCalDay(ds){
       html+='<div class="it"><div class="row" style="justify-content:space-between;align-items:center">'
         +'<span>'+chip+' <span class="cap">'+esc(sub)+'</span></span>'
         +(r.사진?'<a class="cap" style="background:var(--cardio-tint);color:var(--cardio);padding:3px 8px;border-radius:8px;text-decoration:none" href="'+r.사진+'" target="_blank" rel="noopener">📷</a>':'')
-        +'</div>'+(r.성찰?'<div class="bubble" style="margin-top:6px">✍️ '+esc(r.성찰)+'</div>':'')+'</div>';
+        +'</div>'+(r.성찰?'<div class="bubble" style="margin-top:6px">✍️ '+esc(r.성찰)+'</div>':'')
+        +recExtraHTML(r)+'</div>';
     });
     document.getElementById('cal-detail').innerHTML=html+'</div>';
     box.classList.add('open');
@@ -2463,9 +2472,32 @@ function renderDayPicker(prov){
     return '<button '+(d.future?'disabled':'onclick="selDay(\''+prov+'\',\''+d.date+'\',this)"')
       +' class="'+(d.date===ST[prov+'Date']?'on':'')+'"><span>'+d.label+'</span><b>'+d.num+'</b></button>';
   }).join('');
+  renderDupWarn(prov);                                        // [0.92.0]
+}
+/* [0.92.0] 고른 날에 같은 종류 기록이 이미 있으면 알려준다 — 다시 올리면 덮어쓴다 */
+function dupRecOf(prov){
+  var kind=(prov==='cardio')?'유산소':'근력', ds=ST[prov+'Date'];
+  return (ST.myRecords||[]).filter(function(r){return r.날짜===ds && r.종류===kind;})[0]||null;
+}
+function renderDupWarn(prov){
+  var box=document.getElementById(prov+'-dup'); if(!box)return;
+  if(!ST.myRecords){ if(!ST.student)return;
+    call('getMyExercises',[ST.student.학번],function(list){ST.myRecords=list||[];renderDupWarn(prov);}); return; }
+  var r=dupRecOf(prov);
+  if(!r){box.classList.add('hidden');box.innerHTML='';return;}
+  var kind=(prov==='cardio')?'유산소':'근력';
+  box.innerHTML='⚠️ <b>이 날 '+kind+' 기록이 이미 있어요</b>'+(r.인정==='미인정'&&r.미인정사유?' (미인정 · '+esc(r.미인정사유)+')':'')
+    +'<br>다시 올리면 <b>이전 기록을 덮어씁니다.</b> 기록은 하루에 종류별 1건만 남아요.';
+  box.classList.remove('hidden');
+}
+function dupConfirm(prov){
+  var r=dupRecOf(prov); if(!r)return true;
+  var N=String.fromCharCode(10), kind=(prov==='cardio')?'유산소':'근력';
+  return confirm('이 날 '+kind+' 기록이 이미 있어요.'+N+N+'지금 올리면 이전 기록(사진·성찰 포함)을 덮어씁니다.'+N+'계속할까요?');
 }
 function selDay(prov,date,btn){ST[prov+'Date']=date;
   btn.parentNode.querySelectorAll('button').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');
+  renderDupWarn(prov);                                        // [0.92.0]
   // 근력은 사진 날짜와 대조하므로 날짜를 바꾸면 다시 검사
   if(prov==='str'&&typeof strB64!=='undefined'&&strB64)setTimeout(checkStrPhoto,60);}
 
@@ -2487,15 +2519,20 @@ function saveCardio(){
   if(!pnCheck('c'))return;
   if(!cardioNumCheck())return;
   if(!reflectCheck('c-reflect'))return;
+  if(!dupConfirm('cardio'))return;                            // [0.92.0]
   progOpen('유산소 운동 제출');
   callP('submitCardio',[ST.student.학번,{imageBase64:cardioB64,date:ST.cardioDate,
     distanceKm:val('c-dist'),durationMin:val('c-dur'),summary:'페이스 '+val('c-pace')+' · '+val('c-kcal')+'kcal',source:'앱',
     reflect:val('c-reflect'),rpe:PICK.c.rpe,sat:PICK.c.sat,partner:pnValue('c'),
     aiDistanceKm:(cardioAI?cardioAI.km:''),aiDurationMin:(cardioAI?cardioAI.min:'')}],
-    function(r){progDone(r&&r.중복?'이미 제출된 기록이에요':'제출했어요 · 선생님 확인을 기다려요',function(){
+    function(r){
+      if(!r||r.ok===false){progFail((r&&r.msg)||'저장하지 못했어요');return;}   // [0.92.0] 사진 재사용 등 거절 사유 표시
+      ST.myRecords=null;
+      progDone(r.중복?'이미 제출된 기록이에요':(r.덮어씀?'이전 기록을 덮어썼어요':'제출했어요 · 선생님 확인을 기다려요'),function(){
       showUp('saved-cardio',r&&r.savedAt,true);
-      toast(r&&r.중복?'✅ 이미 제출된 기록이에요 · 한 번만 저장됩니다'+savedMsg(r)
-                    :'✅ 제출 완료 · 김진호 선생님이 확인하면 도장이 찍혀요'+savedMsg(r));
+      toast(r.중복?'✅ 이미 제출된 기록이에요 · 한 번만 저장됩니다'+savedMsg(r)
+           :(r.덮어씀?'✅ 이전 기록을 덮어썼어요 · 김진호 선생님이 다시 확인해요'+savedMsg(r)
+                    :'✅ 제출 완료 · 김진호 선생님이 확인하면 도장이 찍혀요'+savedMsg(r)));
       resetCardio();resetPick('c');pnReset('c');loadPartners();go('home');});});
 }
 /* [0.54.0] 거리·시간은 학생이 직접 적는다 — 비어 있으면 저장하지 않는다 */
@@ -2540,7 +2577,9 @@ function progFail(msg){
   if(PG.timer){clearInterval(PG.timer);PG.timer=null;}
   document.getElementById('pg-fill').className='pg-fill bad';
   document.getElementById('pg-sub').textContent=msg||'실패했어요. 다시 시도해 주세요.';
-  setTimeout(function(){document.getElementById('prog').classList.add('hidden');},1500);
+  var long=msg&&msg.length>20;                                // [0.92.0] 거절 사유는 읽을 시간을 준다
+  setTimeout(function(){document.getElementById('prog').classList.add('hidden');},long?4500:1500);
+  if(long)toast(msg);
 }
 /* 제출용 통신 (XHR) — 사진이 큰 인증에 쓴다
    ★[0.90.0] xhr.upload 에 감시(onprogress 등)를 붙이면 브라우저가 보내기 전에 OPTIONS 로
@@ -3083,13 +3122,18 @@ function saveStrength(){
     toast('타임마크 사진이 아니에요. 다시 찍거나 김진호 선생님께 확인 요청을 눌러주세요');return;
   }
   if(!pnCheck('s'))return;
+  if(!dupConfirm('str'))return;                               // [0.92.0]
   progOpen('근력 운동 제출');
   callP('submitStrength',[ST.student.학번,{imageBase64:strB64,date:ST.strDate,summary:rows.join(', '),
     reqCount:reqN,optCount:optN,reflect:val('st-reflect'),
     rpe:PICK.s.rpe,sat:PICK.s.sat,check:strCheck,exception:strException,partner:pnValue('s')}],
-    function(r){progDone(r&&r.중복?'이미 제출된 기록이에요':(strB64?'제출했어요 · 선생님 확인을 기다려요':'기록만 저장했어요'),function(){
+    function(r){
+      if(!r||r.ok===false){progFail((r&&r.msg)||'저장하지 못했어요');return;}   // [0.92.0]
+      ST.myRecords=null;
+      progDone(r.중복?'이미 제출된 기록이에요':(r.덮어씀?'이전 기록을 덮어썼어요':(strB64?'제출했어요 · 선생님 확인을 기다려요':'기록만 저장했어요')),function(){
       showUp('saved-strength',r&&r.savedAt,true);
-      if(r&&r.중복){ toast('✅ 이미 제출된 기록이에요 · 한 번만 저장됩니다'+savedMsg(r)); }
+      if(r.중복){ toast('✅ 이미 제출된 기록이에요 · 한 번만 저장됩니다'+savedMsg(r)); }
+      else if(r.덮어씀){ toast('✅ 이전 기록을 덮어썼어요 · 김진호 선생님이 다시 확인해요'+savedMsg(r)); }
       toast(strB64?('✅ 제출 완료 · 김진호 선생님이 확인하면 도장이 찍혀요'+savedMsg(r)):'📝 기록만 저장됨 · 사진이 없어 인정되지 않아요');
       strB64=null;strCheck=null;strException=null;
       document.getElementById('str-check').innerHTML='';resetStrRows();resetPick('s');pnReset('s');loadPartners();
@@ -3675,6 +3719,7 @@ function loadMyRecords(){
           +(r.자각도?'<span class="chip" style="background:'+rpeColor(r.자각도)+'22;color:'+rpeColor(r.자각도)+'">'+esc(rpeName(r.자각도))+'</span> ':'')
           +(r.만족도?'<span class="chip ok">'+satEmoji(r.만족도)+' '+esc(r.만족도)+'</span>':'')+'</div>':'')
         +(r.성찰?'<div class="bubble" style="margin-top:6px">✍️ '+esc(r.성찰)+'</div>':'')
+        +recExtraHTML(r)
         +'</div>'
         +(r.사진?'<a class="cap" style="background:var(--cardio-tint);color:var(--cardio);padding:4px 9px;border-radius:8px;text-decoration:none;white-space:nowrap" href="'+r.사진+'" target="_blank" rel="noopener">📷 사진</a>':'')
         +'</div>';
@@ -3708,11 +3753,11 @@ function closeZoom(){document.getElementById('fit-zoom').classList.add('hidden')
 function loadNoticesStudent(){
   call('getNotices',[ST.student?ST.student.학번:''],function(list){var html='';
     (list||[]).forEach(function(n){
-      html+='<div class="card"><div class="row" style="justify-content:space-between"><b>'+esc(n.제목)+'</b>'
+      html+='<div class="card"><div class="row" style="justify-content:space-between"><b>'+(n.개별?'<span class="pchip">개인</span> ':'')+esc(n.제목)+'</b>'
         +'<span>'+(n.읽음?'<span class="chip ok">읽음</span>':'<span class="chip bad">새 공지</span>')
         +' <span class="cap">'+(n.날짜||'')+'</span></span></div>'
-        +'<p style="margin:8px 0 0;white-space:pre-wrap">'+emoHtml(n.내용)+'</p>'
-        +(n.읽음?'':'<button class="btn sec sm" style="margin-top:10px" onclick="readOne(&quot;'+n.공지ID+'&quot;)">확인했어요</button>')
+        +(n.개별?'<div style="margin-top:4px">'+noticeBodyHTML(n)+'</div>':'<p style="margin:8px 0 0;white-space:pre-wrap">'+emoHtml(n.내용)+'</p>')
+        +(n.읽음?'':'<button class="btn sec sm" style="margin-top:10px" onclick="readOne(&quot;'+n.공지ID+'&quot;)">'+(n.개별?'확인했습니다':'확인했어요')+'</button>')
         +'</div>';});
     document.getElementById('nt-list').innerHTML=html||'<p class="muted" style="padding:0 4px">등록된 공지가 없습니다.</p>';});
 }
@@ -3743,11 +3788,11 @@ function showPop(){
   if(!ST.student || (lg&&lg.classList.contains('on'))){box.classList.add('hidden');return;}
   if(POPi>=POP.length){box.classList.add('hidden');return;}
   var n=POP[POPi];
-  document.getElementById('pop-cnt').textContent='새 공지 '+(POPi+1)+'/'+POP.length;
+  document.getElementById('pop-cnt').textContent=(n.개별?'💬 나에게 온 공지 ':'새 공지 ')+(POPi+1)+'/'+POP.length;
   document.getElementById('pop-date').textContent=n.날짜||'';
   document.getElementById('pop-title').textContent=n.제목||'';
-  document.getElementById('pop-body').innerHTML=emoHtml(n.내용||'');
-  document.getElementById('pop-btn').textContent=(POPi+1<POP.length)?'확인했어요 · 다음':'확인했어요';
+  document.getElementById('pop-body').innerHTML=noticeBodyHTML(n);                 // [0.92.0] 개인 공지는 진호 말풍선
+  document.getElementById('pop-btn').textContent=(n.개별?'확인했습니다':'확인했어요')+((POPi+1<POP.length)?' · 다음':'');
   box.classList.remove('hidden');
 }
 /* [0.50.0] 확인한 공지는 공지 탭에 «읽음»으로 남는다 — 팝업이 끝나면 목록 갱신 */
@@ -3781,6 +3826,23 @@ function readImg(inp,cb){var f=inp.files[0];if(!f)return;var rd=new FileReader()
 function val(id){return document.getElementById(id).value.trim();}
 function setv(id,v){if(v!=null&&v!=='')document.getElementById(id).value=v;}
 /* [0.52.0] 선생님 코멘트 = 캐릭터가 말풍선으로 말하는 만화 형태 */
+/* [0.92.0] 기록 하나에 붙는 선생님 코멘트(진호 말풍선) + 미인정 사유 */
+function recExtraHTML(r){
+  var h='';
+  if(r.인정==='미인정') h+='<div class="bubble bad" style="margin-top:6px">❌ 인정되지 않았어요'+(r.미인정사유?' · '+esc(r.미인정사유):'')+'<br><span class="cap">같은 날짜로 다시 올리면 이전 기록을 덮어써요.</span></div>';
+  if(r.코멘트||r.스티커) h+=comicHTML(r.코멘트||'',r.스티커||'');
+  return h;
+}
+/* 공지 내용 앞의 [스티커:키] 를 떼어낸다 */
+function parseStk(txt){
+  var m=String(txt||'').match(/^\[스티커:(verygood|good|nice|peace|regret|frustration)\]\s*/);
+  return m?{stk:m[1],text:String(txt).slice(m[0].length)}:{stk:'',text:String(txt||'')};
+}
+function noticeBodyHTML(n){
+  var p=parseStk(n.내용);
+  if(n.개별) return comicHTML(p.text,p.stk)||emoHtml(p.text);
+  return emoHtml(p.text);
+}
 function comicHTML(txt,stk){
   var ch=stk?('<img class="cmc-ch" src="st-'+esc(stk)+'.png" alt="">'):'';
   return '<div class="cmc'+(stk?'':' nochar')+'">'+ch
