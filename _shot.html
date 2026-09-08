@@ -1,4 +1,19 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 0.95.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.01.0 -->
+<!--   [1.01.0] 근력은 «최소 3세트» — 칸을 처음부터 3줄 깔아 두고, 3세트 아래로는 빼지 못한다(＋로 더 늘리는 건 자유). -->
+<!--   [1.00.1] ★긴급 — 근력에 사진을 넣으면 «사진 확인이 끝날 때까지 기다려주세요» 만 뜨고 영영 저장이 안 되던 것.
+        0.54.0 에서 자동 사진검사를 뺄 때 checkStrPhoto() 가 strCheck 를 null 로만 두어,
+        저장 가드 if(strB64 && !strCheck) 에 늘 걸렸다. 이제 «검사 안 함(통과)» 값을 넣는다. -->
+<!--   [1.00.0] 앱을 켤 때 «존 로크 화면 → 홈 → 또 존 로크 → 홈» 으로 두 번 돌던 것 고침.
+        새 판이 올라온 직후 서비스워커가 바뀌면 곧바로 location.reload() 를 불러서 생긴 일이다.
+        이제 ① 켠 지 8초 안에는 새로고침하지 않고 ② 화면을 보고 있지 않거나 ③ 쓰던 글이 있으면 미룬다.
+        미뤄 둔 새로고침은 앱을 다시 열 때(백그라운드 → 화면) 조용히 한다. HTML 은 늘 새로 받으므로 늦어도 문제가 없다. -->
+<!--   [0.99.0] 마스터코드로 들어오면 화면 맨 위에 «마스터코드로 보는 중» 띠가 뜬다(선생님 확인용).
+        이 상태에서는 공지·읽을거리를 읽음으로 남기지 않는다 — 학생이 자기 코드로 들어오면 새 것으로 다시 보여야 하니까. -->
+<!--   [0.98.0] 안 읽은 공지가 여러 개면 한 장씩 넘기지 않고 한 팝업 안에 «타일»로 아래로 이어 붙여 보여준다.
+        맨 아래 «확인했습니다» 한 번으로 전부 읽음 처리(markNoticesRead · GAS 0.81.0). 개인 공지가 위쪽에 온다. -->
+<!--   [0.97.0] 진호 이모티콘 3종 추가 — 꺼이꺼이(sob)·대성통곡(wail)·안돼(no). 코멘트·공지·인사·문의 답변에서 모두 쓸 수 있다. -->
+<!--   [0.96.0] «오늘의 인사» — 홈 맨 위에 뜨는 짧은 인사 띠(전체 공통·날짜별, GAS 0.80.0).
+        공지 팝업과 달리 화면을 막지 않는다. ✕ 를 누르면 그날은 안 뜨고(폰에만 기억) 다음 날 새 인사. -->
 <!--   [0.95.0] 유산소 «✍️ 오늘의 성찰과 사진일기» — 그날을 기억할 사진 1장(선택)을 성찰과 함께 남긴다(GAS 0.79.0 · 31열 일기사진).
         앱 안 도움말(무엇을 찍나·예시 3컷) 포함. 도장판 펼침·기록 탭에 폴라로이드로 보이고, 기록 탭 «📷 나의 사진일기»로 모아 본다. -->
 <!--   [0.94.0] ★규칙 문구 정정 — 같은 날 유산소+근력은 «유산소만» 인정(GAS 0.78.0). 주 4일은 서로 다른 4일. -->
@@ -246,6 +261,7 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .setrow input{flex:1;min-width:0;width:auto;text-align:center;padding:8px 6px;margin:0}
 .setrow .u{font-size:11px;color:var(--muted2);flex:none}
 .setrow .sdel{flex:none;width:28px;height:28px;border-radius:8px;border:1px solid var(--line2);background:#fff;color:var(--muted);font-size:16px;line-height:1;cursor:pointer}
+.setrow .sdel.off{opacity:.28}                     /* [1.01.0] 최소 3세트까지는 못 뺀다 */
 .addset{margin-top:6px;height:30px;padding:0 12px;border-radius:8px;border:1.5px dashed var(--strength-dark);background:#fff;color:var(--strength-dark);font-family:inherit;font-weight:800;font-size:12px;cursor:pointer}
 .exnum .tf{display:flex;align-items:center;gap:3px;flex:1;min-width:0}
 .exnum .tf input{margin-top:3px;padding:9px 6px;text-align:center;min-width:0;width:100%}
@@ -612,6 +628,17 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 #cal-detail{overflow:hidden;max-height:0;transition:max-height .25s ease}
 #cal-detail.open{max-height:900px;margin-top:12px}
 .latewarn.dup{background:#FFF6D9;border-color:#F2D77A;color:#7A5A00}            /* [0.92.0] 덮어쓰기 경고 */
+/* [0.96.0] 오늘의 인사 띠 */
+/* [0.99.0] 마스터코드 둘러보기 띠 */
+.peekbar{position:fixed;top:0;left:0;right:0;z-index:70;background:#4B3BB5;color:#fff;
+  font-size:12.5px;font-weight:700;text-align:center;padding:6px 10px;letter-spacing:-.2px}
+.peekbar.hidden{display:none}
+body.peek{padding-top:30px}
+.grbar{display:flex;gap:10px;align-items:flex-start;background:#FFFBEA;border:1px solid #F0DFA8;border-radius:16px;padding:13px 14px;margin-bottom:12px}
+.grbar .em{font-size:28px;line-height:1.1;flex:none}
+.grbar .em img{width:34px;height:34px;object-fit:contain;display:block}
+.grbar .tx{flex:1;font-size:14px;line-height:1.65;color:#5A4A12;white-space:pre-wrap}
+.grbar .x{flex:none;width:28px;height:28px;border-radius:50%;border:1px solid #E6D28C;background:#fff;color:#8A7524;font-size:14px;cursor:pointer;line-height:1}
 /* [0.95.0] 사진일기 */
 .drop.diary{border-style:dashed;background:#FFFDF5;border-color:#EBD9A6;color:#7A5A00;margin-top:6px}
 .diaryimg{width:100%;border-radius:10px;margin-top:10px;display:block}
@@ -627,6 +654,14 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 .dhelp .ex svg{width:100%;height:auto;border-radius:8px;display:block}
 .dhelp .ex figcaption{font-size:11px;color:var(--muted2);margin-top:4px}
 .bubble.bad{background:#fdecec;color:#a33}                                       /* [0.92.0] 미인정 사유 */
+/* [0.98.0] 공지 타일 — 여러 개면 아래로 이어 붙인다 */
+.ntile{border:1px solid var(--line);border-radius:14px;padding:12px 13px;margin-bottom:10px;background:#fff}
+.ntile:last-child{margin-bottom:0}
+.ntile.me{border-color:var(--primary);background:var(--primary-tint)}
+.ntile .th{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.ntile .th b{font-size:15px}
+.ntile .th .dt{margin-left:auto;font-size:11.5px;color:var(--muted2)}
+.ntile .bd{font-size:14px;color:var(--ink2);line-height:1.65;white-space:pre-wrap}
 .pchip{display:inline-block;background:#EAF1FF;color:#2F5FB3;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:800}
 .wrow #cal-detail.open{margin-top:10px}          /* [0.91.1] 주차 카드 안에 들어갔을 때 */
 .dayrec{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
@@ -728,6 +763,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
       </div>
       <img id="hm-logo" class="hm-logo" alt="혜원핏" src="icon5-mask-512.png">
     </div>
+    <div id="greet-bar"></div>
     <div class="card">
       <div class="gauge">
         <div id="g-week"></div>
@@ -1131,9 +1167,8 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
         <span class="chip warn" id="pop-cnt">새 공지</span>
         <span class="cap" id="pop-date"></span>
       </div>
-      <h2 id="pop-title" style="font-size:19px;margin:8px 0 6px"></h2>
-      <div id="pop-body" style="white-space:pre-wrap;font-size:14px;color:var(--ink2);max-height:46vh;overflow:auto"></div>
-      <button class="btn" style="margin-top:16px" onclick="popConfirm()" id="pop-btn">확인했어요</button>
+      <div id="pop-body" style="max-height:58vh;overflow:auto;margin-top:8px"></div>
+      <button class="btn" style="margin-top:16px" onclick="popConfirm()" id="pop-btn">확인했습니다</button>
     </div>
   </div>
 
@@ -1177,13 +1212,14 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
     <button data-t="notice" onclick="go('notice')"><img class="ic" src="tab-notice.png" alt="">공지</button>
   </nav>
 </div>
+<div class="peekbar hidden" id="peekbar">🔑 <b>마스터코드로 보는 중</b> · 읽음 표시가 남지 않아요</div>
 <div class="toast" id="toast"></div>
 
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '0.95.0';
-var PWA_BUILD = '2026.09.07 23:55';
+var PWA_VER = '1.01.0';
+var PWA_BUILD = '2026.09.08 10:34';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2071,6 +2107,7 @@ function oxPick(k,i,pick){
 
 /* ── 읽음 표시: 폰 + 서버 ── */
 function markRead(kind){
+  if(isPeek()){ toast('🔑 둘러보기 중이라 읽음으로 남지 않아요'); return; }   // [0.99.0]
   kind=(kind==='마음')?'마음':'지식';
   var w=readWeekNo(), at=nowStamp();
   try{localStorage.setItem(readKey(w,kind),at);}catch(e){}
@@ -2214,10 +2251,19 @@ function call(fn,args,cb){
    .then(function(x){ if(x&&x.authFail){logout();return;} cb&&cb(x); })
    .catch(function(e){toast('네트워크 오류 · 연결을 확인하세요');});
 }
+/* [0.99.0] 마스터코드 둘러보기 표시 — 새로고침해도 유지되게 폰에 기억 */
+function setPeek(on){
+  try{ on?localStorage.setItem('grofit_peek','1'):localStorage.removeItem('grofit_peek'); }catch(e){}
+  ST.peek=!!on;
+  var b=document.getElementById('peekbar'); if(b)b.classList.toggle('hidden',!on);
+  document.body.classList.toggle('peek',!!on);
+}
+function isPeek(){ if(ST.peek!==undefined)return !!ST.peek; try{ return localStorage.getItem('grofit_peek')==='1'; }catch(e){ return false; } }
 function logout(){
   if(!confirm('로그아웃할까요? 다시 쓰려면 학번과 학생코드를 입력해야 합니다.'))return;
   /* 토큰·학생정보만 지우고 고른 테마(grofit_theme)는 그대로 둔다 */
   localStorage.removeItem('grofit_token');localStorage.removeItem('grofit_student');
+  setPeek(false);                                            // [0.99.0]
   ST.student=null;ST.home=null;ST.myRecords=null;ST.fitness=null;ST.calDay=null;
   popClose();
   go('login');toast('로그아웃했습니다');
@@ -2236,6 +2282,7 @@ function doLogin(){
     if(btn){ btn.disabled=false; btn.textContent=btn.dataset.t||'로그인'; }
     if(!res||!res.ok){toast(res&&res.msg||'로그인 실패');return;}
     ST.student=res.student;
+    setPeek(!!res.master);                                   // [0.99.0]
     if(res.token)localStorage.setItem('grofit_token',res.token);
     localStorage.setItem('grofit_student',JSON.stringify(res.student));
     toast(res.student.이름+'님 환영합니다');
@@ -2258,6 +2305,23 @@ function applyBundle(b){
     showUp('saved-strength', s.strength || L['근력']   || '', false);
   }
   if(b.notices){ ST.notices=b.notices; showUnread(b.notices); }
+  if(b.greet!==undefined) renderGreet(b.greet);            // [0.96.0]
+}
+/* [0.96.0] 오늘의 인사 — 홈 맨 위 띠. ✕ 를 누르면 그날은 안 뜬다(이 폰에만 기억) */
+function greetSeen(key){ try{ return localStorage.getItem('grofit_greet')===key; }catch(e){ return false; } }
+function renderGreet(g){
+  var box=document.getElementById('greet-bar'); if(!box)return;
+  ST.greet=g;
+  if(!g||!g.있음||greetSeen(g.날짜)){ box.innerHTML=''; return; }
+  var em=/^(verygood|good|nice|peace|regret|frustration|sob|wail|no)$/.test(g.이모지)
+    ? '<img src="st-'+g.이모지+'.png" alt="">' : esc(g.이모지||'👋');
+  box.innerHTML='<div class="grbar"><span class="em">'+em+'</span>'
+    +'<span class="tx">'+esc(g.문구)+'</span>'
+    +'<button class="x" onclick="closeGreet()" aria-label="닫기">✕</button></div>';
+}
+function closeGreet(){
+  try{ if(ST.greet&&ST.greet.날짜) localStorage.setItem('grofit_greet',ST.greet.날짜); }catch(e){}
+  var box=document.getElementById('greet-bar'); if(box)box.innerHTML='';
 }
 
 /* ---------- 홈 ---------- */
@@ -2684,6 +2748,27 @@ function callP(fn,args,cb){
   xhr.send(JSON.stringify({action:fn,token:localStorage.getItem('grofit_token')||'',args:args||[]}));
 }
 
+/* [1.00.0] 새 판이 올라왔을 때 «언제» 새로고침할지
+   전에는 서비스워커가 바뀌는 즉시 location.reload() 를 불렀다. 그래서 앱을 켠 직후에 새 판을 만나면
+   시작 화면 → 홈 → 새로고침 → 시작 화면 → 홈 으로 두 번 돌았다.
+   HTML 은 늘 새로 받으므로(네트워크 우선) 급히 새로고침할 까닭이 없다. 조용해질 때까지 미룬다. */
+var SW_NEW=false, SW_DONE=false, BOOT_AT=Date.now();
+function typingNow(){                       // 쓰던 글이 있으면 절대 새로고침하지 않는다
+  var el=document.querySelectorAll('textarea, input[type=text], input:not([type])');
+  for(var i=0;i<el.length;i++){ if(String(el[i].value||'').trim()) return true; }
+  if(typeof cardioB64!=='undefined'&&cardioB64) return true;
+  if(typeof strB64!=='undefined'&&strB64) return true;
+  if(typeof diaryB64!=='undefined'&&diaryB64) return true;
+  return false;
+}
+function swRefresh(){
+  if(!SW_NEW||SW_DONE) return;
+  if(Date.now()-BOOT_AT<8000) return;       // 막 켠 직후에는 미룬다(시작 화면 두 번 방지)
+  if(document.hidden) return;               // 화면을 보고 있을 때만
+  if(typeof PG!=='undefined'&&PG.busy) return;   // 제출하는 중이면 미룬다
+  if(typingNow()) return;
+  SW_DONE=true; location.reload();
+}
 /* [0.49.0] 시작 스플래시 — 1.8초 뒤 스르르 사라진다. 탭하면 바로 넘어감 */
 var BOOT_DONE=false;
 function bootOut(){
@@ -2726,6 +2811,9 @@ function checkStrPhoto(){
   strCheck=null; strException=null;
   var box=document.getElementById('str-check');
   if(!strB64){ if(box)box.innerHTML=''; return; }
+  /* [1.00.1] 자동 검사를 쓰지 않으므로 «검사 안 함(통과)» 로 둔다.
+     이 값을 안 넣으면 저장 가드에 걸려 사진을 넣은 근력 기록이 영영 저장되지 않는다. */
+  strCheck={pass:true, skipped:true, 요약:'사진은 김진호 선생님이 확인'};
   setChk('ok','✅ 사진을 받았어요.<br><span class="cap">타임마크 <b>사진 코드</b>와 날짜가 보이는지 다시 한 번 봐 주세요. '
     +'김진호 선생님이 확인한 뒤 인정됩니다.</span>');
 }
@@ -2994,15 +3082,20 @@ function addStrRow(part){
     +howHTML(part)
     +'<div class="exnum">'
       +(nowt?'':'<label>무게<input class="s-wt" inputmode="decimal" placeholder="kg"><span class="unit">kg</span></label>')
-      +'<label>세트<input class="s-set" inputmode="numeric" value="1" readonly><span class="unit">세트</span></label>'
+      +'<label>세트<input class="s-set" inputmode="numeric" value="'+STR_MIN_SET+'" readonly><span class="unit">세트</span></label>'
       +'<label><span style="display:block;margin-bottom:3px">단위</span><span class="usel">'
         +'<button type="button"'+(tmode?'':' class="on"')+' data-m="rep" onclick="pickUnit(this)">횟수</button>'
         +'<button type="button"'+(tmode?' class="on"':'')+' data-m="time" onclick="pickUnit(this)">시간</button></span></label>'
     +'</div>'
     /* [0.93.0] 세트마다 한 줄 — ＋ 세트 추가 */
-    +'<div class="setlist">'+setRowHTML(1,tmode)+'</div>'
+    +'<div class="setlist">'+setRowsHTML(STR_MIN_SET,tmode)+'</div>'        // [1.01.0] 처음부터 3세트
     +'<button type="button" class="addset" onclick="addSet(this)">＋ 세트 추가</button>';
   list.appendChild(d);
+}
+/* [1.01.0] 근력은 최소 3세트 — 처음부터 이만큼 깔아 두고, 이보다 적게는 못 줄인다 */
+var STR_MIN_SET=3;
+function setRowsHTML(n,time){
+  var h=''; for(var i=1;i<=n;i++)h+=setRowHTML(i,time); return h;
 }
 /* [0.93.0] 세트 한 줄 */
 function setRowHTML(n,time){
@@ -3010,14 +3103,20 @@ function setRowHTML(n,time){
     +'<span class="repwrap'+(time?' hidden':'')+'"><input class="s-rep" inputmode="numeric" placeholder="0"><span class="u">회</span></span>'
     +'<span class="timewrap'+(time?'':' hidden')+'"><input class="s-min" inputmode="numeric" placeholder="0"><span class="u">분</span>'
     +'<input class="s-sec" inputmode="numeric" placeholder="0"><span class="u">초</span></span>'
-    +'<button type="button" class="sdel" onclick="delSet(this)" aria-label="세트 빼기">−</button></div>';
+    +'<button type="button" class="sdel'+(n<=STR_MIN_SET?' off':'')+'" onclick="delSet(this)" aria-label="세트 빼기">−</button></div>';
 }
 function setCount(row){ var n=row.querySelectorAll('.setrow').length; var c=row.querySelector('.s-set'); if(c)c.value=String(n); return n; }
-function renumberSets(row){ row.querySelectorAll('.setrow .sn').forEach(function(e,i){e.textContent=(i+1)+'세트';}); setCount(row); }
+function renumberSets(row){
+  row.querySelectorAll('.setrow .sn').forEach(function(e,i){e.textContent=(i+1)+'세트';});
+  /* [1.01.0] 최소 세트까지는 빼기 단추를 흐리게 */
+  row.querySelectorAll('.setrow .sdel').forEach(function(b,i){ b.classList.toggle('off', i<STR_MIN_SET); });
+  setCount(row);
+}
 function addSet(btn){
   var row=btn.closest('.exrow'), list=row.querySelector('.setlist');
   var time=strMode(row)==='time', n=list.children.length+1;
   list.insertAdjacentHTML('beforeend',setRowHTML(n,time));
+  renumberSets(row);
   /* 앞 세트 값을 미리 채워 준다(같은 횟수면 그냥 두면 됨) */
   var prev=list.children[n-2], cur=list.children[n-1];
   if(prev){ ['s-rep','s-min','s-sec'].forEach(function(c){var a=prev.querySelector('.'+c),b=cur.querySelector('.'+c); if(a&&b)b.value=a.value;}); }
@@ -3026,7 +3125,7 @@ function addSet(btn){
 }
 function delSet(btn){
   var row=btn.closest('.exrow'), list=row.querySelector('.setlist');
-  if(list.children.length<=1){ toast('세트는 1개 이상이어야 해요'); return; }
+  if(list.children.length<=STR_MIN_SET){ toast('근력은 '+STR_MIN_SET+'세트 이상 해야 해요'); return; }
   btn.closest('.setrow').remove(); renumberSets(row);
 }
 /* [0.80.0] 유산소 예시 화면 — 앱마다 생김새는 달라도 «거리 · 시간 · 날짜» 셋이 보여야 한다.
@@ -3873,6 +3972,7 @@ function loadNoticesStudent(){
     document.getElementById('nt-list').innerHTML=html||'<p class="muted" style="padding:0 4px">등록된 공지가 없습니다.</p>';});
 }
 function readOne(id){
+  if(isPeek()){ toast('🔑 둘러보기 중이라 읽음으로 남지 않아요'); return; }   // [0.99.0]
   call('markNoticeRead',[ST.student.학번,id],function(){toast('확인 완료');loadNoticesStudent();});
 }
 
@@ -3892,31 +3992,44 @@ function showUnread(list){
   POP=(list||[]).filter(function(n){return !n.읽음 && n.공지ID;}).reverse();  // 오래된 것부터
   POPi=0; showPop();
 }
+/* [0.98.0] 안 읽은 공지를 한 팝업 안에 타일로 쌓아 보여준다 — 개인 공지가 위 */
 function showPop(){
   var box=document.getElementById('nt-pop');
   /* [0.51.1] 로그인 안 했거나 로그인 화면이면 띄우지 않는다 */
   var lg=document.getElementById('s-login');
   if(!ST.student || (lg&&lg.classList.contains('on'))){box.classList.add('hidden');return;}
-  if(POPi>=POP.length){box.classList.add('hidden');return;}
-  var n=POP[POPi];
-  document.getElementById('pop-cnt').textContent=(n.개별?'💬 나에게 온 공지 ':'새 공지 ')+(POPi+1)+'/'+POP.length;
-  document.getElementById('pop-date').textContent=n.날짜||'';
-  document.getElementById('pop-title').textContent=n.제목||'';
-  document.getElementById('pop-body').innerHTML=noticeBodyHTML(n);                 // [0.92.0] 개인 공지는 진호 말풍선
-  document.getElementById('pop-btn').textContent=(n.개별?'확인했습니다':'확인했어요')+((POPi+1<POP.length)?' · 다음':'');
+  if(!POP.length){box.classList.add('hidden');return;}
+  var mine=POP.filter(function(n){return n.개별;}), rest=POP.filter(function(n){return !n.개별;});
+  var list=mine.concat(rest);
+  document.getElementById('pop-cnt').textContent=(POP.length>1)?('새 소식 '+POP.length+'개'):(mine.length?'💬 나에게 온 공지':'새 공지');
+  document.getElementById('pop-date').textContent=mine.length?('선생님 코멘트 '+mine.length+'개'):'';
+  document.getElementById('pop-body').innerHTML=list.map(function(n){
+    return '<div class="ntile'+(n.개별?' me':'')+'">'
+      +'<div class="th">'+(n.개별?'<span class="pchip">개인</span>':'')+'<b>'+esc(n.제목||'')+'</b>'
+      +'<span class="dt">'+esc(n.날짜||'')+'</span></div>'
+      +'<div class="bd">'+noticeBodyHTML(n)+'</div></div>';
+  }).join('');
+  document.getElementById('pop-btn').textContent='확인했습니다'+(POP.length>1?(' · '+POP.length+'개'):'');
   box.classList.remove('hidden');
 }
 /* [0.50.0] 확인한 공지는 공지 탭에 «읽음»으로 남는다 — 팝업이 끝나면 목록 갱신 */
+/* [0.98.0] 한 번에 전부 읽음 처리 */
 function popConfirm(){
   if(!ST.student){popClose();return;}
-  var n=POP[POPi];
-  if(!n){document.getElementById('nt-pop').classList.add('hidden');return;}
-  document.getElementById('pop-btn').disabled=true;
-  call('markNoticeRead',[ST.student.학번,n.공지ID],function(){
-    document.getElementById('pop-btn').disabled=false;
-    POPi++; showPop();
-    if(POPi>=POP.length && ST.student) loadNoticesStudent();
-    if(POPi>=POP.length)toast('공지를 모두 확인했어요');
+  var ids=POP.map(function(n){return n.공지ID;}).filter(Boolean);
+  if(!ids.length){popClose();return;}
+  if(isPeek()){                                              // [0.99.0] 둘러보기 — 읽음으로 남기지 않는다
+    POP=[];POPi=0; document.getElementById('nt-pop').classList.add('hidden');
+    toast('🔑 둘러보기 중이라 읽음으로 남지 않아요'); return;
+  }
+  var btn=document.getElementById('pop-btn'); btn.disabled=true; btn.textContent='확인하는 중…';
+  call('markNoticesRead',[ST.student.학번,ids],function(){
+    btn.disabled=false;
+    (ST.notices||[]).forEach(function(n){ if(ids.indexOf(n.공지ID)>=0)n.읽음=true; });
+    POP=[]; POPi=0;
+    document.getElementById('nt-pop').classList.add('hidden');
+    loadNoticesStudent();
+    toast(ids.length>1?('공지 '+ids.length+'개를 확인했어요'):'확인했어요');
   });
 }
 
@@ -3956,7 +4069,7 @@ function recExtraHTML(r){
 }
 /* 공지 내용 앞의 [스티커:키] 를 떼어낸다 */
 function parseStk(txt){
-  var m=String(txt||'').match(/^\[스티커:(verygood|good|nice|peace|regret|frustration)\]\s*/);
+  var m=String(txt||'').match(/^\[스티커:(verygood|good|nice|peace|regret|frustration|sob|wail|no)\]\s*/);
   return m?{stk:m[1],text:String(txt).slice(m[0].length)}:{stk:'',text:String(txt||'')};
 }
 function noticeBodyHTML(n){
@@ -3973,7 +4086,7 @@ function comicHTML(txt,stk){
 
 /* 선생님 코멘트 속 :키: 를 캐릭터 이모티콘 그림으로 */
 function emoHtml(s){
-  return esc(s).replace(/:(verygood|good|nice|peace|regret|frustration):/g,function(m,k){
+  return esc(s).replace(/:(verygood|good|nice|peace|regret|frustration|sob|wail|no):/g,function(m,k){
     return '<img class="emo" src="st-'+k+'.png" alt="">';});
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
@@ -4003,12 +4116,12 @@ function mock(fn,args){
   // 서비스워커 등록 + 새 버전 배포 시 자동 새로고침
   if(false){
     navigator.serviceWorker.register('sw.js').then(function(reg){
-      reg.update();                                   // 열자마자 새 버전 확인
+      setTimeout(function(){ reg.update(); }, 3000);   // [1.00.0] 켜자마자 말고 3초 뒤에 확인 — 시작 화면과 겹치지 않게
       document.addEventListener('visibilitychange',function(){ if(!document.hidden)reg.update(); }); // 앱 다시 열 때마다
       setInterval(function(){ reg.update(); }, 30*60*1000);   // 켜둔 채로도 30분마다
     });
-    var refreshing=false;
-    navigator.serviceWorker.addEventListener('controllerchange',function(){if(refreshing)return;refreshing=true;location.reload();});
+    navigator.serviceWorker.addEventListener('controllerchange',function(){ SW_NEW=true; swRefresh(); });
+    document.addEventListener('visibilitychange',function(){ if(!document.hidden) setTimeout(swRefresh,400); });
   }
   resetStrRows();
   // 체력측정 입력 → 등급 즉시 판정

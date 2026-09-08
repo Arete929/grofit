@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.00.1 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.01.0 -->
+<!--   [1.01.0] 근력은 «최소 3세트» — 칸을 처음부터 3줄 깔아 두고, 3세트 아래로는 빼지 못한다(＋로 더 늘리는 건 자유). -->
 <!--   [1.00.1] ★긴급 — 근력에 사진을 넣으면 «사진 확인이 끝날 때까지 기다려주세요» 만 뜨고 영영 저장이 안 되던 것.
         0.54.0 에서 자동 사진검사를 뺄 때 checkStrPhoto() 가 strCheck 를 null 로만 두어,
         저장 가드 if(strB64 && !strCheck) 에 늘 걸렸다. 이제 «검사 안 함(통과)» 값을 넣는다. -->
@@ -260,6 +261,7 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .setrow input{flex:1;min-width:0;width:auto;text-align:center;padding:8px 6px;margin:0}
 .setrow .u{font-size:11px;color:var(--muted2);flex:none}
 .setrow .sdel{flex:none;width:28px;height:28px;border-radius:8px;border:1px solid var(--line2);background:#fff;color:var(--muted);font-size:16px;line-height:1;cursor:pointer}
+.setrow .sdel.off{opacity:.28}                     /* [1.01.0] 최소 3세트까지는 못 뺀다 */
 .addset{margin-top:6px;height:30px;padding:0 12px;border-radius:8px;border:1.5px dashed var(--strength-dark);background:#fff;color:var(--strength-dark);font-family:inherit;font-weight:800;font-size:12px;cursor:pointer}
 .exnum .tf{display:flex;align-items:center;gap:3px;flex:1;min-width:0}
 .exnum .tf input{margin-top:3px;padding:9px 6px;text-align:center;min-width:0;width:100%}
@@ -1216,8 +1218,8 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.00.1';
-var PWA_BUILD = '2026.09.08 09:37';
+var PWA_VER = '1.01.0';
+var PWA_BUILD = '2026.09.08 10:34';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -3080,15 +3082,20 @@ function addStrRow(part){
     +howHTML(part)
     +'<div class="exnum">'
       +(nowt?'':'<label>무게<input class="s-wt" inputmode="decimal" placeholder="kg"><span class="unit">kg</span></label>')
-      +'<label>세트<input class="s-set" inputmode="numeric" value="1" readonly><span class="unit">세트</span></label>'
+      +'<label>세트<input class="s-set" inputmode="numeric" value="'+STR_MIN_SET+'" readonly><span class="unit">세트</span></label>'
       +'<label><span style="display:block;margin-bottom:3px">단위</span><span class="usel">'
         +'<button type="button"'+(tmode?'':' class="on"')+' data-m="rep" onclick="pickUnit(this)">횟수</button>'
         +'<button type="button"'+(tmode?' class="on"':'')+' data-m="time" onclick="pickUnit(this)">시간</button></span></label>'
     +'</div>'
     /* [0.93.0] 세트마다 한 줄 — ＋ 세트 추가 */
-    +'<div class="setlist">'+setRowHTML(1,tmode)+'</div>'
+    +'<div class="setlist">'+setRowsHTML(STR_MIN_SET,tmode)+'</div>'        // [1.01.0] 처음부터 3세트
     +'<button type="button" class="addset" onclick="addSet(this)">＋ 세트 추가</button>';
   list.appendChild(d);
+}
+/* [1.01.0] 근력은 최소 3세트 — 처음부터 이만큼 깔아 두고, 이보다 적게는 못 줄인다 */
+var STR_MIN_SET=3;
+function setRowsHTML(n,time){
+  var h=''; for(var i=1;i<=n;i++)h+=setRowHTML(i,time); return h;
 }
 /* [0.93.0] 세트 한 줄 */
 function setRowHTML(n,time){
@@ -3096,14 +3103,20 @@ function setRowHTML(n,time){
     +'<span class="repwrap'+(time?' hidden':'')+'"><input class="s-rep" inputmode="numeric" placeholder="0"><span class="u">회</span></span>'
     +'<span class="timewrap'+(time?'':' hidden')+'"><input class="s-min" inputmode="numeric" placeholder="0"><span class="u">분</span>'
     +'<input class="s-sec" inputmode="numeric" placeholder="0"><span class="u">초</span></span>'
-    +'<button type="button" class="sdel" onclick="delSet(this)" aria-label="세트 빼기">−</button></div>';
+    +'<button type="button" class="sdel'+(n<=STR_MIN_SET?' off':'')+'" onclick="delSet(this)" aria-label="세트 빼기">−</button></div>';
 }
 function setCount(row){ var n=row.querySelectorAll('.setrow').length; var c=row.querySelector('.s-set'); if(c)c.value=String(n); return n; }
-function renumberSets(row){ row.querySelectorAll('.setrow .sn').forEach(function(e,i){e.textContent=(i+1)+'세트';}); setCount(row); }
+function renumberSets(row){
+  row.querySelectorAll('.setrow .sn').forEach(function(e,i){e.textContent=(i+1)+'세트';});
+  /* [1.01.0] 최소 세트까지는 빼기 단추를 흐리게 */
+  row.querySelectorAll('.setrow .sdel').forEach(function(b,i){ b.classList.toggle('off', i<STR_MIN_SET); });
+  setCount(row);
+}
 function addSet(btn){
   var row=btn.closest('.exrow'), list=row.querySelector('.setlist');
   var time=strMode(row)==='time', n=list.children.length+1;
   list.insertAdjacentHTML('beforeend',setRowHTML(n,time));
+  renumberSets(row);
   /* 앞 세트 값을 미리 채워 준다(같은 횟수면 그냥 두면 됨) */
   var prev=list.children[n-2], cur=list.children[n-1];
   if(prev){ ['s-rep','s-min','s-sec'].forEach(function(c){var a=prev.querySelector('.'+c),b=cur.querySelector('.'+c); if(a&&b)b.value=a.value;}); }
@@ -3112,7 +3125,7 @@ function addSet(btn){
 }
 function delSet(btn){
   var row=btn.closest('.exrow'), list=row.querySelector('.setlist');
-  if(list.children.length<=1){ toast('세트는 1개 이상이어야 해요'); return; }
+  if(list.children.length<=STR_MIN_SET){ toast('근력은 '+STR_MIN_SET+'세트 이상 해야 해요'); return; }
   btn.closest('.setrow').remove(); renumberSets(row);
 }
 /* [0.80.0] 유산소 예시 화면 — 앱마다 생김새는 달라도 «거리 · 시간 · 날짜» 셋이 보여야 한다.
