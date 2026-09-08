@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.01.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.02.0 -->
+<!--   [1.02.0] 근력 사진을 올릴 때 «어느 운동 사진인지» 고른다 — 그 주 필수 3종 + «선택 운동», 모두 4칸.
+        사진이 있으면 반드시 골라야 저장된다. 고른 값은 운동기록 32열 '사진운동' 에 남아 검토 카드에 보인다. -->
 <!--   [1.01.0] 근력은 «최소 3세트» — 칸을 처음부터 3줄 깔아 두고, 3세트 아래로는 빼지 못한다(＋로 더 늘리는 건 자유). -->
 <!--   [1.00.1] ★긴급 — 근력에 사진을 넣으면 «사진 확인이 끝날 때까지 기다려주세요» 만 뜨고 영영 저장이 안 되던 것.
         0.54.0 에서 자동 사진검사를 뺄 때 checkStrPhoto() 가 strCheck 를 null 로만 두어,
@@ -262,6 +264,13 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .setrow .u{font-size:11px;color:var(--muted2);flex:none}
 .setrow .sdel{flex:none;width:28px;height:28px;border-radius:8px;border:1px solid var(--line2);background:#fff;color:var(--muted);font-size:16px;line-height:1;cursor:pointer}
 .setrow .sdel.off{opacity:.28}                     /* [1.01.0] 최소 3세트까지는 못 뺀다 */
+/* [1.02.0] 사진이 어느 운동인지 고르기 */
+.pofsel{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px}
+.pofsel button{min-height:44px;padding:8px 10px;border-radius:11px;border:1.5px solid var(--line2);background:#fff;
+  font-family:inherit;font-size:13px;font-weight:700;color:var(--ink2);cursor:pointer;line-height:1.35}
+.pofsel button .pl{display:block;font-size:10.5px;font-weight:800;color:var(--muted2);margin-bottom:2px}
+.pofsel button.on{background:var(--strength-tint,#FFF1E4);border-color:var(--strength);color:var(--strength-dark)}
+.pofsel button.on .pl{color:var(--strength-dark)}
 .addset{margin-top:6px;height:30px;padding:0 12px;border-radius:8px;border:1.5px dashed var(--strength-dark);background:#fff;color:var(--strength-dark);font-family:inherit;font-weight:800;font-size:12px;cursor:pointer}
 .exnum .tf{display:flex;align-items:center;gap:3px;flex:1;min-width:0}
 .exnum .tf input{margin-top:3px;padding:9px 6px;text-align:center;min-width:0;width:100%}
@@ -917,6 +926,9 @@ body.peek{padding-top:30px}
         날짜는 <b>위에서 고른 날과 같아야</b> 인정됩니다.<br>
         <b>한 번 낸 사진은 다시 못 씁니다.</b></p>
       </div>
+      <label style="margin-top:2px">어느 운동 사진인가요? <span class="chip bad">필수</span></label>
+      <p class="cap" style="margin:-4px 0 8px">사진에 찍힌 운동을 골라 주세요</p>
+      <div class="pofsel" id="str-pof"></div>
       <div class="drop" id="str-drop" onclick="pick('str-file')">📷 운동 사진 업로드<br><span class="cap">탭하여 사진 선택</span></div>
       <input type="file" id="str-file" accept="image/*" class="hidden" onchange="onStrImg(this)">
       <img id="str-prev" class="hidden" style="width:100%;border-radius:12px;margin-top:12px">
@@ -1218,8 +1230,8 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.01.0';
-var PWA_BUILD = '2026.09.08 10:34';
+var PWA_VER = '1.02.0';
+var PWA_BUILD = '2026.09.08 10:43';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2994,6 +3006,7 @@ var STR_WEEK = {
 function strParts(w){ w = Number(w || ST.strWeek || nowWeekNo()); return STR_WEEK[w] || STR_PARTS; }
 /* 필수 칸이 이번 주 것과 다르면 다시 만든다 */
 function syncStrRows(){
+  renderPof();                                                 // [1.02.0] 주차가 바뀌면 운동 이름도 바뀐다
   /* [0.88.0] 부위 이름(상체·하체·코어)은 주차마다 같아서 비교 기준이 못 된다.
      칸을 만든 «주차»를 기억해 두고, 주차가 달라졌거나 칸이 비었으면 다시 그린다. */
   var list = document.getElementById('str-list'); if(!list) return;
@@ -3092,6 +3105,21 @@ function addStrRow(part){
     +'<button type="button" class="addset" onclick="addSet(this)">＋ 세트 추가</button>';
   list.appendChild(d);
 }
+/* [1.02.0] 사진이 어느 운동인지 — 그 주 필수 3종 + 선택 운동 */
+function renderPof(){
+  var box=document.getElementById('str-pof'); if(!box)return;
+  var ps=strParts(), h='';
+  ps.forEach(function(x){
+    var nm=x.name||x.k;
+    h+='<button type="button" class="'+(ST.strPhotoOf===nm?'on':'')+'" onclick="pickPof(&quot;'+esc(nm)+'&quot;)">'
+      +'<span class="pl">'+esc(x.k)+'</span>'+esc(nm)+'</button>';
+  });
+  h+='<button type="button" class="'+(ST.strPhotoOf==='선택 운동'?'on':'')+'" onclick="pickPof(&quot;선택 운동&quot;)">'
+    +'<span class="pl">＋</span>선택 운동</button>';
+  box.innerHTML=h;
+}
+function pickPof(nm){ ST.strPhotoOf=(ST.strPhotoOf===nm)?'':nm; renderPof(); }
+
 /* [1.01.0] 근력은 최소 3세트 — 처음부터 이만큼 깔아 두고, 이보다 적게는 못 줄인다 */
 var STR_MIN_SET=3;
 function setRowsHTML(n,time){
@@ -3319,10 +3347,15 @@ function saveStrength(){
     toast('타임마크 사진이 아니에요. 다시 찍거나 김진호 선생님께 확인 요청을 눌러주세요');return;
   }
   if(!pnCheck('s'))return;
+  if(strB64 && !ST.strPhotoOf){                               // [1.02.0] 사진이 어느 운동인지 골라야 한다
+    toast('사진이 어느 운동인지 골라 주세요');
+    var pf=document.getElementById('str-pof'); if(pf)pf.scrollIntoView({block:'center',behavior:'smooth'});
+    return;
+  }
   if(!dupConfirm('str'))return;                               // [0.92.0]
   progOpen('근력 운동 제출');
   callP('submitStrength',[ST.student.학번,{imageBase64:strB64,date:ST.strDate,summary:rows.join(', '),
-    reqCount:reqN,optCount:optN,reflect:val('st-reflect'),
+    reqCount:reqN,optCount:optN,photoOf:ST.strPhotoOf||'',reflect:val('st-reflect'),
     rpe:PICK.s.rpe,sat:PICK.s.sat,check:strCheck,exception:strException,partner:pnValue('s')}],
     function(r){
       if(!r||r.ok===false){progFail((r&&r.msg)||'저장하지 못했어요');return;}   // [0.92.0]
@@ -3332,7 +3365,7 @@ function saveStrength(){
       if(r.중복){ toast('✅ 이미 제출된 기록이에요 · 한 번만 저장됩니다'+savedMsg(r)); }
       else if(r.덮어씀){ toast('✅ 이전 기록을 덮어썼어요 · 김진호 선생님이 다시 확인해요'+savedMsg(r)); }
       toast(strB64?('✅ 제출 완료 · 김진호 선생님이 확인하면 도장이 찍혀요'+savedMsg(r)):'📝 기록만 저장됨 · 사진이 없어 인정되지 않아요');
-      strB64=null;strCheck=null;strException=null;
+      strB64=null;strCheck=null;strException=null;ST.strPhotoOf='';renderPof();
       document.getElementById('str-check').innerHTML='';resetStrRows();resetPick('s');pnReset('s');loadPartners();
       document.getElementById('st-reflect').value='';countReflect('st-reflect','st-reflect-n');
       document.getElementById('str-prev').classList.add('hidden');go('home');});});
