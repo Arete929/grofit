@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- 코드명: 혜원핏 학생 웹 설명서 | help.html | @version 4.13.0
+<!-- 코드명: 혜원핏 학생 웹 설명서 | help.html | @version 4.14.0
+     수정요약: [4.14.0] 근력 사진 — 몸 전체가 나오게 찍기. 셀카·접사·운동 뒤 인증샷은 인정 안 됨.
      수정요약: [4.13.0] 유산소 — 앱별로 캡처할 화면과 시간 칸에 적을 값(활성/운동 시간) 안내.
      수정요약: [4.12.0] 유산소 — 폰 앱 화면 캡처로 올리기(시계 화면 사진은 인정 안 됨).
      수정요약: [4.11.1] 근력 — 얼굴 없이 운동 모습 · 타임마크 타이머로 찍기 안내.
@@ -161,6 +162,7 @@ ul.k li{position:relative;padding-left:15px;margin-bottom:7px;font-size:15px;lin
 ul.k li:before{content:'';position:absolute;left:1px;top:9px;width:5px;height:5px;border-radius:50%;background:var(--p)}
 ul.k li b{color:var(--pd)}
 ul.k li.okline{color:var(--pd)} ul.k li.okline:before{background:var(--p)!important;opacity:1!important}
+ul.k li.noline{color:#8A4A44} ul.k li.noline:before{background:#C0392B!important;opacity:1!important}
 .box ul.k li:before{background:currentColor;opacity:.5}
 .qrbox{text-align:center;margin:12px 0}
 .qrbox img{width:150px;height:150px}
@@ -343,7 +345,9 @@ ul.k li.okline{color:var(--pd)} ul.k li.okline:before{background:var(--p)!import
     <div class="txt"><ul class="k">
       <li>주마다 <b>필수 운동 3가지</b> — 이름은 이미 적혀 있습니다.</li>
       <li>사진을 올린 뒤 <b>어느 운동 사진인지</b> 골라야 합니다.</li>
-      <li><b>얼굴은 안 나와도 됩니다.</b> 운동하는 모습이 보이면 됩니다.</li>
+      <li><b>폰을 세워 두고 두세 걸음 떨어져서, 몸 전체가 나오게</b> 찍으세요.</li>
+      <li><b>얼굴은 안 나와도 됩니다.</b> 다만 <b>무슨 운동인지 보여야</b> 인정됩니다.</li>
+      <li>얼굴만 나온 <b>셀카</b>, 팔·다리만 크게 잡힌 <b>가까운 사진</b>, 운동이 <b>끝난 뒤</b> 찍은 인증샷은 인정되지 않습니다.</li>
       <li>혼자면 타임마크 <b>타이머(3·5·10초)</b>로 폰을 세워 두고 찍으세요.</li>
       <li><b>3세트</b>가 기본입니다. 세트마다 횟수를 적으세요.</li>
       <li>더 했으면 <b>＋ 세트 추가</b>로 늘리면 됩니다.</li>
@@ -372,6 +376,10 @@ ul.k li.okline{color:var(--pd)} ul.k li.okline:before{background:var(--p)!import
       <li>일반 카메라로 찍은 사진</li>
       <li><b>이름 · 시간 · 사진 코드</b> 중 하나라도 없거나 잘린 사진</li>
       <li class="okline">✔ <b>얼굴은 안 나와도 됩니다.</b> 운동하는 자세가 보이면 충분합니다.</li>
+      <li class="okline">✔ <b>몸 전체</b>가 들어오게. 폰을 세워 두고 두세 걸음 떨어져서 타이머로.</li>
+      <li class="noline">✕ <b>얼굴만 나온 셀카</b> — 무슨 운동을 했는지 알 수 없어 인정되지 않습니다.</li>
+      <li class="noline">✕ <b>팔·다리만 크게 잡힌 사진</b> — 동작이 안 보입니다.</li>
+      <li class="noline">✕ <b>운동이 끝난 뒤 찍은 인증샷</b> — 운동하는 «장면»이어야 합니다.</li>
       <li>다른 날짜 · 전에 낸 사진 · 친구 사진</li>
     </ul>
   </div>
