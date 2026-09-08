@@ -1,4 +1,7 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.03.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.03.1 -->
+<!--   [1.03.1] 점검에서 나온 세 가지. ① typingNow 가 로그인 칸(학번·코드)까지 «쓰던 글»로 봐서 자동 새로고침이 영영 미뤄지던 것 — 로그인 화면 칸은 뺀다.
+        ② 주차를 바꾸면 «어느 운동 사진» 선택이 옛 주차 이름으로 남던 것 — 현재 주차에 없는 이름이면 지운다.
+        ③ call() 에서 콜백 안 오류까지 «네트워크 오류» 로 뜨던 것 — 통신 실패와 화면 오류를 갈라 놓는다(화면 오류는 콘솔로). -->
 <!--   [1.03.0] ★사진을 «올리기 전에 줄인다». 요즘 폰 사진은 3~8MB 라 base64 로 바꾸면 더 커지는데,
         유산소 사진 + 사진일기까지 두 장이면 본문이 10MB 를 넘어 휴대폰 통신에서 끊겼다(«네트워크 오류»).
         긴 변 1600px · JPEG 0.85 로 줄여 보통 300KB 안팎이 된다(글자·사진코드는 그대로 읽힌다).
@@ -1248,8 +1251,8 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.03.0';
-var PWA_BUILD = '2026.09.08 20:58';
+var PWA_VER = '1.03.1';
+var PWA_BUILD = '2026.09.08 21:32';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2275,8 +2278,13 @@ function call(fn,args,cb){
   fetch(API_BASE,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
     body:JSON.stringify({action:fn,token:localStorage.getItem('grofit_token')||'',args:args||[]})})
    .then(function(r){return r.json();})
-   .then(function(x){ if(x&&x.authFail){logout();return;} cb&&cb(x); })
-   .catch(function(e){toast('네트워크 오류 · 연결을 확인하세요');});
+   .catch(function(e){ toast('네트워크 오류 · 연결을 확인하세요'); return undefined; })   // 통신·응답 실패만 여기
+   .then(function(x){
+     if(x===undefined) return;
+     if(x&&x.authFail){logout();return;}
+     /* [1.03.1] 화면 그리는 중 오류는 통신 오류로 보이지 않게 — 콘솔에만 남긴다 */
+     try{ cb&&cb(x); }catch(err){ console.error('[혜원핏] '+fn+' 처리 중 오류', err); }
+   });
 }
 /* [0.99.0] 마스터코드 둘러보기 표시 — 새로고침해도 유지되게 폰에 기억 */
 function setPeek(on){
@@ -2782,7 +2790,10 @@ function callP(fn,args,cb){
 var SW_NEW=false, SW_DONE=false, BOOT_AT=Date.now();
 function typingNow(){                       // 쓰던 글이 있으면 절대 새로고침하지 않는다
   var el=document.querySelectorAll('textarea, input[type=text], input:not([type])');
-  for(var i=0;i<el.length;i++){ if(String(el[i].value||'').trim()) return true; }
+  for(var i=0;i<el.length;i++){
+    if(el[i].closest('#s-login')) continue;              // [1.03.1] 로그인 칸은 «쓰던 글»이 아니다
+    if(String(el[i].value||'').trim()) return true;
+  }
   if(typeof cardioB64!=='undefined'&&cardioB64) return true;
   if(typeof strB64!=='undefined'&&strB64) return true;
   if(typeof diaryB64!=='undefined'&&diaryB64) return true;
@@ -3124,6 +3135,8 @@ function addStrRow(part){
 function renderPof(){
   var box=document.getElementById('str-pof'); if(!box)return;
   var ps=strParts(), h='';
+  /* [1.03.1] 주차가 바뀌어 지금 이름 목록에 없는 선택은 지운다 */
+  if(ST.strPhotoOf && ST.strPhotoOf!=='선택 운동' && !ps.some(function(x){return (x.name||x.k)===ST.strPhotoOf;})) ST.strPhotoOf='';
   ps.forEach(function(x){
     var nm=x.name||x.k;
     h+='<button type="button" class="'+(ST.strPhotoOf===nm?'on':'')+'" onclick="pickPof(&quot;'+esc(nm)+'&quot;)">'
