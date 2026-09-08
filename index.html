@@ -1,4 +1,8 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.02.1 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.03.0 -->
+<!--   [1.03.0] ★사진을 «올리기 전에 줄인다». 요즘 폰 사진은 3~8MB 라 base64 로 바꾸면 더 커지는데,
+        유산소 사진 + 사진일기까지 두 장이면 본문이 10MB 를 넘어 휴대폰 통신에서 끊겼다(«네트워크 오류»).
+        긴 변 1600px · JPEG 0.85 로 줄여 보통 300KB 안팎이 된다(글자·사진코드는 그대로 읽힌다).
+        사진일기는 1280px, 문의 사진도 같은 방식. 못 줄이면 원본을 그대로 쓴다. -->
 <!--   [1.02.1] «어느 운동 사진인가요?» 아래에 찍는 법 안내 — 얼굴은 안 나와도 되고,
         타임마크 타이머(3·5·10초)로 폰을 세워 두고 운동하는 모습을 찍는다. -->
 <!--   [1.02.0] 근력 사진을 올릴 때 «어느 운동 사진인지» 고른다 — 그 주 필수 3종 + «선택 운동», 모두 4칸.
@@ -1244,8 +1248,8 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.02.1';
-var PWA_BUILD = '2026.09.08 10:49';
+var PWA_VER = '1.03.0';
+var PWA_BUILD = '2026.09.08 20:58';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2193,16 +2197,13 @@ function onInqImg(inp){
       return;
     }
     if(IQ.shots.length>=5){ over++; step(k+1); return; }
-    var fr=new FileReader();
-    fr.onload=function(){
-      var b64=String(fr.result);
+    shrinkImg(files[k],1280,0.8,function(b64){        // [1.03.0] 문의 사진도 줄여서
+      if(!b64){ step(k+1); return; }
       var hx=iqHash(b64);
       if(IQ.shots.some(function(x){return x.hash===hx})) dup++;
       else IQ.shots.push({b64:b64,hash:hx});
       step(k+1);
-    };
-    fr.onerror=function(){ step(k+1); };
-    fr.readAsDataURL(files[k]);
+    });
   };
   step(0);
 }
@@ -2643,7 +2644,7 @@ function onDiaryImg(inp){ readImg(inp,function(b64){ diaryB64=b64;
   document.getElementById('diary-prev').src=b64;
   document.getElementById('diary-box').classList.remove('hidden');
   document.getElementById('diary-drop').classList.add('hidden');
-});}
+},1280,0.8);}
 function clearDiary(){ diaryB64=null;
   var b=document.getElementById('diary-box'); if(b)b.classList.add('hidden');
   var d=document.getElementById('diary-drop'); if(d)d.classList.remove('hidden');
@@ -2768,7 +2769,7 @@ function callP(fn,args,cb){
     if(!x){progFail('응답을 읽지 못했어요');return;}
     cb&&cb(x);
   };
-  xhr.onerror=function(){PG.busy=false;progFail('네트워크 오류 · 연결을 확인하세요');};
+  xhr.onerror=function(){PG.busy=false;progFail('보내지 못했어요 · 신호가 약하거나 사진이 너무 클 수 있어요. 잠시 뒤 다시 눌러 주세요');};
   xhr.ontimeout=function(){PG.busy=false;progFail('시간이 너무 걸려요 · 다시 시도해 주세요');};
   xhr.timeout=180000;
   xhr.send(JSON.stringify({action:fn,token:localStorage.getItem('grofit_token')||'',args:args||[]}));
@@ -4093,7 +4094,39 @@ function ring(pct,center,label,gold){
 }
 function stat(l,v){return '<div class="stat"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>';}
 function dday(deadline){if(!deadline)return'D-—';var d=Math.ceil((new Date(deadline)-new Date())/86400000);return d>=0?'D-'+d:'종료';}
-function readImg(inp,cb){var f=inp.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(e){cb(e.target.result)};rd.readAsDataURL(f);}
+/* [1.03.0] 사진 줄이기 — 올리기 전에 긴 변을 maxPx 로 맞추고 JPEG 로 다시 만든다.
+   왜: 요즘 폰 사진은 3~8MB 다. base64 로 바꾸면 1.33배가 되고, 유산소 사진 + 사진일기면 두 장이라
+   본문이 10MB 를 넘어 휴대폰 통신에서 끊긴다(«네트워크 오류»). 1600px 면 타임마크 사진코드·거리·시간 글자는
+   그대로 읽히면서 보통 300KB 안팎이 된다. 못 줄이면(형식을 못 읽는 등) 원본을 그대로 쓴다. */
+function shrinkImg(file,maxPx,q,cb){
+  var done=false, fin=function(v){ if(!done){done=true;cb(v);} };
+  var rd=new FileReader();
+  rd.onerror=function(){ fin(''); };
+  rd.onload=function(e){
+    var src=String(e.target.result);
+    var im=new Image();
+    im.onerror=function(){ fin(src); };            // 못 읽으면 원본 그대로
+    im.onload=function(){
+      try{
+        var w=im.naturalWidth||im.width, h=im.naturalHeight||im.height;
+        if(!w||!h){ fin(src); return; }
+        var k=Math.min(1,maxPx/Math.max(w,h));
+        var cw=Math.round(w*k), ch=Math.round(h*k);
+        var cv=document.createElement('canvas'); cv.width=cw; cv.height=ch;
+        cv.getContext('2d').drawImage(im,0,0,cw,ch);
+        var out=cv.toDataURL('image/jpeg',q||0.85);
+        if(out.length>6*1024*1024) out=cv.toDataURL('image/jpeg',0.7);   // 그래도 크면 한 번 더
+        fin((out&&out.length<src.length)?out:src);
+      }catch(err){ fin(src); }
+    };
+    im.src=src;
+  };
+  rd.readAsDataURL(file);
+}
+function readImg(inp,cb,maxPx,q){
+  var f=inp.files[0]; if(!f)return;
+  shrinkImg(f,maxPx||1600,q||0.85,function(b64){ if(b64)cb(b64); });
+}
 function val(id){return document.getElementById(id).value.trim();}
 function setv(id,v){if(v!=null&&v!=='')document.getElementById(id).value=v;}
 /* [0.52.0] 선생님 코멘트 = 캐릭터가 말풍선으로 말하는 만화 형태 */
