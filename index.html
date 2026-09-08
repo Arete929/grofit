@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.09.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.09.1 -->
+<!--   [1.09.1] ✕ 줄의 굵은 글씨가 브랜드 주황이라 «권하는 것»처럼 보이던 것 — 붉은색으로. -->
 <!--   [1.09.0] 근력 사진 «이렇게 찍으세요» 를 고쳤다. 되는 것(✔)과 안 되는 것(✕)을 나눠 적는다.
         «얼굴은 안 나와도 된다» 만 있으니 얼굴만 나온 셀카·팔뚝 접사가 올라와 미통과가 났다.
         무슨 운동인지 보여야 인정된다는 것이 핵심이다. -->
@@ -685,6 +686,8 @@ body.peek{padding-top:30px}
 .shoot ul.yn li.y:before{content:'✔';color:#1E7A46}
 .shoot ul.yn li.n:before{content:'✕';color:#C0392B}
 .shoot ul.yn li.n{color:#8A4A44}
+.shoot ul.yn li.n b{color:#B03A2E}
+.shoot p.why b{color:#B03A2E}
 .shoot p.why{margin:9px 0 0;font-size:12.5px;line-height:1.6;color:#8A4A44}
 .drop.diary{border-style:dashed;background:#FFFDF5;border-color:#EBD9A6;color:#7A5A00;margin-top:6px}
 /* [1.07.0] 앱별 안내 */
@@ -998,7 +1001,7 @@ body.peek{padding-top:30px}
           <li class="n">팔·다리만 크게 잡힌 <b>가까운 사진</b></li>
           <li class="n">운동이 <b>끝난 뒤</b> 찍은 인증샷</li>
         </ul>
-        <p class="why">✕ 인 사진은 김진호 선생님이 무슨 운동인지 알 수 없어 <b>미인정</b>이 될 수 있어요.</p>
+        <p class="why">이런 사진은 무슨 운동을 했는지 알 수 없어 <b>미인정</b>이 될 수 있어요.</p>
       </div>
       <div class="drop" id="str-drop" onclick="pick('str-file')">📷 운동 사진 업로드<br><span class="cap">몸 전체가 나온, 운동하는 장면으로</span></div>
       <input type="file" id="str-file" accept="image/*" class="hidden" onchange="onStrImg(this)">
@@ -1301,7 +1304,7 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.09.0';
+var PWA_VER = '1.09.1';
 var PWA_BUILD = '2026.09.09 00:42';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
