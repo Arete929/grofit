@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.07.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.08.0 -->
+<!--   [1.08.0] 3주차 그림 — 스탠다드/내로우 푸시업 · 와이드 스쿼트를 «방법 ▾» 에 붙였다.
+        원본은 OneDrive «…운동처방일지\근력운동이미지» (앞으로 근력 그림은 이 폴더에 쌓인다). -->
 <!--   [1.07.0] 유산소 안내를 앱별로 갈라 적었다 — 어느 화면을 캡처하고, 시간 칸에 무엇을 적는지.
         나이키 런클럽만 «활성 시간 / 경과 시간»이 갈라져 있어 경과 시간을 적으면 페이스가 어긋난다. -->
 <!--   [1.06.0] 1주차 읽을거리 바로잡음. «완벽하지 않아도 됩니다»(OLDR[4])는 «4주 동안 무엇이 자랐을까» 같은
@@ -1282,8 +1284,8 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.07.0';
-var PWA_BUILD = '2026.09.08 23:25';
+var PWA_VER = '1.08.0';
+var PWA_BUILD = '2026.09.09 00:01';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -3043,10 +3045,10 @@ var STR_WEEK = {
        desc:'손 위치를 조절하여 가슴, 어깨, 팔 근육을 강화하는 기본적인 상체 운동이다.',
        body:'큰가슴근(대흉근), 위팔세갈래근(상완삼두근), 어깨세모근(삼각근)',
        feat:'손을 짚는 너비에 따라서 주로 운동하는 근육 부위에 변화를 줄 수 있다.',
-       steps:['<b>스탠다드</b> — 양손은 어깨너비보다 조금 넓게 짚고, 몸을 일직선으로 유지한다. 팔꿈치를 굽혀 가슴이 바닥에 닿기 전까지 내려간 뒤, 다시 처음 자세로 돌아간다.',
-              '<b>내로우</b> — 양손을 어깨너비보다 좁게 모아 바닥을 짚고, 몸을 일직선으로 유지한다. 팔꿈치를 몸 가까이 붙인 채 상체를 낮춘 후, 팔꿈치가 몸을 스치듯 천천히 밀어 올린다.'],
+       steps:[{d:'<b>스탠다드</b> — 양손은 어깨너비보다 조금 넓게 짚고, 몸을 일직선으로 유지한다. 팔꿈치를 굽혀 가슴이 바닥에 닿기 전까지 내려간 뒤, 다시 처음 자세로 돌아간다.', img:'ex-push-std.jpg'},
+              {d:'<b>내로우</b> — 양손을 어깨너비보다 좁게 모아 바닥을 짚고, 몸을 일직선으로 유지한다. 팔꿈치를 몸 가까이 붙인 채 상체를 낮춘 후, 팔꿈치가 몸을 스치듯 천천히 밀어 올린다.', img:'ex-push-narrow.jpg'}],
        warn:[{t:'엉덩이 위치', d:'허리나 엉덩이가 너무 처지거나 들리지 않도록 몸 전체를 일직선으로 유지한다.'},
-             {t:'팔꿈치 각도', d:'팔꿈치를 너무 좁게 접거나 옆으로 과하게 벌리지 않고, 자연스럽게 유지한다.'}],
+             {t:'팔꿈치 각도', img:'ex-push-elbow.jpg', d:'팔꿈치를 너무 좁게 접거나 옆으로 과하게 벌리지 않고, 자연스럽게 유지한다. 내로우는 팔꿈치를 몸에 붙여 스치듯 내려간다.'}],
        alt:[{t:'다이아몬드 푸시업', d:'손을 다이아몬드 모양으로 모아 팔꿈치를 몸에 가까이 두어 위팔세갈래근에 자극을 주는 운동이다.'},
             {t:'디클라인 푸시업', d:'발을 높인 상태에서 푸시업을 진행하여 상체와 어깨에 자극을 주는 운동이다.'}]},
       {k:'하체', c:'p2', name:'와이드 스쿼트', nowt:true, vid:'https://m.site.naver.com/1Q7oy',
@@ -3054,11 +3056,11 @@ var STR_WEEK = {
        desc:'다리를 어깨너비보다 넓게 벌린 자세에서 무릎을 굽혔다가 펴는 하체 운동이다.',
        body:'볼기근(둔근), 긴모음근(장내전근), 넙다리네갈래근(대퇴사두근)',
        feat:'하체의 안정성 및 유연성을 강화하는 데 도움이 된다.',
-       steps:['다리를 어깨너비보다 넓게 벌린 후, 발끝이 약 45도 정도 되도록 자연스럽게 선다.',
-              '허리를 곧게 유지하며 허벅지와 지면이 수평이 되도록 천천히 아래로 내려간다.',
-              '시선은 정면을 유지하며 무릎 관절과 엉덩관절을 차례로 펴면서 천천히 일어난다.'],
+       steps:[{d:'다리를 어깨너비보다 넓게 벌린 후, 발끝이 약 45도 정도 되도록 자연스럽게 선다.', img:'ex-wide-1.jpg'},
+              {d:'허리를 곧게 유지하며 허벅지와 지면이 수평이 되도록 천천히 아래로 내려간다.', img:'ex-wide-2.jpg'},
+              {d:'시선은 정면을 유지하며 무릎 관절과 엉덩관절을 차례로 펴면서 천천히 일어난다.', img:'ex-wide-3.jpg'}],
        tip:'무릎이 발끝 방향을 따라가야 해요!',
-       warn:[{t:'상체의 각도', d:'상체를 과도하게 앞으로 숙이게 되면 체중이 앞으로 쏠리면서 볼기근(둔근)의 개입이 줄고 허리에만 힘이 들어가는 비효율적인 자세가 되어 운동 효과가 현저하게 떨어진다.'}],
+       warn:[{t:'상체의 각도', img:'ex-wide-warn.jpg', d:'상체를 과도하게 앞으로 숙이게 되면 체중이 앞으로 쏠리면서 볼기근(둔근)의 개입이 줄고 허리에만 힘이 들어가는 비효율적인 자세가 되어 운동 효과가 현저하게 떨어진다.'}],
        alt:[{t:'내로우 스쿼트', d:'기본 스쿼트보다 양발의 폭을 줄여서 운동하는 동작이다. 양발의 간격을 좁히면 허벅지 앞쪽 근육에 더 큰 자극이 가해지고, 무릎의 안정성 강화에도 도움이 된다.'}]},
       {k:'코어', c:'p3', name:'사이드 플랭크', nowt:true, unit:'time', vid:'https://m.site.naver.com/1Q7uw',
        book:'단단프로젝트 82쪽 · 사이드 플랭크',
@@ -4392,6 +4394,8 @@ function mock(fn,args){
         applyBundle(DATA.studentBundle);
         var scr=(location.hash||'#home').slice(1);
         go(scr);
+        if(scr==='strength'){ ST.strWeek=3; renderDayPicker('str'); renderStrGuide(); syncStrRows();
+          setTimeout(function(){ document.querySelectorAll('#str-list .howbtn').forEach(function(b){ toggleHow(b); }); },200); }
         var sp=document.getElementById('splash'); if(sp)sp.style.display='none';
         document.body.setAttribute('data-shot-ready','1');
       }catch(e){ document.body.setAttribute('data-shot-err', e.message); }
