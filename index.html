@@ -1,4 +1,7 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.00.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.00.1 -->
+<!--   [1.00.1] ★긴급 — 근력에 사진을 넣으면 «사진 확인이 끝날 때까지 기다려주세요» 만 뜨고 영영 저장이 안 되던 것.
+        0.54.0 에서 자동 사진검사를 뺄 때 checkStrPhoto() 가 strCheck 를 null 로만 두어,
+        저장 가드 if(strB64 && !strCheck) 에 늘 걸렸다. 이제 «검사 안 함(통과)» 값을 넣는다. -->
 <!--   [1.00.0] 앱을 켤 때 «존 로크 화면 → 홈 → 또 존 로크 → 홈» 으로 두 번 돌던 것 고침.
         새 판이 올라온 직후 서비스워커가 바뀌면 곧바로 location.reload() 를 불러서 생긴 일이다.
         이제 ① 켠 지 8초 안에는 새로고침하지 않고 ② 화면을 보고 있지 않거나 ③ 쓰던 글이 있으면 미룬다.
@@ -1213,8 +1216,8 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.00.0';
-var PWA_BUILD = '2026.09.08 01:48';
+var PWA_VER = '1.00.1';
+var PWA_BUILD = '2026.09.08 09:37';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2806,6 +2809,9 @@ function checkStrPhoto(){
   strCheck=null; strException=null;
   var box=document.getElementById('str-check');
   if(!strB64){ if(box)box.innerHTML=''; return; }
+  /* [1.00.1] 자동 검사를 쓰지 않으므로 «검사 안 함(통과)» 로 둔다.
+     이 값을 안 넣으면 저장 가드에 걸려 사진을 넣은 근력 기록이 영영 저장되지 않는다. */
+  strCheck={pass:true, skipped:true, 요약:'사진은 김진호 선생님이 확인'};
   setChk('ok','✅ 사진을 받았어요.<br><span class="cap">타임마크 <b>사진 코드</b>와 날짜가 보이는지 다시 한 번 봐 주세요. '
     +'김진호 선생님이 확인한 뒤 인정됩니다.</span>');
 }
