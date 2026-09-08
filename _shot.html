@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.02.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.02.1 -->
+<!--   [1.02.1] «어느 운동 사진인가요?» 아래에 찍는 법 안내 — 얼굴은 안 나와도 되고,
+        타임마크 타이머(3·5·10초)로 폰을 세워 두고 운동하는 모습을 찍는다. -->
 <!--   [1.02.0] 근력 사진을 올릴 때 «어느 운동 사진인지» 고른다 — 그 주 필수 3종 + «선택 운동», 모두 4칸.
         사진이 있으면 반드시 골라야 저장된다. 고른 값은 운동기록 32열 '사진운동' 에 남아 검토 카드에 보인다. -->
 <!--   [1.01.0] 근력은 «최소 3세트» — 칸을 처음부터 3줄 깔아 두고, 3세트 아래로는 빼지 못한다(＋로 더 늘리는 건 자유). -->
@@ -271,6 +273,11 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .pofsel button .pl{display:block;font-size:10.5px;font-weight:800;color:var(--muted2);margin-bottom:2px}
 .pofsel button.on{background:var(--strength-tint,#FFF1E4);border-color:var(--strength);color:var(--strength-dark)}
 .pofsel button.on .pl{color:var(--strength-dark)}
+/* [1.02.1] 사진 찍는 법 안내 */
+.shoot{background:#FFF7F0;border:1px solid #F3D9C2;border-radius:12px;padding:11px 13px;margin:0 0 10px}
+.shoot>b{display:block;font-size:13.5px;color:var(--strength-dark);margin-bottom:5px}
+.shoot p b{color:var(--strength-dark)}
+.shoot p{margin:0;font-size:12.5px;line-height:1.7;color:var(--ink2)}
 .addset{margin-top:6px;height:30px;padding:0 12px;border-radius:8px;border:1.5px dashed var(--strength-dark);background:#fff;color:var(--strength-dark);font-family:inherit;font-weight:800;font-size:12px;cursor:pointer}
 .exnum .tf{display:flex;align-items:center;gap:3px;flex:1;min-width:0}
 .exnum .tf input{margin-top:3px;padding:9px 6px;text-align:center;min-width:0;width:100%}
@@ -929,6 +936,13 @@ body.peek{padding-top:30px}
       <label style="margin-top:2px">어느 운동 사진인가요? <span class="chip bad">필수</span></label>
       <p class="cap" style="margin:-4px 0 8px">사진에 찍힌 운동을 골라 주세요</p>
       <div class="pofsel" id="str-pof"></div>
+      <div class="shoot">
+        <b>📸 이렇게 찍으세요</b>
+        <p><b>얼굴은 나오지 않아도 됩니다.</b><br>
+        <b>운동하는 모습</b>이 보이게 찍으면 됩니다.<br>
+        혼자일 때는 타임마크 <b>타이머(3·5·10초)</b>를 눌러<br>
+        폰을 세워 두고 자세를 잡으면 자동으로 찍힙니다.</p>
+      </div>
       <div class="drop" id="str-drop" onclick="pick('str-file')">📷 운동 사진 업로드<br><span class="cap">탭하여 사진 선택</span></div>
       <input type="file" id="str-file" accept="image/*" class="hidden" onchange="onStrImg(this)">
       <img id="str-prev" class="hidden" style="width:100%;border-radius:12px;margin-top:12px">
@@ -1230,8 +1244,8 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.02.0';
-var PWA_BUILD = '2026.09.08 10:43';
+var PWA_VER = '1.02.1';
+var PWA_BUILD = '2026.09.08 10:49';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
