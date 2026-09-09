@@ -1,4 +1,7 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.11.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.12.0 -->
+<!--   [1.12.0] 김진호 선생님이 «인정»한 날은 그 종류를 더 못 낸다(서버 0.95.0 이 최종적으로 막는다).
+        여기서는 날짜 칸에 자물쇠를 붙이고, 고르면 알려 주고, 저장 버튼을 잠근다 —
+        사진까지 올린 뒤에 거절당하지 않게. «미인정»은 다시 내라는 뜻이므로 그대로 열려 있다. -->
 <!--   [1.11.0] ★유산소 «시간» 칸 — 시계 표기(2:01:22)를 그대로 받고, 적는 즉시 페이스를 보여 준다.
         2:01:22 을 보고 «2»만 적어 페이스가 0'17"/km 로 저장된 일이 있었다.
         말이 안 되는 페이스면 저장 전에 앱 안 확인창으로 되묻는다. -->
@@ -694,6 +697,11 @@ body.peek{padding-top:30px}
 .shoot ul.yn li.n b{color:#B03A2E}
 .shoot p.why b{color:#B03A2E}
 .shoot p.why{margin:9px 0 0;font-size:12.5px;line-height:1.6;color:#8A4A44}
+/* [1.12.0] 인정된 날 */
+.latewarn.dup.ok{background:#EEF7F0;border-color:#BFE0C8;color:#1E5B33}
+.days button.okday{border-color:#8FCFA4;background:#F1FBF4}
+.days button .lk{position:absolute;top:2px;right:4px;font-size:9.5px;font-style:normal;opacity:.85}
+.days button{position:relative}
 .drop.diary{border-style:dashed;background:#FFFDF5;border-color:#EBD9A6;color:#7A5A00;margin-top:6px}
 /* [1.07.0] 앱별 안내 */
 .appguide{background:#F2F7FF;border:1px solid #CFE0F6;border-radius:14px;padding:12px 14px;margin:10px 0 2px}
@@ -981,7 +989,7 @@ body.peek{padding-top:30px}
       <textarea id="c-reflect" rows="3" maxlength="300" placeholder="오늘 운동은 어땠나요? (예: 초반엔 힘들었는데 20분 넘으니 리듬이 잡혔다)" style="margin-top:10px"></textarea>
       <p class="cap" style="text-align:right;margin:6px 0 0"><span id="c-reflect-n">0</span>/300자</p>
     </div>
-    <div class="row"><button class="btn sec" onclick="resetCardio()">다시</button><button class="btn" onclick="saveCardio()">저장하기</button></div>
+    <div class="row"><button class="btn sec" onclick="resetCardio()">다시</button><button class="btn" id="c-save" onclick="saveCardio()">저장하기</button></div>
     <p class="savedat" id="saved-cardio"></p>
   </section>
 
@@ -1072,7 +1080,7 @@ body.peek{padding-top:30px}
       <textarea id="st-reflect" rows="3" maxlength="300" placeholder="오늘 운동은 어땠나요? (예: 스쿼트 자세를 신경 쓰니 허벅지에 자극이 확실했다)"></textarea>
       <p class="cap" style="text-align:right;margin:6px 0 0"><span id="st-reflect-n">0</span>/300자</p>
     </div>
-    <div class="row"><button class="btn sec" onclick="go('cert')">취소</button><button class="btn" onclick="saveStrength()">저장하기</button></div>
+    <div class="row"><button class="btn sec" onclick="go('cert')">취소</button><button class="btn" id="str-save" onclick="saveStrength()">저장하기</button></div>
     <p class="savedat" id="saved-strength"></p>
   </section>
 
@@ -1338,8 +1346,8 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.11.0';
-var PWA_BUILD = '2026.09.09 01:25';
+var PWA_VER = '1.12.0';
+var PWA_BUILD = '2026.09.09 22:57';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2738,10 +2746,23 @@ function renderDayPicker(prov){
   renderLateWarn(prov);
   var el=document.getElementById(prov+'-days');if(!el)return;
   el.innerHTML=days.map(function(d){
+    var lk=dayAccepted(prov,d.date);                        // [1.12.0] 인정된 날은 자물쇠
     return '<button '+(d.future?'disabled':'onclick="selDay(\''+prov+'\',\''+d.date+'\',this)"')
-      +' class="'+(d.date===ST[prov+'Date']?'on':'')+'"><span>'+d.label+'</span><b>'+d.num+'</b></button>';
+      +' class="'+(d.date===ST[prov+'Date']?'on ':'')+(lk?'okday':'')+'"><span>'+d.label+'</span><b>'+d.num+'</b>'
+      +(lk?'<i class="lk">🔒</i>':'')+'</button>';
   }).join('');
   renderDupWarn(prov);                                        // [0.92.0]
+}
+/* [1.12.0] 이 날 이 종류가 «인정»되었나 → 그러면 더 못 낸다.
+   («미인정»은 다시 내라는 뜻이므로 막지 않는다) */
+function dayLocked(prov){
+  var r=dupRecOf(prov);
+  return (r && String(r.인정||'').trim()==='인정') ? r : null;
+}
+/* 날짜 칸에 붙일 자물쇠 — 홈에서 받은 운동일자(co/so)를 쓴다 */
+function dayAccepted(prov,date){
+  var m=(ST.home&&ST.home['운동일자'])||{}, d=m[date];
+  return !!(d && (prov==='cardio' ? d.co : d.so));
 }
 /* [0.92.0] 고른 날에 같은 종류 기록이 이미 있으면 알려준다 — 다시 올리면 덮어쓴다 */
 function dupRecOf(prov){
@@ -2753,13 +2774,33 @@ function renderDupWarn(prov){
   if(!ST.myRecords){ if(!ST.student)return;
     call('getMyExercises',[ST.student.학번],function(list){ST.myRecords=list||[];renderDupWarn(prov);}); return; }
   var r=dupRecOf(prov);
-  if(!r){box.classList.add('hidden');box.innerHTML='';return;}
+  lockSave(prov);                                             // [1.12.0]
+  if(!r){box.classList.add('hidden');box.innerHTML='';box.className='latewarn dup hidden';return;}
   var kind=(prov==='cardio')?'유산소':'근력';
+  if(String(r.인정||'').trim()==='인정'){                      // [1.12.0] 인정된 날 — 더 안 내도 된다
+    box.className='latewarn dup ok';
+    box.innerHTML='✅ <b>이 날 '+kind+'은 김진호 선생님이 인정했어요</b>'
+      +'<br><b>더 올리지 않아도 됩니다.</b> 다시 내야 할 일이 있으면 선생님께 말씀드리세요.';
+    box.classList.remove('hidden');
+    return;
+  }
+  box.className='latewarn dup';
   box.innerHTML='⚠️ <b>이 날 '+kind+' 기록이 이미 있어요</b>'+(r.인정==='미인정'&&r.미인정사유?' (미인정 · '+esc(r.미인정사유)+')':'')
     +'<br>다시 올리면 <b>이전 기록을 덮어씁니다.</b> 기록은 하루에 종류별 1건만 남아요.';
   box.classList.remove('hidden');
 }
+/* [1.12.0] 인정된 날이면 저장 버튼을 잠근다 */
+function lockSave(prov){
+  var b=document.getElementById(prov==='cardio'?'c-save':'str-save'); if(!b)return;
+  var lock=!!dayLocked(prov);
+  b.disabled=lock;
+  b.textContent=lock?'✅ 이미 인정된 날':'저장하기';
+}
 function dupConfirm(prov){
+  if(dayLocked(prov)){                                        // [1.12.0] 서버도 막지만 여기서 먼저
+    toast('이 날은 이미 인정됐어요 · 더 올리지 않아도 됩니다');
+    return false;
+  }
   var r=dupRecOf(prov); if(!r)return true;
   var N=String.fromCharCode(10), kind=(prov==='cardio')?'유산소':'근력';
   return confirm('이 날 '+kind+' 기록이 이미 있어요.'+N+N+'지금 올리면 이전 기록(사진·성찰 포함)을 덮어씁니다.'+N+'계속할까요?');
