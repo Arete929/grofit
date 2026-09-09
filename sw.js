@@ -1,9 +1,9 @@
 /* 그로핏 PWA 서비스워커 | 버전 올리면 캐시 갱신·자동 새로고침 */
-var CACHE = 'grofit-v1.13.0';
+var CACHE = 'grofit-v1.14.0';
 var ASSETS = ['./', './index.html',
   './tab-home.png', './tab-cert.png', './tab-exercise.png', './tab-fit.png', './tab-reflect.png', './tab-score.png', './tab-notice.png', './ic-cardio.png', './ic-strength.png',
   './jinho.png', './tm-1-job.jpg', './tm-2-perm.jpg', './tm-3-template.jpg', './tm-4-edit.jpg', './tm-5-done.jpg', './ex-squat.jpg', './ex-wave-1.jpg', './ex-wave-2.jpg', './ex-wave-3.jpg', './ex-wave-4.jpg', './ex-wave-warn.jpg', './ex-armwalk-1.jpg', './ex-armwalk-2.jpg', './ex-armwalk-warn1.jpg', './ex-armwalk-warn2.jpg', './ex-lunge-1.jpg', './ex-lunge-2.jpg', './ex-lunge-warn.jpg', './ex-wide-1.jpg', './ex-wide-2.jpg', './ex-wide-3.jpg', './ex-wide-warn.jpg', './ex-side-1.jpg', './ex-side-2.jpg', './ex-side-warn.jpg', './ex-push-std.jpg', './ex-push-narrow.jpg', './ex-push-elbow.jpg', './ex-squat-knee.jpg', './ex-squat-back.jpg', './ex-squat-wall.jpg', './ex-plank.jpg', './ex-legraise.jpg',
-  './st-verygood.png','./st-good.png','./st-nice.png','./st-peace.png','./st-regret.png','./st-frustration.png','./st-sob.png','./st-wail.png','./st-no.png',
+  './st-verygood.png','./st-good.png','./st-nice.png','./st-peace.png','./st-regret.png','./st-frustration.png','./st-sob.png','./st-wail.png','./st-no.png', './st-workout.png', './st-watch.png', './st-cheer.png',
   './splash-locke.jpg','./ic-flex.png','./ic-body.png'];
 /* 테마 6종의 manifest·아이콘·로고도 오프라인 캐시 (설치 아이콘이 테마별로 다름) */
 for (var i = 1; i <= 6; i++) ASSETS.push('./manifest' + i + '.webmanifest',
