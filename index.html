@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.12.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.13.0 -->
+<!--   [1.13.0] 근력의 «선택 운동» 을 «추가 운동» 으로 부른다. 저장하는 딱지도 [선택] → [추가].
+        ★예전 기록에는 [선택] 이 들어 있다 — 읽는 쪽(관리자·서버)이 둘 다 받는다. -->
 <!--   [1.12.0] 김진호 선생님이 «인정»한 날은 그 종류를 더 못 낸다(서버 0.95.0 이 최종적으로 막는다).
         여기서는 날짜 칸에 자물쇠를 붙이고, 고르면 알려 주고, 저장 버튼을 잠근다 —
         사진까지 올린 뒤에 거절당하지 않게. «미인정»은 다시 내라는 뜻이므로 그대로 열려 있다. -->
@@ -32,7 +34,7 @@
         사진일기는 1280px, 문의 사진도 같은 방식. 못 줄이면 원본을 그대로 쓴다. -->
 <!--   [1.02.1] «어느 운동 사진인가요?» 아래에 찍는 법 안내 — 얼굴은 안 나와도 되고,
         타임마크 타이머(3·5·10초)로 폰을 세워 두고 운동하는 모습을 찍는다. -->
-<!--   [1.02.0] 근력 사진을 올릴 때 «어느 운동 사진인지» 고른다 — 그 주 필수 3종 + «선택 운동», 모두 4칸.
+<!--   [1.02.0] 근력 사진을 올릴 때 «어느 운동 사진인지» 고른다 — 그 주 필수 3종 + «추가 운동», 모두 4칸.
         사진이 있으면 반드시 골라야 저장된다. 고른 값은 운동기록 32열 '사진운동' 에 남아 검토 카드에 보인다. -->
 <!--   [1.01.0] 근력은 «최소 3세트» — 칸을 처음부터 3줄 깔아 두고, 3세트 아래로는 빼지 못한다(＋로 더 늘리는 건 자유). -->
 <!--   [1.00.1] ★긴급 — 근력에 사진을 넣으면 «사진 확인이 끝날 때까지 기다려주세요» 만 뜨고 영영 저장이 안 되던 것.
@@ -84,8 +86,8 @@
         ② 안내 글은 마침표마다 줄을 바꿔 한 문장씩 보이게 했다(근력·유산소 안내 상자). -->
 <!--   [0.82.0] 로그인한 화면 맨 아래(탭바 바로 위)에 «혜원핏 v0.82.0 · 배포 시각 · 서버 v0.72.0» 한 줄 표시.
         PWA_BUILD 는 배포할 때마다 실제 시각으로 갱신한다. -->
-<!--   [0.81.0] 근력 화면을 «이번 주 필수 운동»과 «➕ 선택 운동» 두 타일로 나눴다. ＋ 운동 추가는 선택 타일 안으로.
-        저장 문자열도 «[필수·하체] …» / «[선택] …» 으로 갈라 적고, 필수·선택 개수를 따로 서버에 보낸다(나중에 집계용). -->
+<!--   [0.81.0] 근력 화면을 «이번 주 필수 운동»과 «➕ 추가 운동» 두 타일로 나눴다. ＋ 운동 추가는 선택 타일 안으로.
+        저장 문자열도 «[필수·하체] …» / «[추가] …» 으로 갈라 적고, 필수·선택 개수를 따로 서버에 보낸다(나중에 집계용). -->
 <!--   [0.80.0] «운동한 날짜» 옆에 «1주차» 배지를 붙였다(고른 주차를 늘 알 수 있게).
         유산소 화면에 «어떤 화면을 올리나요» 예시 3종(삼성 헬스·애플 피트니스·나이키 런 클럽 꼴) — 거리·시간·날짜 세 가지가 보여야 함을 그림으로.
         ※예시는 실제 앱 캡처가 아니라 직접 그린 그림. 진짜 캡처가 들어오면 <img>로 바꾸면 된다. -->
@@ -1061,7 +1063,7 @@ body.peek{padding-top:30px}
       <div id="str-list"></div>
     </div>
     <div class="card">
-      <h2>➕ 선택 운동 <span class="cap">· 안 적어도 괜찮아요</span></h2>
+      <h2>➕ 추가 운동 <span class="cap">· 안 적어도 괜찮아요</span></h2>
       <p class="cap" style="margin:-4px 0 10px">필수 말고 <b>더 한 운동</b>이 있으면 여기에 적으세요.<br>
       스트레칭 · 줄넘기 · 덤벨 운동 무엇이든 좋습니다.<br>
       여기에는 <b>무게</b>도 적을 수 있어요.</p>
@@ -1346,8 +1348,8 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.12.0';
-var PWA_BUILD = '2026.09.09 22:57';
+var PWA_VER = '1.13.0';
+var PWA_BUILD = '2026.09.10 01:12';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -3260,7 +3262,7 @@ function renderStrGuide(){
       + '<p>운동 이름은 이미 적혀 있어요.<br><b>세트와 횟수만</b> 채우면 됩니다.<br>'
       + '플랭크처럼 버티는 운동은 <b>시간</b>으로 적어요.</p>'
       + '<p>이름 옆 <b>«방법 ▾»</b>을 누르면<br>자세 그림 · 하는 순서 · 주의할 점 · <b>시연 영상</b>이 나옵니다.</p>'
-      + '<p>더 한 운동은 아래 <b>➕ 선택 운동</b>에 넣으세요.</p>';
+      + '<p>더 한 운동은 아래 <b>➕ 추가 운동</b>에 넣으세요.</p>';
   } else {
     box.innerHTML = '<b>💪 3가지는 이렇게 구성하세요</b>'
       + '<ol><li><b>상체</b> 운동 — 예) 무릎대고 팔굽혀펴기</li>'
@@ -3269,7 +3271,7 @@ function renderStrGuide(){
       + '<p><b>운동 이름은 구체적으로</b> 적어주세요.<br>«어떤 동작을 했는지» 알 수 있게요.</p>'
       + '<p class="exex"><span class="bad">✗ 근력운동, 상체운동, 스트레칭, 유연성, 운동함</span>'
       + '<span class="good">✓ 무릎대고 팔굽혀펴기 · 덤벨 숄더프레스 · 스쿼트 · 런지 · 플랭크 · 앉아 앞으로 굽히기</span></p>'
-      + '<p>세 칸을 모두 채워야 저장됩니다.<br>더 했으면 아래 <b>➕ 선택 운동</b>에 넣으세요.</p>';
+      + '<p>세 칸을 모두 채워야 저장됩니다.<br>더 했으면 아래 <b>➕ 추가 운동</b>에 넣으세요.</p>';
   }
   applyGuideState();
 }
@@ -3317,19 +3319,19 @@ function addStrRow(part){
     +'<button type="button" class="addset" onclick="addSet(this)">＋ 세트 추가</button>';
   list.appendChild(d);
 }
-/* [1.02.0] 사진이 어느 운동인지 — 그 주 필수 3종 + 선택 운동 */
+/* [1.02.0] 사진이 어느 운동인지 — 그 주 필수 3종 + 추가 운동 */
 function renderPof(){
   var box=document.getElementById('str-pof'); if(!box)return;
   var ps=strParts(), h='';
   /* [1.03.1] 주차가 바뀌어 지금 이름 목록에 없는 선택은 지운다 */
-  if(ST.strPhotoOf && ST.strPhotoOf!=='선택 운동' && !ps.some(function(x){return (x.name||x.k)===ST.strPhotoOf;})) ST.strPhotoOf='';
+  if(ST.strPhotoOf && ST.strPhotoOf!=='추가 운동' && !ps.some(function(x){return (x.name||x.k)===ST.strPhotoOf;})) ST.strPhotoOf='';
   ps.forEach(function(x){
     var nm=x.name||x.k;
     h+='<button type="button" class="'+(ST.strPhotoOf===nm?'on':'')+'" onclick="pickPof(&quot;'+esc(nm)+'&quot;)">'
       +'<span class="pl">'+esc(x.k)+'</span>'+esc(nm)+'</button>';
   });
-  h+='<button type="button" class="'+(ST.strPhotoOf==='선택 운동'?'on':'')+'" onclick="pickPof(&quot;선택 운동&quot;)">'
-    +'<span class="pl">＋</span>선택 운동</button>';
+  h+='<button type="button" class="'+(ST.strPhotoOf==='추가 운동'?'on':'')+'" onclick="pickPof(&quot;추가 운동&quot;)">'
+    +'<span class="pl">＋</span>추가 운동</button>';
   box.innerHTML=h;
 }
 function pickPof(nm){ ST.strPhotoOf=(ST.strPhotoOf===nm)?'':nm; renderPof(); }
@@ -3525,12 +3527,12 @@ function saveStrength(){
     if(!v.nm||!v.st||!v.rp){미완.push(part);return;}
     rows.push('[필수·'+part+'] '+v.txt); reqN++;
   });
-  /* 선택 운동 — 완전히 비어 있으면 그냥 넘어간다 */
+  /* 추가 운동 — 완전히 비어 있으면 그냥 넘어간다 */
   document.querySelectorAll('#str-opt .exrow').forEach(function(r){
     var v=read(r);
     if(!v.nm&&!v.wt&&!v.st&&!v.rp)return;
-    if(!v.nm||!v.st||!v.rp){미완.push('선택 운동');return;}
-    rows.push('[선택] '+v.txt); optN++;
+    if(!v.nm||!v.st||!v.rp){미완.push('추가 운동');return;}
+    rows.push('[추가] '+v.txt); optN++;
   });
   var N=String.fromCharCode(10);
   // 근력은 상체·하체·유연성 각 1가지씩 필수
