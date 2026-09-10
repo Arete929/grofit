@@ -1,4 +1,7 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.14.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.14.1 -->
+<!--   [1.14.1] ★새 이모티콘 3종이 학생 화면에 안 뜨던 것. 스티커 이름을 가려내는 정규식이
+        세 곳에 9종으로 박혀 있어 [스티커:cheer] 가 글자 그대로 나왔다.
+        STK_KEYS 한 곳에서 목록을 만들고 세 곳이 그것을 쓴다. -->
 <!--   [1.14.0] 진호 이모티콘 3종 추가 — 운동하자 · 지켜보고 있다 · 힘내.
         선생님이 피드백에 붙이면 학생 공지에 그대로 뜬다(st-workout/watch/cheer). -->
 <!--   [1.13.0] 근력의 «선택 운동» 을 «추가 운동» 으로 부른다. 저장하는 딱지도 [선택] → [추가].
@@ -1350,8 +1353,11 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.14.0';
-var PWA_BUILD = '2026.09.10 01:32';
+var PWA_VER = '1.14.1';
+/* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
+var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
+var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
+var PWA_BUILD = '2026.09.10 20:24';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2475,7 +2481,7 @@ function renderGreet(g){
   var box=document.getElementById('greet-bar'); if(!box)return;
   ST.greet=g;
   if(!g||!g.있음||greetSeen(g.날짜)){ box.innerHTML=''; return; }
-  var em=/^(verygood|good|nice|peace|regret|frustration|sob|wail|no)$/.test(g.이모지)
+  var em=STK_ONE.test(g.이모지)
     ? '<img src="st-'+g.이모지+'.png" alt="">' : esc(g.이모지||'👋');
   box.innerHTML='<div class="grbar"><span class="em">'+em+'</span>'
     +'<span class="tx">'+esc(g.문구)+'</span>'
@@ -4400,7 +4406,7 @@ function recExtraHTML(r){
 }
 /* 공지 내용 앞의 [스티커:키] 를 떼어낸다 */
 function parseStk(txt){
-  var m=String(txt||'').match(/^\[스티커:(verygood|good|nice|peace|regret|frustration|sob|wail|no)\]\s*/);
+  var m=String(txt||'').match(new RegExp('^\\[스티커:(' + STK_KEYS + ')\\]\\s*'));
   return m?{stk:m[1],text:String(txt).slice(m[0].length)}:{stk:'',text:String(txt||'')};
 }
 function noticeBodyHTML(n){
@@ -4417,7 +4423,7 @@ function comicHTML(txt,stk){
 
 /* 선생님 코멘트 속 :키: 를 캐릭터 이모티콘 그림으로 */
 function emoHtml(s){
-  return esc(s).replace(/:(verygood|good|nice|peace|regret|frustration|sob|wail|no):/g,function(m,k){
+  return esc(s).replace(new RegExp(':(' + STK_KEYS + '):','g'),function(m,k){
     return '<img class="emo" src="st-'+k+'.png" alt="">';});
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
