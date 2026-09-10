@@ -1,4 +1,10 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.14.1 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.15.0 -->
+<!--   [1.15.0] ① 들어가는 속도 — 지난번 받은 홈을 폰에 기억해 두고 켜자마자 먼저 보여 준다.
+        저녁에 학생이 몰리면 서버가 20~30초 걸릴 때가 있어, 빈 홈을 오래 보던 것.
+        공지 팝업은 새 답이 온 뒤에만 띄운다(두 번 뜨지 않게).
+        ② 2주차부터 유산소 기준 — 활성 30분 이상 · 페이스 14분보다 빠르게. 적는 즉시 알려 주고 저장 전 되묻는다.
+        막지는 않는다 — 인정은 선생님이 한다. 기준값은 서버 설정에서 받는다.
+        ③ 2주차부터 나이키 런클럽만, «상세 정보» 화면만(지도 보이는 요약 화면은 X). -->
 <!--   [1.14.1] ★새 이모티콘 3종이 학생 화면에 안 뜨던 것. 스티커 이름을 가려내는 정규식이
         세 곳에 9종으로 박혀 있어 [스티커:cheer] 가 글자 그대로 나왔다.
         STK_KEYS 한 곳에서 목록을 만들고 세 곳이 그것을 쓴다. -->
@@ -910,7 +916,7 @@ body.peek{padding-top:30px}
     </div>
     <div class="card" style="cursor:pointer" onclick="go('cardio')">
       <div class="row" style="align-items:center"><img class="ic-big" src="ic-cardio.png" alt="">
-        <div><h2 style="margin:0">유산소 운동하기</h2><p class="cap" style="margin:2px 0 0">삼성헬스·NRC·애플피트니스 스크린샷</p></div></div>
+        <div><h2 style="margin:0">유산소 운동하기</h2><p class="cap" style="margin:2px 0 0">나이키 런클럽 «상세 정보» 캡처 · 2주차부터 NRC만</p></div></div>
     </div>
     <div class="card" style="cursor:pointer" onclick="go('strength')">
       <div class="row" style="align-items:center"><img class="ic-big" src="ic-strength.png" alt="">
@@ -931,9 +937,11 @@ body.peek{padding-top:30px}
     <div id="cardio-late" class="latewarn hidden"></div>
     <div id="cardio-dup" class="latewarn dup hidden"></div>
     <div class="guidebox">
-      <b>📱 운동 앱 하나를 골라 쓰세요</b>
-      <p><b>삼성헬스 · 애플 피트니스 · 나이키 런클럽(NRC)</b> 중<br>
-      <b>하나</b>를 정해 4주 동안 계속 사용하세요.</p>
+      <b>📱 2주차부터는 «나이키 런클럽(NRC)»만!</b>
+      <p><b>2주차부터 유산소는 나이키 런클럽 기록만 인정</b>돼요.<br>
+      <span class="cap">1주차는 삼성헬스·애플 피트니스도 괜찮아요. NRC 가 없으면 앱스토어·플레이스토어에서 설치 (무료)</span></p>
+      <p style="margin-top:8px"><b>✔ 활성 시간 30분 이상 · ✔ 페이스 14분보다 빠르게</b><br>
+      <span class="cap">2주차부터의 인정 기준이에요. 둘 중 하나라도 못 채우면 인정되지 않아요.</span></p>
       <p style="margin-top:8px"><b>휴대폰 앱의 기록 화면을 «캡처»해서</b> 올려 주세요.<br>
       <b>시계 화면을 사진으로 찍은 것은 인정되지 않습니다.</b><br>
       <span class="cap">워치로 뛰었어도 폰 앱에 기록이 넘어옵니다. 그 화면을 캡처하세요.</span></p>
@@ -941,13 +949,12 @@ body.peek{padding-top:30px}
     <div class="appguide">
       <b>📱 어느 화면을 올리나요?</b>
       <ul>
-        <li><b>나이키 런클럽</b> — 그 러닝을 누르고 <b>«상세 정보»</b><br>
+        <li><b>나이키 런클럽</b> — 그 러닝을 누르고 <b>«상세 정보»</b> 화면<br>
           <span class="cap">시간은 <b>활성 시간</b>으로 적어요. 경과 시간을 적으면 페이스가 어긋나요.</span></li>
-        <li><b>삼성헬스</b> — 운동 기록을 누른 화면<br>
-          <span class="cap">거리·시간·날짜가 위쪽에 함께 나와요. 시간은 <b>운동 시간</b>.</span></li>
-        <li><b>애플 피트니스</b> — 그 운동의 <b>«세부사항»</b><br>
-          <span class="cap">애플워치로 기록한 것만 자세히 남아요.</span></li>
+        <li>⛔ <b>지도가 보이는 요약 화면은 올리지 마세요</b><br>
+          <span class="cap">숫자가 다 안 보이고, 사는 곳이 드러날 수 있어요.</span></li>
       </ul>
+      <p class="cap">1주차(삼성헬스·애플 피트니스)는 그 운동의 기록 화면을 캡처하면 돼요.</p>
       <p><b>거리 · 시간 · 날짜</b>가 한 화면에 보이면 됩니다.</p>
     </div>
     <button type="button" class="howbtn shotbtn" onclick="toggleShots(this)">🖼 어떤 화면을 올리나요? · 예시 보기</button>
@@ -1353,11 +1360,11 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.14.1';
+var PWA_VER = '1.15.0';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.10 20:24';
+var PWA_BUILD = '2026.09.10 22:42';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2430,6 +2437,7 @@ function isPeek(){ if(ST.peek!==undefined)return !!ST.peek; try{ return localSto
 function logout(){
   if(!confirm('로그아웃할까요? 다시 쓰려면 학번과 학생코드를 입력해야 합니다.'))return;
   /* 토큰·학생정보만 지우고 고른 테마(grofit_theme)는 그대로 둔다 */
+  try{ localStorage.removeItem(bundleKey()); }catch(e){}   // [1.15.0]
   localStorage.removeItem('grofit_token');localStorage.removeItem('grofit_student');
   setPeek(false);                                            // [0.99.0]
   ST.student=null;ST.home=null;ST.myRecords=null;ST.fitness=null;ST.calDay=null;
@@ -2460,8 +2468,13 @@ function doLogin(){
 }
 
 /* 한 번에 받은 묶음으로 화면을 채운다 */
-function applyBundle(b){
+/* [1.15.0] 지난번 받은 홈을 폰에 기억 — 켜자마자 먼저 보여 준다 */
+function bundleKey(){ return 'grofit_bundle_'+((ST.student&&ST.student.학번)||''); }
+function saveBundle(b){ try{ if(ST.student) localStorage.setItem(bundleKey(), JSON.stringify(b)); }catch(e){} }
+function loadBundle(){ try{ var t=localStorage.getItem(bundleKey()); return t?JSON.parse(t):null; }catch(e){ return null; } }
+function applyBundle(b, fromCache){
   if(!b) return;
+  if(!fromCache) saveBundle(b);                   // [1.15.0] 새로 받은 것만 기억한다
   setTimeout(paintAppVer,0);        // [0.82.0] 서버 버전이 오면 맨 아랫줄을 다시 쓴다
   if(b.reads) ST.reads=b.reads;   // [0.67.0] 서버 읽음 기록
   if(b.config) ST.config=b.config;
@@ -2472,7 +2485,7 @@ function applyBundle(b){
     showUp('saved-cardio',   s.cardio   || L['유산소'] || '', false);
     showUp('saved-strength', s.strength || L['근력']   || '', false);
   }
-  if(b.notices){ ST.notices=b.notices; showUnread(b.notices); }
+  if(b.notices){ ST.notices=b.notices; if(!fromCache) showUnread(b.notices); }   // [1.15.0] 기억해 둔 것으로는 팝업을 띄우지 않는다
   if(b.greet!==undefined) renderGreet(b.greet);            // [0.96.0]
 }
 /* [0.96.0] 오늘의 인사 — 홈 맨 위 띠. ✕ 를 누르면 그날은 안 뜬다(이 폰에만 기억) */
@@ -2816,6 +2829,7 @@ function dupConfirm(prov){
   return confirm('이 날 '+kind+' 기록이 이미 있어요.'+N+N+'지금 올리면 이전 기록(사진·성찰 포함)을 덮어씁니다.'+N+'계속할까요?');
 }
 function selDay(prov,date,btn){ST[prov+'Date']=date;
+  if(prov==='cardio') setTimeout(cLive,0);                   // [1.15.0] 주차가 바뀌면 기준도 바뀐다
   btn.parentNode.querySelectorAll('button').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');
   renderDupWarn(prov);                                        // [0.92.0]
   // 근력은 사진 날짜와 대조하므로 날짜를 바꾸면 다시 검사
@@ -2905,7 +2919,15 @@ function cardioNumCheck(){
 }
 /* [1.11.0] 말이 안 되는 페이스면 저장 전에 한 번 되묻는다 */
 function cardioPaceCheck(){
-  var p=paceOf(parseFloat(val('c-dist')), durMin());
+  var km=parseFloat(val('c-dist')), mn=durMin();
+  var p=paceOf(km, mn);
+  /* [1.15.0] 2주차부터 인정 기준 — 막지 않고 한 번 되묻는다(인정은 선생님이 한다) */
+  var iss=stdIssues(km,mn,p);
+  if(iss.length){
+    var N0='\n', sd=cardioStd();
+    return askP(sd.week+'주차부터 유산소는'+N0+'«활성 시간 '+sd.min+'분 이상 · 페이스 '+sd.maxPace+'분보다 빠르게» 여야 인정돼요.'
+      +N0+N0+iss.map(function(t){return '⛔ '+t;}).join(N0)+N0+N0+'이대로면 인정되지 않아요. 그래도 올릴까요?');
+  }
   if(!p||(p.v>=3&&p.v<=25)) return Promise.resolve(true);
   var N='\n';
   var why = p.v<3
@@ -4360,15 +4382,32 @@ function paceOf(km,min){
   return {v:v, txt:mm+"'"+(ss<10?'0':'')+ss+'"'};
 }
 /* 적는 즉시 페이스를 보여 준다 — 잘못 적었으면 그 자리에서 보인다 */
+/* [1.15.0] 이 주차에 유산소 인정 기준이 걸리나 — 값은 서버 설정(없으면 2주차 · 30분 · 14분) */
+function cardioStd(){
+  var c=ST.config||{};
+  var from=Number(c.유산소기준_시작주차)||2, mn=Number(c.유산소_최소분)||30, mp=Number(c.유산소_최대페이스)||14;
+  var w=Number(ST.cardioWeek)||nowWeekNo();
+  return { on: w>=from, from: from, min: mn, maxPace: mp, week: w };
+}
+function stdIssues(km,min,p){
+  var sd=cardioStd(), out=[];
+  if(!sd.on) return out;
+  if(isFinite(min)&&min>0&&min<sd.min) out.push('활성 시간 '+sd.min+'분 이상이어야 인정돼요 (지금 '+(Math.round(min*10)/10)+'분)');
+  if(p&&p.v>=sd.maxPace) out.push('페이스가 '+sd.maxPace+'분보다 빨라야 인정돼요 (지금 '+p.txt+')');
+  return out;
+}
 function cLive(){
   var box=document.getElementById('c-live'); if(!box)return;
   var km=parseFloat(val('c-dist')), min=durMin();
   var p=paceOf(km,min);
   if(!p){ box.classList.add('hidden'); return; }
-  var bad=(p.v<3||p.v>25);
+  var iss=stdIssues(km,min,p);                    // [1.15.0]
+  var bad=(p.v<3||p.v>25||iss.length>0);
   var sub='';
   if(p.v<3) sub='<span class="sub">시간을 너무 짧게 적은 것 같아요. 2:01:22 이면 <b>121</b>분이에요.</span>';
   else if(p.v>25) sub='<span class="sub">걷는 것보다 느려요. 시간은 «활성 시간»(움직인 시간)으로 적었나요?</span>';
+  if(iss.length) sub+=iss.map(function(t){return '<span class="sub">⛔ '+esc(t)+'</span>';}).join('');   // [1.15.0]
+  else if(cardioStd().on) sub+='<span class="sub" style="color:#1E7A46">✔ '+cardioStd().week+'주차 인정 기준을 채웠어요</span>';
   box.className='clive'+(bad?' bad':'');
   box.innerHTML='→ 페이스 <b>'+p.txt+'</b>/km <span class="sub" style="display:inline">('
     +(Math.round(min*10)/10)+'분 · '+km+'km)</span>'+sub;
@@ -4499,6 +4538,8 @@ function mock(fn,args){
       ST.student=JSON.parse(saved);
       document.getElementById('hi-name').textContent=ST.student.학번+' '+ST.student.이름;
       go('home', true);
+      var cached=loadBundle();                    // [1.15.0] 지난번 홈을 먼저 — 서버를 기다리지 않는다
+      if(cached) applyBundle(cached, true);
       call('studentBundle',[ST.student.학번],function(b){
         if(!b||!b.ok)return;
         applyBundle(b);
