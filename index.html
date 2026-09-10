@@ -1,4 +1,8 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.15.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.16.0 -->
+<!--   [1.16.0] ★읽을거리 «읽었어요» 가 서버에 저장되지 않았다(서버 FN 누락 — GAS 1.04.0 에서 고침).
+        폰에는 ✓ 가 남아 학생은 된 줄 알았다. 이제 앱을 켤 때 폰에만 있고 서버에 없는 읽음을
+        원래 읽은 시각 그대로 하나씩 올려 보낸다(syncReads). 둘러보기(마스터)일 때는 안 한다.
+        1주차 읽을거리 «같은 날 둘 다 하면 각각 인정» → «그날은 유산소로만 센다»(규칙과 반대였다). -->
 <!--   [1.15.0] ① 들어가는 속도 — 지난번 받은 홈을 폰에 기억해 두고 켜자마자 먼저 보여 준다.
         저녁에 학생이 몰리면 서버가 20~30초 걸릴 때가 있어, 빈 홈을 오래 보던 것.
         공지 팝업은 새 답이 온 뒤에만 띄운다(두 번 뜨지 않게).
@@ -1360,11 +1364,11 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.15.0';
+var PWA_VER = '1.16.0';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.10 22:42';
+var PWA_BUILD = '2026.09.10 23:22';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -1904,7 +1908,7 @@ var KN = {
        p:['무산소 운동은 <b>근육을 굵게</b> 만들고 기초대사량을 올립니다. '
          +'유산소 운동은 <b>심장과 폐를 키워</b> 한 번에 내보내는 피의 양을 늘리고, 오래 버티는 힘을 줍니다.',
           '근력만 하면 계단 두 층에 숨이 차고, 유산소만 하면 근육이 빠져 기초대사가 내려갑니다. '
-         +'그래서 혜원핏의 한 주는 <b>유산소 2일 + 근력 2일</b>입니다. 같은 날 둘 다 하면 각각 인정되는 것도 이 때문입니다.']},
+         +'그래서 혜원핏의 한 주는 <b>유산소 2일 + 근력 2일</b>입니다. 같은 날 둘 다 했다면 그날은 <b>유산소로만</b> 세요. 근력은 다른 날 따로 해야 해요.']},
       {h:'내 운동은 어느 쪽?',
        p:['헷갈리면 이렇게 봅니다. <b>말을 이어서 할 수 있으면 유산소</b>, 말이 끊기고 근육이 타면 무산소. '
          +'줄넘기 3분은 유산소에 가깝고, 전력 질주 20초는 무산소입니다. 타임마크로 찍는 근력 운동은 무산소, 걷기 앱 기록은 유산소로 올리면 됩니다.']}
@@ -2278,6 +2282,28 @@ function oxPick(k,i,pick){
   w.innerHTML=(right?'<b>맞았어요.</b> ':'<b>아쉬워요.</b> ')+q.why; w.hidden=false;
 }
 
+/* [1.16.0] 폰에만 있고 서버에 없는 읽음을 원래 시각으로 올려 보낸다.
+   서버가 오랫동안 «읽었어요» 를 거절해(FN 누락) 폰에만 남은 기록이 많다. 하나씩 차례로 보낸다. */
+function syncReads(){
+  if(!ST.student||isPeek()) return;
+  var srv=ST.reads||{}, todo=[], W=Number((ST.config&&ST.config.총_주차수)||4)||4;
+  for(var w=1; w<=W; w++){
+    ['마음','지식'].forEach(function(k){
+      var at=null;
+      try{ at=localStorage.getItem(readKey(w,k)); }catch(e){}
+      if(!at && k==='지식'){ try{ at=localStorage.getItem('grofit_read_'+w); }catch(e){} }   // 옛 키(지식만)
+      if(at && !srv[w+'-'+k]) todo.push([w,k,at]);
+    });
+  }
+  (function next(i){
+    if(i>=todo.length) return;
+    var x=todo[i];
+    call('markReading',[ST.student.학번,x[0],x[1],x[2]],function(r){
+      if(r&&r.reads) ST.reads=r.reads;
+      next(i+1);
+    });
+  })(0);
+}
 /* ── 읽음 표시: 폰 + 서버 ── */
 function markRead(kind){
   if(isPeek()){ toast('🔑 둘러보기 중이라 읽음으로 남지 않아요'); return; }   // [0.99.0]
@@ -2477,6 +2503,7 @@ function applyBundle(b, fromCache){
   if(!fromCache) saveBundle(b);                   // [1.15.0] 새로 받은 것만 기억한다
   setTimeout(paintAppVer,0);        // [0.82.0] 서버 버전이 오면 맨 아랫줄을 다시 쓴다
   if(b.reads) ST.reads=b.reads;   // [0.67.0] 서버 읽음 기록
+  if(!fromCache && b.reads) setTimeout(syncReads,1500);   // [1.16.0] 폰에만 있는 읽음을 서버로
   if(b.config) ST.config=b.config;
   if(b.home){ paintHome(b.home); }
   if(b.stamps){ var s=b.stamps;
