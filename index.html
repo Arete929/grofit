@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.21.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.21.1 -->
+<!--   [1.21.1] 올릴 화면 이름 정정 — 삼성헬스 «운동 상세보기» · NRC «상세정보» · 애플 «세부사항»(그대로). «2주차부터» 명시. -->
 <!--   [1.21.0] 유산소 페이스 기준 주차별(GAS 1.15.0 유산소_주차별_최대페이스) — 2주차 14분 · 3주차 12분 · 4주차 10분.
         cardioStd(주차) 가 그 주차 값을 쓰고, 유산소 안내 상자(#cardio-std)가 고른 주차의 기준과 주차별 단계를 보여 준다. -->
 <!--   [1.20.0] ① 규칙 변경(GAS 1.14.0) — 같은 날 유산소+근력은 둘 다 센다(운동한 날은 하루). 읽을거리 문장 정정.
@@ -949,7 +950,7 @@ body.peek{padding-top:30px}
     </div>
     <div class="card" style="cursor:pointer" onclick="go('cardio')">
       <div class="row" style="align-items:center"><img class="ic-big" src="ic-cardio.png" alt="">
-        <div><h2 style="margin:0">유산소 운동하기</h2><p class="cap" style="margin:2px 0 0">운동 앱 «상세 정보» 화면 캡처 · 삼성헬스·NRC·애플 피트니스</p></div></div>
+        <div><h2 style="margin:0">유산소 운동하기</h2><p class="cap" style="margin:2px 0 0">삼성 «운동 상세보기» · NRC «상세정보» · 애플 «세부사항» 캡처</p></div></div>
     </div>
     <div class="card" style="cursor:pointer" onclick="go('strength')">
       <div class="row" style="align-items:center"><img class="ic-big" src="ic-strength.png" alt="">
@@ -980,10 +981,11 @@ body.peek{padding-top:30px}
     </div>
     <div class="appguide">
       <b>📱 어느 화면을 올리고, 시간은 무엇을 적나요?</b>
+      <p class="cap" style="margin:4px 0 6px"><b>2주차부터</b>는 아래 화면만 인정돼요. 1주차는 그 운동의 기록 화면이면 돼요.</p>
       <ul>
-        <li><b>삼성헬스</b> — 그 운동을 누른 <b>«운동 상세정보»</b> 화면<br>
+        <li><b>삼성헬스</b> — 그 운동을 누르고 <b>«운동 상세보기»</b> 화면<br>
           <span class="cap">시간 칸에는 <b>«운동 시간»</b> · ✗ «총 시간»</span></li>
-        <li><b>나이키 런클럽</b> — 그 러닝을 누르고 <b>«상세 정보»</b> 화면<br>
+        <li><b>나이키 런클럽</b> — 그 러닝을 누르고 <b>«상세정보»</b> 화면<br>
           <span class="cap">시간 칸에는 <b>«활성 시간»</b> · ✗ «경과 시간»</span></li>
         <li><b>애플 피트니스</b> — 그 운동의 <b>«세부사항»</b> 화면<br>
           <span class="cap">시간 칸에는 <b>«운동 시간»</b> · ✗ «경과 시간»</span></li>
@@ -1407,11 +1409,11 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.21.0';
+var PWA_VER = '1.21.1';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.12 21:09';
+var PWA_BUILD = '2026.09.12 21:15';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
