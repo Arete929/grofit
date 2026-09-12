@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.23.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.23.1 -->
+<!--   [1.23.1] 서버 요청 한 번 실패(구글 넘겨주는 주소 404·HTML·끊김)면 1.2초 뒤 한 번 더(callOnce). 두 번 다 실패할 때만 알림.
+        9/12 밤 3277 로그인이 «서버 응답 이상 404 (studentBoot)» 로 막혔는데, 같은 시각 이 PC에서도 넘겨주는 주소가 404·35초를 냈다. -->
 <!--   [1.23.0] 안 읽은 공지 팝업 — 맨 아래 «확인했습니다 · N개» 한 번으로 전부 닫던 것을, 공지 타일마다 «확인했습니다» 를 따로 누르게.
         누른 공지만 읽음(markNoticesRead [그 ID]) · 타일이 빠지고 «남은 공지 N개» · 다 누르면 팝업이 닫힌다. 아래 단추(#pop-btn)는 숨긴다. -->
 <!--   [1.22.0] 근력 필수 운동은 단위를 고정해 보여 준다 — STR_WEEK 의 unit:'time'(플랭크·사이드 플랭크)은 «시간», 나머지는 «횟수».
@@ -1418,11 +1420,11 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.23.0';
+var PWA_VER = '1.23.1';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.12 22:40';
+var PWA_BUILD = '2026.09.12 22:52';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2495,14 +2497,21 @@ function showUp(id,at,just){
 function toast(m,ms){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');
   clearTimeout(toast._t); toast._t=setTimeout(function(){t.classList.remove('on')},ms||1900);}   // [1.22.0] 오류는 오래 보이게
 function pick(id){document.getElementById(id).click();}
-function call(fn,args,cb){
-  fetch(API_BASE,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+/* [1.23.1] 구글이 결과를 넘겨주는 주소(googleusercontent)가 가끔 404·HTML 을 준다(9/12 밤 실측).
+   한 번 실패하면 1.2초 뒤 한 번 더 보낸다 — call 로 부르는 것은 읽기이거나 같은 값을 다시 적는 것뿐이라 두 번 가도 된다. */
+function callOnce(fn,args){
+  return fetch(API_BASE,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
     body:JSON.stringify({action:fn,token:localStorage.getItem('grofit_token')||'',args:args||[]})})
    .then(function(r){ return r.text().then(function(t){          // [1.22.0] JSON 이 아니면 까닭을 남긴다
      try{ return JSON.parse(t); }
      catch(e){ var er=new Error('bad json'); er.why='서버 응답 이상 '+r.status; er.body=String(t).slice(0,200); throw er; }
-   }); })
-   .catch(function(e){                                               // 통신·응답 실패만 여기
+   }); });
+}
+function call(fn,args,cb){
+  callOnce(fn,args)
+   .catch(function(e){ console.warn('[혜원핏] '+fn+' 한 번 더', (e&&e.why)||e);
+     return new Promise(function(ok){ setTimeout(ok,1200); }).then(function(){ return callOnce(fn,args); }); })
+   .catch(function(e){                                               // 두 번 다 실패했을 때만 여기
      var why=(e&&e.why)||'연결 실패';
      console.error('[혜원핏] '+fn+' 실패 · '+why, e&&e.body||e);
      toast('네트워크 오류 · '+why+' ('+fn+') · 연결을 확인하세요', 6000); return undefined; })
