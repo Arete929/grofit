@@ -1,4 +1,7 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.24.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.25.0 -->
+<!--   [1.25.0] 2주차부터 앱 고르기를 «사진 올리는 칸 위»로 — 앱을 안 고르면 사진 선택이 안 된다(cardioPick).
+        고르면 그 앱의 **실제 상세 화면**(학생 제출 사진을 골라 개인 정보를 가리고 ①움직인 ②전체 표시 — ex-app-samsung/nrc/apple.jpg)이 바로 아래에.
+        «예시 보기»도 2주차부터는 세 앱의 실제 화면. NRC 는 아이폰에서 «러닝 시간»으로 나오는 것도 안내(칸 이름 «활성·러닝 시간»). -->
 <!--   [1.24.0] 2주차부터 유산소 — 앱 고르기(삼성헬스 · Nike Run Club · 애플 피트니스, 버튼) → 그 앱의 시간 이름으로 칸이 바뀐다.
         삼성 운동 시간+총 시간 / NRC 활성 시간+경과 시간 / 애플 운동 시간+경과 시간. 두 개를 적으면 «휴식 시간(자동)» = 전체 − 움직인.
         앱을 안 고르거나 전체 시간이 비었거나 움직인 시간보다 짧으면 저장 전에 멈춘다. 고른 앱은 폰에 기억(grofit_capp_<학번>).
@@ -463,6 +466,15 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .pnmode button b svg{width:27px;height:27px;display:block;margin:0 auto}
 .pnmode button.on{border-color:var(--primary);background:var(--primary-tint);color:var(--primary-dark)}
 .pnmode.capp button{padding:12px 4px;font-size:13.5px;font-weight:800;line-height:1.3}              /* [1.24.0] 유산소 앱 고르기 */
+/* [1.25.0] 고른 앱의 실제 상세 화면 예시 */
+.appex{margin-top:12px}
+.appex-in{background:#F6F8F5;border:1px solid var(--line);border-radius:14px;padding:12px}
+.appex-in+.appex-in{margin-top:12px}
+.appex-in img{display:block;width:100%;max-width:300px;margin:8px auto;border-radius:10px;border:1px solid var(--line)}
+.appex-in.big img{max-width:340px}
+.appex-t{margin:0;font-size:13.5px}
+.appex-c{margin:6px 0 0;font-size:12.5px;line-height:1.7;color:var(--ink2)}
+.appex-c .m1{color:#1FA463;font-weight:800} .appex-c .m2{color:#E8870E;font-weight:800}
 #c-rest{background:#F4F6F3;color:var(--ink);font-weight:800}
 #c-rest.bad{background:#FCEFEE;color:#A03B2E}
 .pntags{display:flex;flex-wrap:wrap;gap:6px}
@@ -1004,7 +1016,7 @@ body.peek{padding-top:30px}
         <li><b>삼성헬스</b> — 그 운동을 누르고 <b>«운동 상세보기»</b> 화면<br>
           <span class="cap">움직인 시간 = <b>«운동 시간»</b> · 전체 시간 = <b>«총 시간»</b></span></li>
         <li><b>나이키 런클럽</b> — 그 러닝을 누르고 <b>«상세정보»</b> 화면<br>
-          <span class="cap">움직인 시간 = <b>«활성 시간»</b> · 전체 시간 = <b>«경과 시간»</b></span></li>
+          <span class="cap">움직인 시간 = <b>«활성 시간»</b>(아이폰은 «러닝 시간») · 전체 시간 = <b>«경과 시간»</b></span></li>
         <li><b>애플 피트니스</b> — 그 운동의 <b>«세부사항»</b> 화면<br>
           <span class="cap">움직인 시간 = <b>«운동 시간»</b> · 전체 시간 = <b>«경과 시간»</b></span></li>
         <li>⛔ <b>지도가 보이는 요약 화면은 올리지 마세요</b><br>
@@ -1023,18 +1035,20 @@ body.peek{padding-top:30px}
       <div id="c-pnbox" class="hidden" style="margin-top:12px"></div>
     </div>
     <div class="card">
-      <div class="drop" id="cardio-drop" onclick="pick('cardio-file')">📷 운동 앱 스크린샷 업로드<br><span class="cap">탭하여 사진 선택</span></div>
+      <!-- [1.25.0] 2주차부터 — 사진을 올리기 전에 앱부터 고른다. 고르면 그 앱의 실제 상세 화면 예시가 나온다 -->
+      <div id="c-appbox" class="hidden" style="margin-bottom:14px">
+        <h2 style="margin-bottom:8px">어느 앱으로 쟀나요?</h2>
+        <div class="pnmode capp" id="c-app"></div>
+        <div id="c-appex" class="appex hidden"></div>
+      </div>
+      <div class="drop" id="cardio-drop" onclick="cardioPick()">📷 운동 앱 스크린샷 업로드<br><span class="cap">탭하여 사진 선택</span></div>
       <input type="file" id="cardio-file" accept="image/*" class="hidden" onchange="onCardioImg(this)">
       <img id="cardio-prev" class="hidden" style="width:100%;border-radius:12px;margin-top:12px">
     </div>
     <div class="card hidden" id="cardio-result">
       <h2>내 기록 적기 <span class="cap" id="cardio-ai"></span></h2>
       <p class="cap" style="margin:-4px 0 10px">사진을 보면서 <b>직접 적어 주세요.</b> 적어 보는 것도 수행평가의 일부예요</p>
-      <!-- [1.24.0] 2주차부터 — 어느 앱인지 고르면 그 앱의 시간 이름으로 칸이 바뀐다 -->
-      <div id="c-appbox" class="hidden" style="margin-bottom:12px">
-        <label>어느 앱으로 쟀나요?</label>
-        <div class="pnmode capp" id="c-app"></div>
-      </div>
+      <!-- [1.24.0] 2주차부터 — 고른 앱의 시간 이름으로 칸이 바뀐다 (앱 고르기는 [1.25.0] 사진 올리는 칸 위로) -->
       <div class="grid2">
         <div class="field"><label>거리 (km)</label><input id="c-dist" inputmode="decimal" oninput="cLive()"></div>
         <div class="field"><label id="c-dur-lab">움직인 시간</label><input id="c-dur" placeholder="2:01:22" oninput="cLive()"></div>
@@ -1435,11 +1449,11 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.24.0';
+var PWA_VER = '1.25.0';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.12 23:16';
+var PWA_BUILD = '2026.09.13 00:52';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -3578,6 +3592,12 @@ function shotSvg(t,i){
 }
 function renderShots(){
   var box=document.getElementById('cardio-shots'); if(!box)return;
+  if(cAppOn()){                                    // [1.25.0] 2주차부터 — 세 앱의 실제 상세 화면
+    box.innerHTML='<p class="hdesc"><b>2주차부터</b>는 앱마다 이 화면을 캡처해 올려요.</p>'
+      +CAPPS.map(function(a){ return cAppExHTML(a, true); }).join('')
+      +'<p class="hwarn" style="margin-top:12px"><b>⚠ 이런 화면은 안 됩니다</b><br>지도가 보이는 요약 화면 · 한 주 합계 화면 · 걸음 수만 나온 화면 · 남의 기록</p>';
+    return;
+  }
   var h='<p class="hdesc">앱마다 생김새는 달라도 <b>세 가지</b>가 한 화면에 보이면 됩니다.</p>'
     +'<span class="hbody">① 거리 &nbsp;·&nbsp; ② 시간 &nbsp;·&nbsp; ③ 날짜</span>'
     +'<div class="shots">'
@@ -3591,7 +3611,7 @@ function renderShots(){
 }
 function toggleShots(btn){
   var box=document.getElementById('cardio-shots'); if(!box)return;
-  if(!box.innerHTML) renderShots();
+  renderShots();                                   // [1.25.0] 주차에 따라 내용이 달라서 열 때마다 새로
   var open=box.classList.toggle('hidden')===false;
   btn.textContent=open?'🖼 예시 닫기':'🖼 어떤 화면을 올리나요? · 예시 보기';
   btn.classList.toggle('on',open);
@@ -4570,10 +4590,24 @@ function cardioStd(wk){
 /* ══════ [1.24.0] 2주차부터 유산소 앱 고르기 ══════
    앱마다 시간 이름이 다르다 — 움직인 시간(인정·페이스 기준)과 전체 시간(쉰 시간까지). 두 개를 적으면 휴식 시간이 나온다.
    고른 앱은 이 폰에 기억(4주 내내 같은 앱). 1주차는 예전처럼 시간 한 칸. */
-var CAPPS=[
-  {k:'삼성헬스',      mv:'운동 시간', tt:'총 시간'},
-  {k:'Nike Run Club', mv:'활성 시간', tt:'경과 시간'},
-  {k:'애플 피트니스', mv:'운동 시간', tt:'경과 시간'}];
+var CAPPS=[   /* [1.25.0] img = 학생이 낸 실제 상세 화면(가림·①②표시) · scr = 올릴 화면 이름 */
+  {k:'삼성헬스',      mv:'운동 시간', tt:'총 시간',   scr:'운동 상세보기', img:'ex-app-samsung.jpg'},
+  {k:'Nike Run Club', mv:'활성 시간', tt:'경과 시간', scr:'상세정보',     img:'ex-app-nrc.jpg',
+   mvLab:'활성·러닝 시간', note:'아이폰은 «활성 시간» 대신 «러닝 시간»으로 나와요. 그게 움직인 시간이에요.'},
+  {k:'애플 피트니스', mv:'운동 시간', tt:'경과 시간', scr:'세부사항',     img:'ex-app-apple.jpg'}];
+/* [1.25.0] 2주차부터 사진을 고르기 전에 앱부터 */
+function cardioPick(){
+  if(cAppOn() && !cAppCur()){ toast('먼저 어느 앱으로 쟀는지 골라 주세요'); focusEl('c-appbox'); return; }
+  pick('cardio-file');
+}
+function cAppExHTML(a, big){
+  return '<div class="appex-in'+(big?' big':'')+'"><p class="appex-t">📱 <b>'+esc(a.k)+'</b> — <b>«'+esc(a.scr)+'»</b> 화면을 캡처해 올려요</p>'
+    +'<img src="'+a.img+'" alt="'+esc(a.k)+' '+esc(a.scr)+' 예시" loading="lazy">'
+    +'<p class="appex-c"><span class="m1">① 움직인 시간</span> = «'+esc(a.mv)+'»'+(a.mvLab?' (아이폰 «러닝 시간»)':'')
+    +' · <span class="m2">② 전체 시간</span> = «'+esc(a.tt)+'»<br>기록 적을 때 <b>두 시간을 모두</b> 적어요. 휴식 시간은 저절로 계산돼요.</p>'
+    +(a.note?'<p class="appex-c">'+esc(a.note)+'</p>':'')
+    +'<p class="appex-c muted">실제 학생이 올린 화면이에요 (개인 정보는 가림).</p></div>';
+}
 function cAppKey(){ return 'grofit_capp_'+((ST.student&&ST.student.학번)||''); }
 function cAppOn(){ return cardioStd().on; }
 function cAppCur(){ return CAPPS.filter(function(a){ return a.k===ST.capp; })[0]||null; }
@@ -4588,8 +4622,10 @@ function renderCardioApp(){
     return '<button type="button"'+(ST.capp===a.k?' class="on"':'')+' onclick="pickCApp(&quot;'+a.k+'&quot;)">'+esc(a.k)+'</button>';
   }).join('');
   var a=on?cAppCur():null;
-  document.getElementById('c-dur-lab').textContent = a ? a.mv+' (움직인 시간)' : '움직인 시간';
+  document.getElementById('c-dur-lab').textContent = a ? (a.mvLab||a.mv)+' (움직인 시간)' : '움직인 시간';
   document.getElementById('c-total-lab').textContent = a ? a.tt+' (전체 시간)' : '전체 시간';
+  var ex=document.getElementById('c-appex');                        // [1.25.0] 고른 앱의 실제 상세 화면
+  if(ex){ ex.classList.toggle('hidden',!a); ex.innerHTML = a ? cAppExHTML(a) : ''; }
   cLive();
 }
 function pickCApp(k){
