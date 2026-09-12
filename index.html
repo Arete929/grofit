@@ -1,4 +1,8 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.17.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.18.0 -->
+<!--   [1.18.0] 2주차 유산소 «NRC 전용» → «삼성헬스 · 나이키 런클럽 · 애플 피트니스 중 하나».
+        앱마다 올릴 화면(삼성·NRC = 운동 상세정보 / 애플 = 세부사항)과 시간 칸에 적을 값을 따로 안내한다.
+        기준 시간은 «움직인 시간»(삼성·애플 운동 시간 / NRC 활성 시간). «총 시간»·«경과 시간»은 쉰 시간까지 들어가 적으면 안 된다.
+        시간 칸 이름도 «움직인 시간». 인정 기준 문구의 «활성 시간»을 «움직인 시간»으로. -->
 <!--   [1.17.0] 4주차 필수 상체 «베어 크롤» → «베어 워킹 니 푸시업».
         베어 크롤은 버티며 기어가기라 3주차 정식 푸시업보다 상체 부하가 낮아 마지막 주에 강도가 내려갔다.
         2주차 암 워킹의 이동 + 1주차 니 푸시업을 합친 종합 동작으로 바꿨다(점진적 과부하).
@@ -924,7 +928,7 @@ body.peek{padding-top:30px}
     </div>
     <div class="card" style="cursor:pointer" onclick="go('cardio')">
       <div class="row" style="align-items:center"><img class="ic-big" src="ic-cardio.png" alt="">
-        <div><h2 style="margin:0">유산소 운동하기</h2><p class="cap" style="margin:2px 0 0">나이키 런클럽 «상세 정보» 캡처 · 2주차부터 NRC만</p></div></div>
+        <div><h2 style="margin:0">유산소 운동하기</h2><p class="cap" style="margin:2px 0 0">운동 앱 «상세 정보» 화면 캡처 · 삼성헬스·NRC·애플 피트니스</p></div></div>
     </div>
     <div class="card" style="cursor:pointer" onclick="go('strength')">
       <div class="row" style="align-items:center"><img class="ic-big" src="ic-strength.png" alt="">
@@ -945,24 +949,27 @@ body.peek{padding-top:30px}
     <div id="cardio-late" class="latewarn hidden"></div>
     <div id="cardio-dup" class="latewarn dup hidden"></div>
     <div class="guidebox">
-      <b>📱 2주차부터는 «나이키 런클럽(NRC)»만!</b>
-      <p><b>2주차부터 유산소는 나이키 런클럽 기록만 인정</b>돼요.<br>
-      <span class="cap">1주차는 삼성헬스·애플 피트니스도 괜찮아요. NRC 가 없으면 앱스토어·플레이스토어에서 설치 (무료)</span></p>
-      <p style="margin-top:8px"><b>✔ 활성 시간 30분 이상 · ✔ 페이스 14분보다 빠르게</b><br>
+      <b>📱 삼성헬스 · 나이키 런클럽(NRC) · 애플 피트니스 중 하나</b>
+      <p>세 앱 가운데 <b>하나를 정해 4주 내내</b> 쓰세요.</p>
+      <p style="margin-top:8px"><b>✔ 움직인 시간 30분 이상 · ✔ 페이스 14분보다 빠르게</b><br>
       <span class="cap">2주차부터의 인정 기준이에요. 둘 중 하나라도 못 채우면 인정되지 않아요.</span></p>
       <p style="margin-top:8px"><b>휴대폰 앱의 기록 화면을 «캡처»해서</b> 올려 주세요.<br>
       <b>시계 화면을 사진으로 찍은 것은 인정되지 않습니다.</b><br>
       <span class="cap">워치로 뛰었어도 폰 앱에 기록이 넘어옵니다. 그 화면을 캡처하세요.</span></p>
     </div>
     <div class="appguide">
-      <b>📱 어느 화면을 올리나요?</b>
+      <b>📱 어느 화면을 올리고, 시간은 무엇을 적나요?</b>
       <ul>
+        <li><b>삼성헬스</b> — 그 운동을 누른 <b>«운동 상세정보»</b> 화면<br>
+          <span class="cap">시간 칸에는 <b>«운동 시간»</b> · ✗ «총 시간»</span></li>
         <li><b>나이키 런클럽</b> — 그 러닝을 누르고 <b>«상세 정보»</b> 화면<br>
-          <span class="cap">시간은 <b>활성 시간</b>으로 적어요. 경과 시간을 적으면 페이스가 어긋나요.</span></li>
+          <span class="cap">시간 칸에는 <b>«활성 시간»</b> · ✗ «경과 시간»</span></li>
+        <li><b>애플 피트니스</b> — 그 운동의 <b>«세부사항»</b> 화면<br>
+          <span class="cap">시간 칸에는 <b>«운동 시간»</b> · ✗ «경과 시간»</span></li>
         <li>⛔ <b>지도가 보이는 요약 화면은 올리지 마세요</b><br>
           <span class="cap">숫자가 다 안 보이고, 사는 곳이 드러날 수 있어요.</span></li>
       </ul>
-      <p class="cap">1주차(삼성헬스·애플 피트니스)는 그 운동의 기록 화면을 캡처하면 돼요.</p>
+      <p class="cap">«총 시간»·«경과 시간»은 멈추고 쉰 시간까지 들어간 시간이에요. 인정은 <b>움직인 시간</b>으로 해요.</p>
       <p><b>거리 · 시간 · 날짜</b>가 한 화면에 보이면 됩니다.</p>
     </div>
     <button type="button" class="howbtn shotbtn" onclick="toggleShots(this)">🖼 어떤 화면을 올리나요? · 예시 보기</button>
@@ -983,7 +990,7 @@ body.peek{padding-top:30px}
       <p class="cap" style="margin:-4px 0 10px">사진을 보면서 <b>직접 적어 주세요.</b> 적어 보는 것도 수행평가의 일부예요</p>
       <div class="grid2">
         <div class="field"><label>거리 (km)</label><input id="c-dist" inputmode="decimal" oninput="cLive()"></div>
-        <div class="field"><label>시간</label><input id="c-dur" placeholder="2:01:22" oninput="cLive()"></div>
+        <div class="field"><label>움직인 시간</label><input id="c-dur" placeholder="2:01:22" oninput="cLive()"></div>
         <div class="field"><label>페이스</label><input id="c-pace" placeholder="8'45&quot;"></div>
         <div class="field"><label>칼로리</label><input id="c-kcal" inputmode="numeric"></div>
       </div>
@@ -1368,11 +1375,11 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.17.0';
+var PWA_VER = '1.18.0';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.11 10:18';
+var PWA_BUILD = '2026.09.12 12:28';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -1983,9 +1990,9 @@ KN.달리기앱 = {
   부제: '유산소 운동은 앱 화면을 찍어 올립니다. 첫 주에 설정을 잡아 두면 4주가 편합니다.',
   카드부제: '무엇을 켜고 무엇을 찍어야 하나 · 실내에서 거리가 0인 이유',
   본문: [
-    {h:'무엇으로 재도 됩니다',
-     p:['삼성 헬스, 나이키 런 클럽, 스트라바, 아이폰 건강 앱 — <b>거리와 시간이 나오는 앱이면 무엇이든</b> 됩니다. '
-       +'이미 쓰던 것이 있으면 그대로 쓰세요. 새로 깔 필요 없습니다.',
+    {h:'무엇으로 재나요',
+     p:['<b>삼성헬스 · 나이키 런클럽(NRC) · 애플 피트니스</b> 가운데 하나를 정해 4주 내내 씁니다. '
+       +'이미 쓰던 것이 있으면 그대로 쓰세요.',
         '<b>달리기가 아니어도 됩니다.</b> 빠르게 걷기, 자전거도 유산소입니다. 앱에서 종목만 맞게 고르면 됩니다.']},
     {h:'시작 전에 두 가지만',
      p:['첫째, <b>위치(GPS)를 켜세요.</b> 이것이 꺼져 있으면 아무리 뛰어도 <b>거리가 0km</b>로 남습니다. '
@@ -2956,14 +2963,14 @@ function cardioPaceCheck(){
   var iss=stdIssues(km,mn,p);
   if(iss.length){
     var N0='\n', sd=cardioStd();
-    return askP(sd.week+'주차부터 유산소는'+N0+'«활성 시간 '+sd.min+'분 이상 · 페이스 '+sd.maxPace+'분보다 빠르게» 여야 인정돼요.'
+    return askP(sd.week+'주차부터 유산소는'+N0+'«움직인 시간 '+sd.min+'분 이상 · 페이스 '+sd.maxPace+'분보다 빠르게» 여야 인정돼요.'
       +N0+N0+iss.map(function(t){return '⛔ '+t;}).join(N0)+N0+N0+'이대로면 인정되지 않아요. 그래도 올릴까요?');
   }
   if(!p||(p.v>=3&&p.v<=25)) return Promise.resolve(true);
   var N='\n';
   var why = p.v<3
     ? '시간을 너무 짧게 적은 것 같아요.'+N+'2:01:22 처럼 나와 있으면 «2»가 아니라 «121»분이에요.'
-    : '걷는 것보다 느린 속도예요.'+N+'시간을 «활성 시간»(움직인 시간)으로 적었는지 봐 주세요.';
+    : '걷는 것보다 느린 속도예요.'+N+'시간을 «움직인 시간»(삼성·애플 운동 시간 / NRC 활성 시간)으로 적었는지 봐 주세요.';
   return askP('페이스가 '+p.txt+'/km 로 나와요.'+N+N+why+N+N+'이대로 제출할까요?');
 }
 function focusEl(id){ var e=document.getElementById(id); if(!e)return;
@@ -4427,7 +4434,7 @@ function cardioStd(){
 function stdIssues(km,min,p){
   var sd=cardioStd(), out=[];
   if(!sd.on) return out;
-  if(isFinite(min)&&min>0&&min<sd.min) out.push('활성 시간 '+sd.min+'분 이상이어야 인정돼요 (지금 '+(Math.round(min*10)/10)+'분)');
+  if(isFinite(min)&&min>0&&min<sd.min) out.push('움직인 시간 '+sd.min+'분 이상이어야 인정돼요 (지금 '+(Math.round(min*10)/10)+'분)');
   if(p&&p.v>=sd.maxPace) out.push('페이스가 '+sd.maxPace+'분보다 빨라야 인정돼요 (지금 '+p.txt+')');
   return out;
 }
@@ -4440,7 +4447,7 @@ function cLive(){
   var bad=(p.v<3||p.v>25||iss.length>0);
   var sub='';
   if(p.v<3) sub='<span class="sub">시간을 너무 짧게 적은 것 같아요. 2:01:22 이면 <b>121</b>분이에요.</span>';
-  else if(p.v>25) sub='<span class="sub">걷는 것보다 느려요. 시간은 «활성 시간»(움직인 시간)으로 적었나요?</span>';
+  else if(p.v>25) sub='<span class="sub">걷는 것보다 느려요. 시간은 «움직인 시간»(삼성·애플 운동 시간 / NRC 활성 시간)으로 적었나요?</span>';
   if(iss.length) sub+=iss.map(function(t){return '<span class="sub">⛔ '+esc(t)+'</span>';}).join('');   // [1.15.0]
   else if(cardioStd().on) sub+='<span class="sub" style="color:#1E7A46">✔ '+cardioStd().week+'주차 인정 기준을 채웠어요</span>';
   box.className='clive'+(bad?' bad':'');
