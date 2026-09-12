@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.20.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.21.0 -->
+<!--   [1.21.0] 유산소 페이스 기준 주차별(GAS 1.15.0 유산소_주차별_최대페이스) — 2주차 14분 · 3주차 12분 · 4주차 10분.
+        cardioStd(주차) 가 그 주차 값을 쓰고, 유산소 안내 상자(#cardio-std)가 고른 주차의 기준과 주차별 단계를 보여 준다. -->
 <!--   [1.20.0] ① 규칙 변경(GAS 1.14.0) — 같은 날 유산소+근력은 둘 다 센다(운동한 날은 하루). 읽을거리 문장 정정.
         ② 주간 성찰 — 쓰기 전에 «✋ 이번 주 운동을 모두 끝냈나요?» [아직이에요 / 네, 다 끝냈어요]. «네» 여야 쓰는 칸이 열린다.
         이 폰에서 그 주차에 한 번 «네» 하면(localStorage grofit_rfok_<학번>_<주차>) 또는 이번 주 성찰을 이미 냈으면 다시 묻지 않는다. -->
@@ -970,7 +972,7 @@ body.peek{padding-top:30px}
     <div class="guidebox">
       <b>📱 삼성헬스 · 나이키 런클럽(NRC) · 애플 피트니스 중 하나</b>
       <p>세 앱 가운데 <b>하나를 정해 4주 내내</b> 쓰세요.</p>
-      <p style="margin-top:8px"><b>✔ 움직인 시간 30분 이상 · ✔ 페이스 14분보다 빠르게</b><br>
+      <p style="margin-top:8px" id="cardio-std"><b>✔ 움직인 시간 30분 이상 · ✔ 페이스 기준(2주차 14분 → 3주차 12분 → 4주차 10분)</b><br>
       <span class="cap">2주차부터의 인정 기준이에요. 둘 중 하나라도 못 채우면 인정되지 않아요.</span></p>
       <p style="margin-top:8px"><b>휴대폰 앱의 기록 화면을 «캡처»해서</b> 올려 주세요.<br>
       <b>시계 화면을 사진으로 찍은 것은 인정되지 않습니다.</b><br>
@@ -1405,11 +1407,11 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.20.0';
+var PWA_VER = '1.21.0';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.12 20:56';
+var PWA_BUILD = '2026.09.12 21:09';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2839,6 +2841,7 @@ function renderDayPicker(prov){
   var wl=document.getElementById(prov+'-wklab');          // [0.80.0] 고른 주차를 늘 보이게
   if(wl)wl.textContent=ST[prov+'Week']+'주차';
   renderLateWarn(prov);
+  if(prov==='cardio') renderCardioStd();                  // [1.21.0] 고른 주차의 인정 기준
   var el=document.getElementById(prov+'-days');if(!el)return;
   el.innerHTML=days.map(function(d){
     var lk=dayAccepted(prov,d.date);                        // [1.12.0] 인정된 날은 자물쇠
@@ -4478,11 +4481,24 @@ function paceOf(km,min){
 }
 /* 적는 즉시 페이스를 보여 준다 — 잘못 적었으면 그 자리에서 보인다 */
 /* [1.15.0] 이 주차에 유산소 인정 기준이 걸리나 — 값은 서버 설정(없으면 2주차 · 30분 · 14분) */
-function cardioStd(){
+function cardioStd(wk){
   var c=ST.config||{};
-  var from=Number(c.유산소기준_시작주차)||2, mn=Number(c.유산소_최소분)||30, mp=Number(c.유산소_최대페이스)||14;
-  var w=Number(ST.cardioWeek)||nowWeekNo();
+  var from=Number(c.유산소기준_시작주차)||2, mn=Number(c.유산소_최소분)||30;
+  var w=Number(wk)||Number(ST.cardioWeek)||nowWeekNo();
+  var pm=c.유산소_주차별_최대페이스||{};                              // [1.21.0] 주차별 {2:14,3:12,4:10}
+  var mp=Number(pm[w])||Number(c.유산소_최대페이스)||14;
   return { on: w>=from, from: from, min: mn, maxPace: mp, week: w };
+}
+/* [1.21.0] 유산소 화면 안내 상자의 인정 기준 — 고른 주차 값으로 */
+function renderCardioStd(){
+  var el=document.getElementById('cardio-std'); if(!el)return;
+  var sd=cardioStd(), tw=Number((ST.config||{}).총_주차수)||4, steps=[];
+  for(var w=sd.from; w<=tw; w++) steps.push(w+'주차 '+cardioStd(w).maxPace+'분');
+  el.innerHTML = sd.on
+    ? '<b>✔ '+sd.week+'주차 기준 — 움직인 시간 '+sd.min+'분 이상 · 페이스 '+sd.maxPace+'분보다 빠르게</b><br>'
+      +'<span class="cap">둘 중 하나라도 못 채우면 인정되지 않아요.<br>페이스 기준은 주마다 빨라져요: '+steps.join(' → ')+'</span>'
+    : '<b>✔ '+sd.week+'주차는 시간·페이스 기준 없이 인정돼요</b><br>'
+      +'<span class="cap">'+sd.from+'주차부터 움직인 시간 '+sd.min+'분 이상 · 페이스 기준('+steps.join(' → ')+')</span>';
 }
 function stdIssues(km,min,p){
   var sd=cardioStd(), out=[];
