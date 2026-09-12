@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.22.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.23.0 -->
+<!--   [1.23.0] 안 읽은 공지 팝업 — 맨 아래 «확인했습니다 · N개» 한 번으로 전부 닫던 것을, 공지 타일마다 «확인했습니다» 를 따로 누르게.
+        누른 공지만 읽음(markNoticesRead [그 ID]) · 타일이 빠지고 «남은 공지 N개» · 다 누르면 팝업이 닫힌다. 아래 단추(#pop-btn)는 숨긴다. -->
 <!--   [1.22.0] 근력 필수 운동은 단위를 고정해 보여 준다 — STR_WEEK 의 unit:'time'(플랭크·사이드 플랭크)은 «시간», 나머지는 «횟수».
         [횟수][시간] 토글은 이름 없는 칸(추가 운동, 주차 정의가 없을 때의 부위 칸)에만. 고정 칸은 .usel.fixed 에 .on 단추 하나라 strMode 그대로.
         ② 서비스워커 캐시를 화면/그림 둘로 — 업데이트 때 index.html 만 새로 받는다(예전엔 그림 104개 4.8MB 를 매번 통째로).
@@ -776,6 +778,7 @@ body.peek{padding-top:30px}
 .ntile .th b{font-size:15px}
 .ntile .th .dt{margin-left:auto;font-size:11.5px;color:var(--muted2)}
 .ntile .bd{font-size:14px;color:var(--ink2);line-height:1.65;white-space:pre-wrap}
+.ntile .ntok{margin-top:10px}                                                   /* [1.23.0] 공지마다 확인 */
 .pchip{display:inline-block;background:#EAF1FF;color:#2F5FB3;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:800}
 .wrow #cal-detail.open{margin-top:10px}          /* [0.91.1] 주차 카드 안에 들어갔을 때 */
 .dayrec{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
@@ -1415,11 +1418,11 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.22.0';
+var PWA_VER = '1.23.0';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.12 21:46';
+var PWA_BUILD = '2026.09.12 22:40';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -4400,16 +4403,35 @@ function showPop(){
   if(!POP.length){box.classList.add('hidden');return;}
   var mine=POP.filter(function(n){return n.개별;}), rest=POP.filter(function(n){return !n.개별;});
   var list=mine.concat(rest);
-  document.getElementById('pop-cnt').textContent=(POP.length>1)?('새 소식 '+POP.length+'개'):(mine.length?'💬 나에게 온 공지':'새 공지');
+  document.getElementById('pop-cnt').textContent=(POP.length>1)?('새 소식 '+POP.length+'개 · 하나씩 확인해 주세요'):(mine.length?'💬 나에게 온 공지':'새 공지');
   document.getElementById('pop-date').textContent=mine.length?('선생님 코멘트 '+mine.length+'개'):'';
+  /* [1.23.0] 공지마다 «확인했습니다» 를 따로 누른다 — 한 번에 전부 닫던 아래 단추는 숨긴다 */
   document.getElementById('pop-body').innerHTML=list.map(function(n){
-    return '<div class="ntile'+(n.개별?' me':'')+'">'
+    return '<div class="ntile'+(n.개별?' me':'')+'" data-id="'+String(n.공지ID).replace(/[^\w-]/g,'')+'">'
       +'<div class="th">'+(n.개별?'<span class="pchip">개인</span>':'')+'<b>'+esc(n.제목||'')+'</b>'
       +'<span class="dt">'+esc(n.날짜||'')+'</span></div>'
-      +'<div class="bd">'+noticeBodyHTML(n)+'</div></div>';
+      +'<div class="bd">'+noticeBodyHTML(n)+'</div>'
+      +'<button type="button" class="btn sm ntok" onclick="popOne(this)">확인했습니다</button></div>';
   }).join('');
-  document.getElementById('pop-btn').textContent='확인했습니다'+(POP.length>1?(' · '+POP.length+'개'):'');
+  document.getElementById('pop-btn').classList.add('hidden');
   box.classList.remove('hidden');
+}
+/* [1.23.0] 공지 하나 확인 — 읽음으로 남기고 그 타일을 뺀다. 다 확인하면 팝업을 닫는다 */
+function popOne(btn){
+  var tile=btn.closest('.ntile'), id=tile&&tile.getAttribute('data-id');
+  if(!id||!ST.student) return;
+  var done=function(){
+    (ST.notices||[]).forEach(function(n){ if(n.공지ID===id) n.읽음=true; });
+    POP=POP.filter(function(n){ return n.공지ID!==id; });
+    if(!POP.length){
+      document.getElementById('nt-pop').classList.add('hidden');
+      loadNoticesStudent(); toast('모두 확인했어요');
+    } else { showPop(); toast('확인했어요 · 남은 공지 '+POP.length+'개'); }
+  };
+  if(isPeek()){ toast('🔑 둘러보기 중이라 읽음으로 남지 않아요'); done(); return; }
+  btn.disabled=true; btn.textContent='확인하는 중…';
+  setTimeout(function(){ if(btn.disabled){ btn.disabled=false; btn.textContent='확인했습니다'; } }, 15000);   // 통신이 끊기면 다시 누르게
+  call('markNoticesRead',[ST.student.학번,[id]],done);
 }
 /* [0.50.0] 확인한 공지는 공지 탭에 «읽음»으로 남는다 — 팝업이 끝나면 목록 갱신 */
 /* [0.98.0] 한 번에 전부 읽음 처리 */
