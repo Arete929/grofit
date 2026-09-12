@@ -1,4 +1,7 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.18.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.19.0 -->
+<!--   [1.19.0] 선생님이 «보류»한 기록을 «⏸ 보류 중»(보라)으로 — 도장판 배지(«보류 중 · n일 · 확인 중 m일»), 날짜 칸 점·바탕,
+        그날 기록 펼침의 안내 말풍선, 날짜 고를 때 «이미 있어요» 줄. 서버 GAS 1.13.0 의 운동일자 h · 보류중 · 기록 «보류» 를 쓴다.
+        보류 메모는 오지 않는다. 인정 전까지 운동한 날로 안 세는 것은 그대로. -->
 <!--   [1.18.0] 2주차 유산소 «NRC 전용» → «삼성헬스 · 나이키 런클럽 · 애플 피트니스 중 하나».
         앱마다 올릴 화면(삼성·NRC = 운동 상세정보 / 애플 = 세부사항)과 시간 칸에 적을 값을 따로 안내한다.
         기준 시간은 «움직인 시간»(삼성·애플 운동 시간 / NRC 활성 시간). «총 시간»·«경과 시간»은 쉰 시간까지 들어가 적으면 안 된다.
@@ -675,6 +678,9 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 .wcell.pend{background:#f2f6fa;border-color:#d6e2ee}
 .wcell.pend .n{color:#5b7fa8}
 .wcell .dd i.p{background:#9db9d4}
+.wb.hold{background:#f1ecf8;color:#5b3f8f}                                       /* [1.19.0] 보류 중 */
+.wcell.hold .n{color:#6b4fa0}
+.wcell .dd i.h{background:#a58bd0}
 .wcells{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .wcell{aspect-ratio:1;border-radius:9px;background:#fafbfa;border:1px solid transparent;
   display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted2)}
@@ -683,6 +689,7 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 .wcell .dd{display:flex;gap:2px;margin-top:2px;height:5px}
 .wcell .dd i{width:5px;height:5px;border-radius:50%;display:block}
 .wcell.on{background:var(--surface);border-color:var(--line2);cursor:pointer}
+.wcell.hold{background:#f7f3fc;border-color:#ddd0ef}                            /* [1.19.0] .on 뒤, .today·.sel 앞 */
 .wcell.today{border:1.5px solid var(--primary);background:var(--primary-tint)}
 .wcell.sel{border:2px solid var(--primary);background:var(--primary-tint)}
 .stamps{display:flex;gap:6px;margin-bottom:8px}
@@ -748,6 +755,7 @@ body.peek{padding-top:30px}
 .dhelp .ex svg{width:100%;height:auto;border-radius:8px;display:block}
 .dhelp .ex figcaption{font-size:11px;color:var(--muted2);margin-top:4px}
 .bubble.bad{background:#fdecec;color:#a33}                                       /* [0.92.0] 미인정 사유 */
+.bubble.hold{background:#f1ecf8;color:#5b3f8f}                                   /* [1.19.0] 보류 중 */
 /* [0.98.0] 공지 타일 — 여러 개면 아래로 이어 붙인다 */
 .ntile{border:1px solid var(--line);border-radius:14px;padding:12px 13px;margin-bottom:10px;background:#fff}
 .ntile:last-child{margin-bottom:0}
@@ -1375,11 +1383,11 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.18.0';
+var PWA_VER = '1.19.0';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.12 12:28';
+var PWA_BUILD = '2026.09.12 19:42';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2621,8 +2629,11 @@ function renderCal(h){
     }
     else { bc='miss'; bt='아쉬워요 · '+(Number(info['완료일수'])||0)+'일'; }
     // 냈지만 아직 확인 전인 날이 있으면 그걸 먼저 알려준다
-    var pd=Number(info['검토중'])||0;
-    if(pd>0&&!met){ bc='pend'; bt='선생님 확인 중 · '+pd+'일'; }
+    var pd=Number(info['검토중'])||0, hd=Number(info['보류중'])||0;   // [1.19.0] 보류중은 검토중에 들어 있다
+    if(pd>0&&!met){
+      if(hd>0){ bc='hold'; bt='⏸ 보류 중 · '+hd+'일'+(pd>hd?' · 확인 중 '+(pd-hd)+'일':''); }
+      else { bc='pend'; bt='선생님 확인 중 · '+pd+'일'; }
+    }
 
     var left='';
     if(isNow){
@@ -2634,11 +2645,12 @@ function renderCal(h){
     for(var i=0;i<7;i++){
       var d=new Date(s); d.setDate(s.getDate()+i);
       var ds=fmtLocal(d), rec=map[ds];
-      var pend = !!(rec&&rec.p);
-      var cls='wcell'+(rec?' on':'')+(pend?' pend':'')+(ds===tds?' today':'')+(ST.calDay===ds?' sel':'');
+      var pend = !!(rec&&rec.p), hold = !!(rec&&rec.h);       // [1.19.0] 보류 = 보라
+      var pc = hold?'h':'p';
+      var cls='wcell'+(rec?' on':'')+(pend?(hold?' hold':' pend'):'')+(ds===tds?' today':'')+(ST.calDay===ds?' sel':'');
       var dots = rec ? ('<span class="dd">'
-        +(rec.c?'<i class="'+(pend?'p':'')+'" style="'+(pend?'':'background:var(--cardio)')+'"></i>':'')
-        +(rec.s?'<i class="'+(pend?'p':'')+'" style="'+(pend?'':'background:var(--strength)')+'"></i>':'')+'</span>') : '';
+        +(rec.c?'<i class="'+(pend?pc:'')+'" style="'+(pend?'':'background:var(--cardio)')+'"></i>':'')
+        +(rec.s?'<i class="'+(pend?pc:'')+'" style="'+(pend?'':'background:var(--strength)')+'"></i>':'')+'</span>') : '';
       var clk = rec ? ' onclick="toggleCalDay(&quot;'+ds+'&quot;)"' : '';
       cells+='<div class="'+cls+'"'+clk+'><span class="w">'+DOW[d.getDay()]+'</span>'
         +'<span class="n">'+d.getDate()+'</span>'+dots+'</div>';
@@ -2847,6 +2859,7 @@ function renderDupWarn(prov){
   }
   box.className='latewarn dup';
   box.innerHTML='⚠️ <b>이 날 '+kind+' 기록이 이미 있어요</b>'+(r.인정==='미인정'&&r.미인정사유?' (미인정 · '+esc(r.미인정사유)+')':'')
+    +(r.보류?' (⏸ 보류 중)':'')                                                        // [1.19.0]
     +'<br>다시 올리면 <b>이전 기록을 덮어씁니다.</b> 기록은 하루에 종류별 1건만 남아요.';
   box.classList.remove('hidden');
 }
@@ -4481,6 +4494,8 @@ function polarHTML(r){
 }
 function recExtraHTML(r){
   var h=polarHTML(r);                                   // [0.95.0]
+  if(r.보류) h+='<div class="bubble hold" style="margin-top:6px">⏸ <b>보류 중</b> — 선생님이 확인하고 판정을 잠시 미뤄 둔 기록이에요.'
+    +'<br><span class="cap">인정되기 전까지는 운동한 날로 세지 않아요. 궁금하면 선생님께 물어보세요.</span></div>';   // [1.19.0]
   if(r.인정==='미인정') h+='<div class="bubble bad" style="margin-top:6px">❌ 인정되지 않았어요'+(r.미인정사유?' · '+esc(r.미인정사유):'')+'<br><span class="cap">같은 날짜로 다시 올리면 이전 기록을 덮어써요.</span></div>';
   if(r.코멘트||r.스티커) h+=comicHTML(r.코멘트||'',r.스티커||'');
   return h;
