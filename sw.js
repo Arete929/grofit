@@ -6,7 +6,7 @@
    처음 이 판으로 바뀔 때도 옛 캐시에 있던 그림을 옮겨 담으므로 다시 받지 않는다.
    ★그림 파일을 «같은 이름»으로 바꿔 넣었으면 STATIC 숫자를 올릴 것 — 그래야 새 그림을 받는다.
    ★그림 한 장을 못 받아도 설치는 계속된다(예전 addAll 은 한 장만 없어도 설치가 통째로 실패했다). */
-var CACHE = 'grofit-v1.23.1';
+var CACHE = 'grofit-v1.24.0';
 var STATIC = 'grofit-static-1';
 var PAGES = ['./', './index.html'];
 var ASSETS = [
