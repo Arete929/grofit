@@ -1,4 +1,8 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.21.1 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.22.0 -->
+<!--   [1.22.0] 근력 필수 운동은 단위를 고정해 보여 준다 — STR_WEEK 의 unit:'time'(플랭크·사이드 플랭크)은 «시간», 나머지는 «횟수».
+        [횟수][시간] 토글은 이름 없는 칸(추가 운동, 주차 정의가 없을 때의 부위 칸)에만. 고정 칸은 .usel.fixed 에 .on 단추 하나라 strMode 그대로.
+        ② 서비스워커 캐시를 화면/그림 둘로 — 업데이트 때 index.html 만 새로 받는다(예전엔 그림 104개 4.8MB 를 매번 통째로).
+        ③ «네트워크 오류» 알림에 실패한 요청 이름과 까닭(연결 실패 / 서버 응답 이상 + 상태)을 붙인다 — 3277 만 못 들어가던 것 추적용. -->
 <!--   [1.21.1] 올릴 화면 이름 정정 — 삼성헬스 «운동 상세보기» · NRC «상세정보» · 애플 «세부사항»(그대로). «2주차부터» 명시. -->
 <!--   [1.21.0] 유산소 페이스 기준 주차별(GAS 1.15.0 유산소_주차별_최대페이스) — 2주차 14분 · 3주차 12분 · 4주차 10분.
         cardioStd(주차) 가 그 주차 값을 쓰고, 유산소 안내 상자(#cardio-std)가 고른 주차의 기준과 주차별 단계를 보여 준다. -->
@@ -320,6 +324,8 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .usel button{border:0;background:transparent;color:var(--muted2);font-family:inherit;
   font-size:10.5px;font-weight:800;padding:2px 7px;cursor:pointer;line-height:1.5}
 .usel button.on{background:var(--strength-dark);color:#fff}
+.usel.fixed{border-color:transparent;background:transparent}                     /* [1.22.0] 필수 운동 — 단위 고정 */
+.usel.fixed button{cursor:default;pointer-events:none;border-radius:6px}
 .exnum label.tmode{flex:1.9}
 /* [0.93.0] 세트별 입력 */
 .setlist{margin-top:7px;display:flex;flex-direction:column;gap:5px}
@@ -1109,7 +1115,7 @@ body.peek{padding-top:30px}
         <p>세 칸을 모두 채워야 저장됩니다. 더 했으면 ＋로 추가하세요.</p>
       </div>
       <p class="cap" style="margin:-2px 0 10px"><b>세트</b>와 <b>횟수</b>를 채우면 됩니다.<br>
-      플랭크처럼 버티는 운동은 <b>시간</b>을 눌러 <b>분 · 초</b>로 적으세요.</p>
+      필수 운동은 단위(횟수·시간)가 정해져 있어요. <b>추가 운동</b>만 횟수·시간을 고를 수 있어요.</p>
       <div id="str-list"></div>
     </div>
     <div class="card">
@@ -1409,11 +1415,11 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.21.1';
+var PWA_VER = '1.22.0';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.12 21:15';
+var PWA_BUILD = '2026.09.12 21:46';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2483,13 +2489,20 @@ function showUp(id,at,just){
   el.textContent = at ? ((just?'✅ 업로드됨 · ':'마지막 업로드 · ')+at) : '';
   el.className='savedat'+(just?' just':'');
 }
-function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(function(){t.classList.remove('on')},1900);}
+function toast(m,ms){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');
+  clearTimeout(toast._t); toast._t=setTimeout(function(){t.classList.remove('on')},ms||1900);}   // [1.22.0] 오류는 오래 보이게
 function pick(id){document.getElementById(id).click();}
 function call(fn,args,cb){
   fetch(API_BASE,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
     body:JSON.stringify({action:fn,token:localStorage.getItem('grofit_token')||'',args:args||[]})})
-   .then(function(r){return r.json();})
-   .catch(function(e){ toast('네트워크 오류 · 연결을 확인하세요'); return undefined; })   // 통신·응답 실패만 여기
+   .then(function(r){ return r.text().then(function(t){          // [1.22.0] JSON 이 아니면 까닭을 남긴다
+     try{ return JSON.parse(t); }
+     catch(e){ var er=new Error('bad json'); er.why='서버 응답 이상 '+r.status; er.body=String(t).slice(0,200); throw er; }
+   }); })
+   .catch(function(e){                                               // 통신·응답 실패만 여기
+     var why=(e&&e.why)||'연결 실패';
+     console.error('[혜원핏] '+fn+' 실패 · '+why, e&&e.body||e);
+     toast('네트워크 오류 · '+why+' ('+fn+') · 연결을 확인하세요', 6000); return undefined; })
    .then(function(x){
      if(x===undefined) return;
      if(x&&x.authFail){logout();return;}
@@ -3371,8 +3384,11 @@ function renderStrGuide(){
   if(fixed){
     box.innerHTML = '<b>💪 ' + wk + '주차 필수 운동은 '
       + ps.map(function(p){return '«'+p.name+'»';}).join(' · ') + ' 입니다</b>'
-      + '<p>운동 이름은 이미 적혀 있어요.<br><b>세트와 횟수만</b> 채우면 됩니다.<br>'
-      + '플랭크처럼 버티는 운동은 <b>시간</b>으로 적어요.</p>'
+      + '<p>운동 이름과 단위(횟수·시간)는 이미 정해져 있어요.<br><b>세트마다 횟수(또는 시간)만</b> 채우면 됩니다.'
+      + (ps.some(function(p){return p.unit==='time';})
+          ? '<br>' + ps.filter(function(p){return p.unit==='time';}).map(function(p){return '«'+p.name+'»';}).join(' · ')
+            + ' 은 버티는 운동이라 <b>분 · 초</b>로 적어요.' : '')
+      + '</p>'
       + '<p>이름 옆 <b>«방법 ▾»</b>을 누르면<br>자세 그림 · 하는 순서 · 주의할 점 · <b>시연 영상</b>이 나옵니다.</p>'
       + '<p>더 한 운동은 아래 <b>➕ 추가 운동</b>에 넣으세요.</p>';
   } else {
@@ -3422,9 +3438,13 @@ function addStrRow(part){
     +'<div class="exnum">'
       +(nowt?'':'<label>무게<input class="s-wt" inputmode="decimal" placeholder="kg"><span class="unit">kg</span></label>')
       +'<label>세트<input class="s-set" inputmode="numeric" value="'+STR_MIN_SET+'" readonly><span class="unit">세트</span></label>'
-      +'<label><span style="display:block;margin-bottom:3px">단위</span><span class="usel">'
-        +'<button type="button"'+(tmode?'':' class="on"')+' data-m="rep" onclick="pickUnit(this)">횟수</button>'
-        +'<button type="button"'+(tmode?' class="on"':'')+' data-m="time" onclick="pickUnit(this)">시간</button></span></label>'
+      +(fixName
+        /* [1.22.0] 필수 운동은 단위가 정해져 있다 — 고르지 않고 보여만 준다(strMode 는 .on 하나를 읽는다) */
+        ? '<label><span style="display:block;margin-bottom:3px">단위</span><span class="usel fixed">'
+          +'<button type="button" class="on" data-m="'+(tmode?'time':'rep')+'" tabindex="-1">'+(tmode?'시간':'횟수')+'</button></span></label>'
+        : '<label><span style="display:block;margin-bottom:3px">단위</span><span class="usel">'
+          +'<button type="button"'+(tmode?'':' class="on"')+' data-m="rep" onclick="pickUnit(this)">횟수</button>'
+          +'<button type="button"'+(tmode?' class="on"':'')+' data-m="time" onclick="pickUnit(this)">시간</button></span></label>')
     +'</div>'
     /* [0.93.0] 세트마다 한 줄 — ＋ 세트 추가 */
     +'<div class="setlist">'+setRowsHTML(STR_MIN_SET,tmode)+'</div>'        // [1.01.0] 처음부터 3세트
