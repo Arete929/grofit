@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.26.1 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.26.2 -->
+<!--   [1.26.2] 서버 요청(call)이 실패하면 1.2초 뒤 · 3초 뒤 두 번 더 보낸다(전엔 한 번). 구글이 결과를 넘겨주는 주소가 붐빌 때
+        404 를 연달아 줘서 «네트워크 오류 · 서버 응답 이상 404» 가 뜨던 것(9/13 밤) 줄이기. 사진 올리기(XHR)는 그대로. -->
 <!--   [1.26.1] 근력 세트 칸의 빈칸 표시 «0» → «횟수 적기»(시간은 «분»·«초»). «0 0 0» 이 이미 적힌 값처럼 보여
         어디에 적는지 못 찾았다는 문의(3305). 저장 형식·검사는 그대로. -->
 <!--   [1.26.0] 공지 글의 [예시:삼성] · [예시:NRC] · [예시:애플] → 그 자리에 실제 상세 화면(ex-app-*.jpg). emoHtml 이 처리해서
@@ -1457,7 +1459,7 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.26.1';
+var PWA_VER = '1.26.2';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
@@ -2544,11 +2546,16 @@ function callOnce(fn,args){
      catch(e){ var er=new Error('bad json'); er.why='서버 응답 이상 '+r.status; er.body=String(t).slice(0,200); throw er; }
    }); });
 }
+/* [1.26.2] 9/13 밤 1주차 마감(22:00) 뒤에도 «서버 응답 이상 404» 가 두 번 연달아 나 알림이 떴다 → 3초 뒤 한 번 더(모두 세 번) */
+function callRetry_(fn,args,ms){
+  return function(e){ console.warn('[혜원핏] '+fn+' 다시', (e&&e.why)||e);
+    return new Promise(function(ok){ setTimeout(ok,ms); }).then(function(){ return callOnce(fn,args); }); };
+}
 function call(fn,args,cb){
   callOnce(fn,args)
-   .catch(function(e){ console.warn('[혜원핏] '+fn+' 한 번 더', (e&&e.why)||e);
-     return new Promise(function(ok){ setTimeout(ok,1200); }).then(function(){ return callOnce(fn,args); }); })
-   .catch(function(e){                                               // 두 번 다 실패했을 때만 여기
+   .catch(callRetry_(fn,args,1200))
+   .catch(callRetry_(fn,args,3000))
+   .catch(function(e){                                               // 세 번 다 실패했을 때만 여기
      var why=(e&&e.why)||'연결 실패';
      console.error('[혜원핏] '+fn+' 실패 · '+why, e&&e.body||e);
      toast('네트워크 오류 · '+why+' ('+fn+') · 연결을 확인하세요', 6000); return undefined; })
