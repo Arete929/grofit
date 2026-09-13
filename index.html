@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.26.3 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.26.4 -->
+<!--   [1.26.4] 성찰 화면 «이번 주 요약» 예시(그 주 기록이 없을 때)를 지금 규칙으로 — 여름 시범의 «목표 3일 · 근력 1일» 이 2주차 첫날 떴다.
+        예시 = 추천 한 주(월 근력 · 수 유산소 · 금 근력 · 토 유산소), 목표 숫자는 서버 설정으로 덮는다(sampleWeek). 홈 자리표시 «주 4일 목표 0/4», 목표 없을 때 기본 4. -->
 <!--   [1.26.3] ★로그인 안정 — ① 서버 요청 한 번에 18초까지만 기다리고 끊은 뒤 다시 보낸다(AbortController · CALL_TIMEOUT).
         9/13 밤 실측: 서버 처리 3~7초인데 구글이 결과를 넘겨주는 주소가 19~30초를 끌다 404·엉뚱한 쪽을 줬다(정상 0.3~2.5초).
         ② 자동 로그인이면 앱을 켤 때 getPublicConfig 를 따로 부르지 않는다 — 묶음(studentBundle)의 설정으로 테마·제목(applyPubCfg).
@@ -1463,7 +1465,7 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.26.3';
+var PWA_VER = '1.26.4';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
