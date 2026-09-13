@@ -1,4 +1,8 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.26.2 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.26.3 -->
+<!--   [1.26.3] ★로그인 안정 — ① 서버 요청 한 번에 18초까지만 기다리고 끊은 뒤 다시 보낸다(AbortController · CALL_TIMEOUT).
+        9/13 밤 실측: 서버 처리 3~7초인데 구글이 결과를 넘겨주는 주소가 19~30초를 끌다 404·엉뚱한 쪽을 줬다(정상 0.3~2.5초).
+        ② 자동 로그인이면 앱을 켤 때 getPublicConfig 를 따로 부르지 않는다 — 묶음(studentBundle)의 설정으로 테마·제목(applyPubCfg).
+        서버 요청이 둘 → 하나. (GAS 1.19.0 설정 캐시 · 로그인 로그 쓰기 제거와 함께) -->
 <!--   [1.26.2] 서버 요청(call)이 실패하면 1.2초 뒤 · 3초 뒤 두 번 더 보낸다(전엔 한 번). 구글이 결과를 넘겨주는 주소가 붐빌 때
         404 를 연달아 줘서 «네트워크 오류 · 서버 응답 이상 404» 가 뜨던 것(9/13 밤) 줄이기. 사진 올리기(XHR)는 그대로. -->
 <!--   [1.26.1] 근력 세트 칸의 빈칸 표시 «0» → «횟수 적기»(시간은 «분»·«초»). «0 0 0» 이 이미 적힌 값처럼 보여
@@ -1459,7 +1463,7 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.26.2';
+var PWA_VER = '1.26.3';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
@@ -2538,13 +2542,22 @@ function toast(m,ms){var t=document.getElementById('toast');t.textContent=m;t.cl
 function pick(id){document.getElementById(id).click();}
 /* [1.23.1] 구글이 결과를 넘겨주는 주소(googleusercontent)가 가끔 404·HTML 을 준다(9/12 밤 실측).
    한 번 실패하면 1.2초 뒤 한 번 더 보낸다 — call 로 부르는 것은 읽기이거나 같은 값을 다시 적는 것뿐이라 두 번 가도 된다. */
+/* [1.26.3] 한 번에 18초까지만 기다린다 — 9/13 밤 실측: 서버 처리는 3~7초인데 구글이 결과를 넘겨주는 주소가
+   19~30초를 끌다 404·엉뚱한 쪽을 줬다(정상은 0.3~2.5초). 오래 끌면 끊고 곧바로 다시 보낸다(call 의 재시도). */
+var CALL_TIMEOUT=18000;
 function callOnce(fn,args){
-  return fetch(API_BASE,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+  var ac=(typeof AbortController!=='undefined')?new AbortController():null, tm=null;
+  if(ac) tm=setTimeout(function(){ try{ ac.abort(); }catch(e){} }, CALL_TIMEOUT);
+  return fetch(API_BASE,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},signal:ac?ac.signal:undefined,
     body:JSON.stringify({action:fn,token:localStorage.getItem('grofit_token')||'',args:args||[]})})
+   .catch(function(e){ if(tm)clearTimeout(tm);
+     var er=new Error('fetch'); er.why=(e&&e.name==='AbortError')?'응답이 너무 늦음':'연결 실패'; throw er; })
    .then(function(r){ return r.text().then(function(t){          // [1.22.0] JSON 이 아니면 까닭을 남긴다
+     if(tm)clearTimeout(tm);
      try{ return JSON.parse(t); }
      catch(e){ var er=new Error('bad json'); er.why='서버 응답 이상 '+r.status; er.body=String(t).slice(0,200); throw er; }
-   }); });
+   }, function(e){ if(tm)clearTimeout(tm);                       // 본문을 받다가 끊긴 경우
+     var er=new Error('body'); er.why=(e&&e.name==='AbortError')?'응답이 너무 늦음':'연결 실패'; throw er; }); });
 }
 /* [1.26.2] 9/13 밤 1주차 마감(22:00) 뒤에도 «서버 응답 이상 404» 가 두 번 연달아 나 알림이 떴다 → 3초 뒤 한 번 더(모두 세 번) */
 function callRetry_(fn,args,ms){
@@ -2558,7 +2571,7 @@ function call(fn,args,cb){
    .catch(function(e){                                               // 세 번 다 실패했을 때만 여기
      var why=(e&&e.why)||'연결 실패';
      console.error('[혜원핏] '+fn+' 실패 · '+why, e&&e.body||e);
-     toast('네트워크 오류 · '+why+' ('+fn+') · 연결을 확인하세요', 6000); return undefined; })
+     toast('서버가 붐벼 응답이 늦어요 · 잠시 뒤 다시 해 주세요 ('+why+' · '+fn+')', 6000); return undefined; })   // [1.26.3] 대개 구글 쪽이라 «연결 확인»은 틀린 안내
    .then(function(x){
      if(x===undefined) return;
      if(x&&x.authFail){logout();return;}
@@ -4808,7 +4821,30 @@ function mock(fn,args){
   }
   applyTheme(myTheme());          // 내가 고른 테마 우선(깜빡임 방지)
   renderThemeSwatches();
-  call('getPublicConfig',[],function(c){if(c){ST.config=c;
+  /* [1.26.3] 자동 로그인이면 설정을 따로 부르지 않는다 — 묶음(studentBundle)에 설정이 들어 있다. 앱을 켤 때 서버 요청이 둘 → 하나 */
+  var autoIn=!!(localStorage.getItem('grofit_student') && localStorage.getItem('grofit_token'));
+  if(!autoIn) call('getPublicConfig',[],applyPubCfg);
+  document.getElementById('ver').textContent=verLine();
+  /* [0.65.0] 자동 로그인 — 저장해 둔 학생 정보로 화면부터 띄우고,
+     studentBundle 한 번으로 설정·홈·공지·저장시각을 모두 받는다.  */
+  var saved=localStorage.getItem('grofit_student');
+  if(saved && localStorage.getItem('grofit_token')){
+    try{
+      ST.student=JSON.parse(saved);
+      document.getElementById('hi-name').textContent=ST.student.학번+' '+ST.student.이름;
+      go('home', true);
+      var cached=loadBundle();                    // [1.15.0] 지난번 홈을 먼저 — 서버를 기다리지 않는다
+      if(cached){ applyBundle(cached, true); if(cached.config) applyPubCfg(cached.config); }
+      call('studentBundle',[ST.student.학번],function(b){
+        if(!b||!b.ok)return;
+        applyBundle(b);
+        if(b.config) applyPubCfg(b.config);        // [1.26.3] 테마·제목도 묶음의 설정으로
+      });
+    }catch(e){}
+  }
+})();
+/* [1.26.3] 설정 받은 뒤 — 테마·로그인 화면 제목 (예전엔 앱 켤 때 getPublicConfig 콜백 안에 있었다) */
+function applyPubCfg(c){ if(c){ST.config=c;
     var mine=null; try{mine=localStorage.getItem('grofit_theme');}catch(e){}
     var allow=(String(c.학생_테마선택)!=='off');   // 관리자가 잠그면 학교 지정 테마로 통일
     if(!allow){
@@ -4823,25 +4859,7 @@ function mock(fn,args){
     }
     if(c.앱_제목)document.getElementById('lg-title').textContent=c.앱_제목;
     if(c.평가명)document.getElementById('lg-sub').textContent=c.평가명;
-  }});
-  document.getElementById('ver').textContent=verLine();
-  /* [0.65.0] 자동 로그인 — 저장해 둔 학생 정보로 화면부터 띄우고,
-     studentBundle 한 번으로 설정·홈·공지·저장시각을 모두 받는다.  */
-  var saved=localStorage.getItem('grofit_student');
-  if(saved && localStorage.getItem('grofit_token')){
-    try{
-      ST.student=JSON.parse(saved);
-      document.getElementById('hi-name').textContent=ST.student.학번+' '+ST.student.이름;
-      go('home', true);
-      var cached=loadBundle();                    // [1.15.0] 지난번 홈을 먼저 — 서버를 기다리지 않는다
-      if(cached) applyBundle(cached, true);
-      call('studentBundle',[ST.student.학번],function(b){
-        if(!b||!b.ok)return;
-        applyBundle(b);
-      });
-    }catch(e){}
-  }
-})();
+  }}
 </script>
 </body>
 </html>
