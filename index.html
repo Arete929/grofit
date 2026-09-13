@@ -944,7 +944,7 @@ body.peek{padding-top:30px}
       <div class="gauge">
         <div id="g-week"></div>
         <div style="flex:1">
-          <div class="list-item" style="padding:6px 0"><span id="g-total-l">주 3일 목표</span><span class="chip ok" id="g-total-c">0/3</span></div>
+          <div class="list-item" style="padding:6px 0"><span id="g-total-l">주 4일 목표</span><span class="chip ok" id="g-total-c">0/4</span></div>
           <div class="list-item" style="padding:6px 0"><span>유산소 필수</span><span class="chip cardio" id="g-cardio-c">0/2</span></div>
           <div class="list-item" style="padding:6px 0" id="g-str-row"><span>근력 필수</span><span class="chip strength" id="g-str-c">0/2</span></div>
         </div>
@@ -4186,15 +4186,24 @@ function satEmoji(v){var f=SAT.filter(function(s){return s.v===v;});return f.len
 /* ---------- 이번 주 운동 요약 (성찰 쓸 때 보면서) ---------- */
 var WK=null, WK_DEMO=false;
 /* 기록이 하나도 없을 때 보여줄 예시 */
-var WK_SAMPLE={주차:1,총주차:4,시작일:'2026-08-10',종료일:'2026-08-16',운동일수:3,유산소일수:2,근력일수:1,
-  목표일수:3,유산소필수:2,달성:true,총거리:6.0,총시간:53,
-  요일맵:{'2026-08-11':{c:true,s:false},'2026-08-13':{c:false,s:true},'2026-08-15':{c:true,s:false}},
+/* [1.26.4] 지금 규칙(주 4일 · 유산소 2 · 근력 2)으로 — 예전 여름 시범의 «목표 3일 · 근력 1일» 예시가 2주차 첫날 성찰 화면에 떴다.
+   목표 숫자는 보여 줄 때 서버 설정으로 덮는다(sampleWeek). 날짜는 추천 한 주(월 근력 · 수 유산소 · 금 근력 · 토 유산소) */
+var WK_SAMPLE={주차:1,총주차:4,시작일:'2026-09-07',종료일:'2026-09-13',운동일수:4,유산소일수:2,근력일수:2,
+  목표일수:4,유산소필수:2,근력필수:2,달성:true,총거리:6.5,총시간:63,
+  요일맵:{'2026-09-07':{c:false,s:true},'2026-09-09':{c:true,s:false},'2026-09-11':{c:false,s:true},'2026-09-12':{c:true,s:false}},
   지난주:null,
-  누적:{주차수:1,운동일수:3,유산소일수:2,근력일수:1,총거리:6.0,총시간:53,달성주차:1,목표일수:3},
-  주차별:[{주차:1,운동일수:3,유산소일수:2,근력일수:1,총거리:6.0,총시간:53,달성:true}],
-  기록:[{날짜:'2026-08-11',요일:'화',종류:'유산소',거리:3.2,시간:28,내용:'페이스 8분45초 · 240kcal',성찰:'초반엔 힘들었는데 20분 넘으니 리듬이 잡혔다.'},
-        {날짜:'2026-08-13',요일:'목',종류:'근력',내용:'스쿼트 3세트×15, 런지 3세트×12',성찰:'자세를 신경 쓰니 허벅지에 자극이 확실했다.'},
-        {날짜:'2026-08-15',요일:'토',종류:'유산소',거리:2.8,시간:25,내용:'가볍게 걷기',성찰:''}]};
+  누적:{주차수:1,운동일수:4,유산소일수:2,근력일수:2,총거리:6.5,총시간:63,달성주차:1,목표일수:4},
+  주차별:[{주차:1,운동일수:4,유산소일수:2,근력일수:2,총거리:6.5,총시간:63,달성:true}],
+  기록:[{날짜:'2026-09-07',요일:'월',종류:'근력',내용:'암 워킹 3세트×10/8/6회, 리버스 런지 3세트×12/10/8회, 플랭크 3세트×40/30/20초',성찰:'첫 세트를 최대로 하니 마지막 세트가 버거웠다.'},
+        {날짜:'2026-09-09',요일:'수',종류:'유산소',거리:3.3,시간:31,내용:'페이스 9분24초 · 240kcal',성찰:'초반엔 힘들었는데 20분 넘으니 리듬이 잡혔다.'},
+        {날짜:'2026-09-11',요일:'금',종류:'근력',내용:'암 워킹 3세트×11/9/7회, 리버스 런지 3세트×12/10/9회, 플랭크 3세트×45/35/25초',성찰:'월요일보다 한 번씩 더 했다.'},
+        {날짜:'2026-09-12',요일:'토',종류:'유산소',거리:3.2,시간:32,내용:'페이스 10분 · 230kcal',성찰:''}]};
+function sampleWeek(){
+  var s=JSON.parse(JSON.stringify(WK_SAMPLE)), c=ST.config||{};
+  s.목표일수=Number(c.주간_목표일수)||4; s.유산소필수=Number(c.유산소_최소일수)||2; s.근력필수=Number(c.근력_최소일수)||2;
+  if(s.누적) s.누적.목표일수=s.목표일수;
+  return s;
+}
 
 /* yyyy-mm-dd 계산 도우미 */
 function isoAdd(iso,n){var d=new Date(iso+'T00:00:00');d.setDate(d.getDate()+n);
@@ -4226,7 +4235,7 @@ function dvBadge(cur,prev,unit,dec,compact){
 
 /* 누적 주차별 미니 막대 */
 function cumBars(w){
-  var arr=w.주차별||[], n=Number(w.총주차)||4, mx=Number(w.목표일수)||3, h='';
+  var arr=w.주차별||[], n=Number(w.총주차)||4, mx=Number(w.목표일수)||4, h='';
   arr.forEach(function(x){if(x.운동일수>mx)mx=x.운동일수;});
   for(var i=1;i<=n;i++){
     var x=null;
@@ -4275,7 +4284,7 @@ function renderWeek(w,demo){
       +(r.성찰?'<div class="cap" style="margin-top:3px">✍️ '+esc(r.성찰)+'</div>':'')+'</div></div>';
   }).join('');
 
-  var p=w.지난주, pct=Math.min(100,Math.round((w.운동일수/(w.목표일수||3))*100));
+  var p=w.지난주, pct=Math.min(100,Math.round((w.운동일수/(w.목표일수||4))*100));
   var cum=w.누적||null;
 
   // 2주차부터만 비교 섹션을 붙인다
@@ -4345,7 +4354,7 @@ function loadReflect(){
   rfOpen(ok);                                                     // [1.20.0]
   call('getWeekSummary',[ST.student.학번],function(w){
     if(w&&w.기록&&w.기록.length)renderWeek(w,false);
-    else renderWeek(WK_SAMPLE,true);        // 기록 없으면 예시로 보여주기
+    else renderWeek(sampleWeek(),true);     // 기록 없으면 예시로 보여주기 · [1.26.4] 목표는 지금 설정으로
   });
   call('getReflections',[ST.student.학번],function(list){
     /* [1.20.0] 이번 주 성찰을 이미 냈으면 확인은 끝난 것 */
