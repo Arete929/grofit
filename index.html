@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.25.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.26.0 -->
+<!--   [1.26.0] 공지 글의 [예시:삼성] · [예시:NRC] · [예시:애플] → 그 자리에 실제 상세 화면(ex-app-*.jpg). emoHtml 이 처리해서
+        새 공지 팝업·공지 탭·코멘트 어디서나 같다. 앱에 든 예시 세 장만 쓸 수 있다(다른 이름은 글자 그대로). -->
 <!--   [1.25.0] 2주차부터 앱 고르기를 «사진 올리는 칸 위»로 — 앱을 안 고르면 사진 선택이 안 된다(cardioPick).
         고르면 그 앱의 **실제 상세 화면**(학생 제출 사진을 골라 개인 정보를 가리고 ①움직인 ②전체 표시 — ex-app-samsung/nrc/apple.jpg)이 바로 아래에.
         «예시 보기»도 2주차부터는 세 앱의 실제 화면. NRC 는 아이폰에서 «러닝 시간»으로 나오는 것도 안내(칸 이름 «활성·러닝 시간»). -->
@@ -475,6 +477,10 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .appex-t{margin:0;font-size:13.5px}
 .appex-c{margin:6px 0 0;font-size:12.5px;line-height:1.7;color:var(--ink2)}
 .appex-c .m1{color:#1FA463;font-weight:800} .appex-c .m2{color:#E8870E;font-weight:800}
+/* [1.26.0] 공지 속 실제 화면 예시 */
+.ntimg{display:block;max-width:300px;margin:10px auto;text-align:center;white-space:normal}
+.ntimg img{display:block;width:100%;border-radius:10px;border:1px solid var(--line)}
+.ntimg small{display:block;font-size:12px;color:var(--muted2);margin-top:4px}
 #c-rest{background:#F4F6F3;color:var(--ink);font-weight:800}
 #c-rest.bad{background:#FCEFEE;color:#A03B2E}
 .pntags{display:flex;flex-wrap:wrap;gap:6px}
@@ -1449,11 +1455,11 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.25.0';
+var PWA_VER = '1.26.0';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.13 00:52';
+var PWA_BUILD = '2026.09.13 09:44';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -4731,8 +4737,18 @@ function comicHTML(txt,stk){
 
 /* 선생님 코멘트 속 :키: 를 캐릭터 이모티콘 그림으로 */
 function emoHtml(s){
-  return esc(s).replace(new RegExp(':(' + STK_KEYS + '):','g'),function(m,k){
-    return '<img class="emo" src="st-'+k+'.png" alt="">';});
+  return ntImgs(esc(s).replace(new RegExp(':(' + STK_KEYS + '):','g'),function(m,k){
+    return '<img class="emo" src="st-'+k+'.png" alt="">';}));
+}
+/* [1.26.0] 공지 글의 [예시:삼성] · [예시:NRC] · [예시:애플] → 그 앱의 실제 상세 화면(앱에 들어 있는 예시 세 장만) */
+var NT_IMG={'삼성':['ex-app-samsung.jpg','삼성헬스 «운동 상세보기»'],'삼성헬스':['ex-app-samsung.jpg','삼성헬스 «운동 상세보기»'],
+  'NRC':['ex-app-nrc.jpg','Nike Run Club «상세정보»'],'나이키':['ex-app-nrc.jpg','Nike Run Club «상세정보»'],
+  '애플':['ex-app-apple.jpg','애플 피트니스 «세부사항»'],'애플 피트니스':['ex-app-apple.jpg','애플 피트니스 «세부사항»']};
+function ntImgs(h){
+  return String(h).replace(/\[예시:\s*([^\]<]+?)\s*\]/g,function(m,k){
+    var e=NT_IMG[k]; if(!e) return m;
+    return '<span class="ntimg"><img src="'+e[0]+'" alt="'+e[1]+' 예시" loading="lazy"><small>'+e[1]+'</small></span>';
+  });
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
 
