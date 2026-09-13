@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.26.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.26.1 -->
+<!--   [1.26.1] 근력 세트 칸의 빈칸 표시 «0» → «횟수 적기»(시간은 «분»·«초»). «0 0 0» 이 이미 적힌 값처럼 보여
+        어디에 적는지 못 찾았다는 문의(3305). 저장 형식·검사는 그대로. -->
 <!--   [1.26.0] 공지 글의 [예시:삼성] · [예시:NRC] · [예시:애플] → 그 자리에 실제 상세 화면(ex-app-*.jpg). emoHtml 이 처리해서
         새 공지 팝업·공지 탭·코멘트 어디서나 같다. 앱에 든 예시 세 장만 쓸 수 있다(다른 이름은 글자 그대로). -->
 <!--   [1.25.0] 2주차부터 앱 고르기를 «사진 올리는 칸 위»로 — 앱을 안 고르면 사진 선택이 안 된다(cardioPick).
@@ -1455,7 +1457,7 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.26.0';
+var PWA_VER = '1.26.1';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
@@ -3533,9 +3535,10 @@ function setRowsHTML(n,time){
 /* [0.93.0] 세트 한 줄 */
 function setRowHTML(n,time){
   return '<div class="setrow"><span class="sn">'+n+'세트</span>'
-    +'<span class="repwrap'+(time?' hidden':'')+'"><input class="s-rep" inputmode="numeric" placeholder="0"><span class="u">회</span></span>'
-    +'<span class="timewrap'+(time?'':' hidden')+'"><input class="s-min" inputmode="numeric" placeholder="0"><span class="u">분</span>'
-    +'<input class="s-sec" inputmode="numeric" placeholder="0"><span class="u">초</span></span>'
+    /* [1.26.1] 빈칸 표시가 «0» 이면 이미 적힌 값(«0 0 0»)으로 보여 어디에 적는지 못 찾았다(3305 문의) → 할 일을 글자로 */
+    +'<span class="repwrap'+(time?' hidden':'')+'"><input class="s-rep" inputmode="numeric" placeholder="횟수 적기"><span class="u">회</span></span>'
+    +'<span class="timewrap'+(time?'':' hidden')+'"><input class="s-min" inputmode="numeric" placeholder="분"><span class="u">분</span>'
+    +'<input class="s-sec" inputmode="numeric" placeholder="초"><span class="u">초</span></span>'
     +'<button type="button" class="sdel'+(n<=STR_MIN_SET?' off':'')+'" onclick="delSet(this)" aria-label="세트 빼기">−</button></div>';
 }
 function setCount(row){ var n=row.querySelectorAll('.setrow').length; var c=row.querySelector('.s-set'); if(c)c.value=String(n); return n; }
