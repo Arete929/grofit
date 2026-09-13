@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.26.4 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.27.0 -->
+<!--   [1.27.0] 유산소 휴식 시간 30분 이하(선생님 결정 9/14) — 서버 설정 유산소_최대휴식분(GAS 1.21.0). 휴식 칸이 넘으면 빨갛게 «— 30분 넘으면 미인정»,
+        올릴 때 되묻는 기준에 휴식 추가(stdIssues), 유산소 안내 상자·앞 안내 문구에 «휴식 30분 이하». 기준 주차(2주차)부터. -->
 <!--   [1.26.4] 성찰 화면 «이번 주 요약» 예시(그 주 기록이 없을 때)를 지금 규칙으로 — 여름 시범의 «목표 3일 · 근력 1일» 이 2주차 첫날 떴다.
         예시 = 추천 한 주(월 근력 · 수 유산소 · 금 근력 · 토 유산소), 목표 숫자는 서버 설정으로 덮는다(sampleWeek). 홈 자리표시 «주 4일 목표 0/4», 목표 없을 때 기본 4. -->
 <!--   [1.26.3] ★로그인 안정 — ① 서버 요청 한 번에 18초까지만 기다리고 끊은 뒤 다시 보낸다(AbortController · CALL_TIMEOUT).
@@ -1038,7 +1040,7 @@ body.peek{padding-top:30px}
         <li>⛔ <b>지도가 보이는 요약 화면은 올리지 마세요</b><br>
           <span class="cap">숫자가 다 안 보이고, 사는 곳이 드러날 수 있어요.</span></li>
       </ul>
-      <p class="cap"><b>2주차부터</b>는 기록할 때 앱을 고르고 <b>시간 두 개</b>(움직인 · 전체)를 적어요. 휴식 시간은 저절로 계산돼요.<br>
+      <p class="cap"><b>2주차부터</b>는 기록할 때 앱을 고르고 <b>시간 두 개</b>(움직인 · 전체)를 적어요. 휴식 시간은 저절로 계산돼요 — <b>휴식 30분이 넘으면 미인정</b>.<br>
       인정과 페이스는 <b>움직인 시간</b>으로 봐요.</p>
       <p><b>거리 · 시간 · 날짜</b>가 한 화면에 보이면 됩니다.</p>
     </div>
@@ -1465,7 +1467,7 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.26.4';
+var PWA_VER = '1.27.0';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
@@ -3097,7 +3099,7 @@ function cardioPaceCheck(){
   var iss=stdIssues(km,mn,p);
   if(iss.length){
     var N0='\n', sd=cardioStd();
-    return askP(sd.week+'주차부터 유산소는'+N0+'«움직인 시간 '+sd.min+'분 이상 · 페이스 '+sd.maxPace+'분보다 빠르게» 여야 인정돼요.'
+    return askP(sd.week+'주차부터 유산소는'+N0+'«움직인 시간 '+sd.min+'분 이상 · 페이스 '+sd.maxPace+'분보다 빠르게 · 휴식 '+sd.maxRest+'분 이하» 여야 인정돼요.'
       +N0+N0+iss.map(function(t){return '⛔ '+t;}).join(N0)+N0+N0+'이대로면 인정되지 않아요. 그래도 올릴까요?');
   }
   if(!p||(p.v>=3&&p.v<=25)) return Promise.resolve(true);
@@ -4625,7 +4627,8 @@ function cardioStd(wk){
   var w=Number(wk)||Number(ST.cardioWeek)||nowWeekNo();
   var pm=c.유산소_주차별_최대페이스||{};                              // [1.21.0] 주차별 {2:14,3:12,4:10}
   var mp=Number(pm[w])||Number(c.유산소_최대페이스)||14;
-  return { on: w>=from, from: from, min: mn, maxPace: mp, week: w };
+  var mr=Number(c.유산소_최대휴식분)||30;                               // [1.27.0] 휴식 시간 최대(넘으면 미인정)
+  return { on: w>=from, from: from, min: mn, maxPace: mp, maxRest: mr, week: w };
 }
 /* ══════ [1.24.0] 2주차부터 유산소 앱 고르기 ══════
    앱마다 시간 이름이 다르다 — 움직인 시간(인정·페이스 기준)과 전체 시간(쉰 시간까지). 두 개를 적으면 휴식 시간이 나온다.
@@ -4683,6 +4686,8 @@ function renderRest(){
   if(!(mv>0)||!(tt>0)){ el.value=''; return; }
   if(tt<mv){ el.value='전체 시간이 더 짧아요'; el.classList.add('bad'); return; }
   el.value=fmtMin(tt-mv);
+  var sd=cardioStd();                                                   // [1.27.0] 휴식 30분 넘으면 빨갛게
+  if(sd.on && (tt-mv)>sd.maxRest){ el.value=fmtMin(tt-mv)+' — '+sd.maxRest+'분 넘으면 미인정'; el.classList.add('bad'); }
 }
 /* [1.21.0] 유산소 화면 안내 상자의 인정 기준 — 고른 주차 값으로 */
 function renderCardioStd(){
@@ -4690,8 +4695,8 @@ function renderCardioStd(){
   var sd=cardioStd(), tw=Number((ST.config||{}).총_주차수)||4, steps=[];
   for(var w=sd.from; w<=tw; w++) steps.push(w+'주차 '+cardioStd(w).maxPace+'분');
   el.innerHTML = sd.on
-    ? '<b>✔ '+sd.week+'주차 기준 — 움직인 시간 '+sd.min+'분 이상 · 페이스 '+sd.maxPace+'분보다 빠르게</b><br>'
-      +'<span class="cap">둘 중 하나라도 못 채우면 인정되지 않아요.<br>페이스 기준은 주마다 빨라져요: '+steps.join(' → ')+'</span>'
+    ? '<b>✔ '+sd.week+'주차 기준 — 움직인 시간 '+sd.min+'분 이상 · 페이스 '+sd.maxPace+'분보다 빠르게 · 휴식 '+sd.maxRest+'분 이하</b><br>'
+      +'<span class="cap">하나라도 못 지키면 인정되지 않아요. 휴식 시간 = 전체 시간 − 움직인 시간.<br>페이스 기준은 주마다 빨라져요: '+steps.join(' → ')+'</span>'
     : '<b>✔ '+sd.week+'주차는 시간·페이스 기준 없이 인정돼요</b><br>'
       +'<span class="cap">'+sd.from+'주차부터 움직인 시간 '+sd.min+'분 이상 · 페이스 기준('+steps.join(' → ')+')</span>';
 }
@@ -4700,6 +4705,8 @@ function stdIssues(km,min,p){
   if(!sd.on) return out;
   if(isFinite(min)&&min>0&&min<sd.min) out.push('움직인 시간 '+sd.min+'분 이상이어야 인정돼요 (지금 '+(Math.round(min*10)/10)+'분)');
   if(p&&p.v>=sd.maxPace) out.push('페이스가 '+sd.maxPace+'분보다 빨라야 인정돼요 (지금 '+p.txt+')');
+  var tt=totMin();                                                      // [1.27.0] 휴식 시간
+  if(isFinite(min)&&min>0&&tt>0&&tt>=min&&(tt-min)>sd.maxRest) out.push('휴식 시간이 '+sd.maxRest+'분 이하여야 인정돼요 (지금 '+fmtMin(tt-min)+')');
   return out;
 }
 function cLive(){
