@@ -1,4 +1,7 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.27.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.28.0 -->
+<!--   [1.28.0] 지난주 성찰 늦게 쓰기 — 성찰 화면 위에 «이번 주 N주차 / 지난주 N-1주차» 고르기(rfWeekSel · renderRfWeeks). 지난주는
+        «운동 다 끝냈나» 묻지 않고 «늦게 낸 성찰로 남아요» 안내, 그 주 요약(getWeekSummary 주차)·그 주 질문, 낸 글이 있으면 칸에 채워 고치기.
+        지난 성찰 목록에 «⏰ 늦게 냄». 서버 GAS 1.22.0(이번 주·지난주만 받음, 늦게낸시각). -->
 <!--   [1.27.0] 유산소 휴식 시간 30분 이하(선생님 결정 9/14) — 서버 설정 유산소_최대휴식분(GAS 1.21.0). 휴식 칸이 넘으면 빨갛게 «— 30분 넘으면 미인정»,
         올릴 때 되묻는 기준에 휴식 추가(stdIssues), 유산소 안내 상자·앞 안내 문구에 «휴식 30분 이하». 기준 주차(2주차)부터. -->
 <!--   [1.26.4] 성찰 화면 «이번 주 요약» 예시(그 주 기록이 없을 때)를 지금 규칙으로 — 여름 시범의 «목표 3일 · 근력 1일» 이 2주차 첫날 떴다.
@@ -849,6 +852,17 @@ body.peek{padding-top:30px}
 /* [1.11.0] 앱 안 확인창 — 기본 confirm 은 앞에 주소(arete929.github.io)가 붙는다 */
 /* [1.20.0] 성찰 쓰기 전 확인 */
 .rfgate{background:#FFF7E6;border:1px solid #F2DDB0;border-radius:14px;padding:14px 14px 12px;color:#5A4413}
+/* [1.28.0] 이번 주 · 지난주 성찰 고르기 */
+.rfwk{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 12px}
+.rfwk:empty{display:none}
+.rfwk button{border:1.5px solid var(--line);background:var(--card,#fff);border-radius:12px;padding:9px 8px;font-family:inherit;cursor:pointer;text-align:center;line-height:1.35}
+.rfwk button b{display:block;font-size:14px;color:var(--ink)}
+.rfwk button span{display:block;font-size:11.5px;font-weight:700;color:var(--muted)}
+.rfwk button span.ok{color:var(--primary-dark)}
+.rfwk button span.miss{color:#C0392B}
+.rfwk button.need{border-color:#F0B4A8;background:#FFF5F3}
+.rfwk button.on{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-tint,#EDFAD6)}
+.rflate{background:#FFF1EE;border:1px solid #F3C4BE;color:#A03B2E;border-radius:12px;padding:9px 12px;font-size:13px;margin:0 0 10px;line-height:1.5}
 .rfgate b{font-size:15px}
 .rfgate p{margin:6px 0 12px;font-size:13px;line-height:1.75}
 .rfgate-btns{display:flex;gap:8px}
@@ -1274,7 +1288,10 @@ body.peek{padding-top:30px}
       <h1>성찰일지</h1><span class="badge-dday" id="rf-week">이번 주차</span></div>
     <div id="rf-summary"></div>
     <div class="card">
-      <h2>이번 주 성찰</h2>
+      <!-- [1.28.0] 이번 주 · 지난주 고르기 — 지난주 성찰도 늦게라도 쓸 수 있다 -->
+      <div class="rfwk" id="rf-wkpick"></div>
+      <h2 id="rf-h2">이번 주 성찰</h2>
+      <p class="rflate hidden" id="rf-late"></p>
       <!-- [1.20.0] 쓰기 전에 «이번 주 운동을 다 끝냈나» 먼저 묻는다 -->
       <div class="rfgate" id="rf-gate">
         <b>✋ 이번 주 운동을 모두 끝냈나요?</b>
@@ -1467,7 +1484,7 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.27.0';
+var PWA_VER = '1.28.0';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
@@ -2429,9 +2446,9 @@ function qBubble(week, q, lab){
     + '<span class="who">김진호 선생님</span></div></div>';
 }
 /* 성찰 화면 위에 이번 주 질문 */
-function renderReflectQ(){
+function renderReflectQ(w0){
   var el=document.getElementById('rf-q'); if(!el)return;
-  var w=curWeekNo(), R=weekReading(w);
+  var w=Number(w0)||(typeof rfWeekSel==='function'?rfWeekSel():curWeekNo()), R=weekReading(w);   // [1.28.0] 지난주 성찰이면 그 주 질문
   el.innerHTML=qBubble(w, R.마음.질문, w+'주차 성찰 질문 · 마음단단');
 }
 
@@ -4314,7 +4331,7 @@ function renderWeek(w,demo){
   }
 
   box.innerHTML='<div class="wk'+(demo?' demo':'')+'">'
-    +'<div class="hd"><h2 style="margin:0">📊 이번 주 내 운동</h2>'
+    +'<div class="hd"><h2 style="margin:0">📊 '+((!demo&&w.현재주차&&w.주차<w.현재주차)?(w.주차+'주차 내 운동'):'이번 주 내 운동')+'</h2>'   // [1.28.0]
     +(demo?'<span class="badge-demo">예시</span>'
           :'<span class="cap">'+w.주차+'주차 · '+md(w.시작일)+' ~ '+md(w.종료일)+'</span>')+'</div>'
     +'<div class="big">'+w.운동일수+'일 운동 <span style="font-size:14px;color:var(--muted);font-weight:600">/ 목표 '+w.목표일수+'일</span> '
@@ -4339,8 +4356,27 @@ function insertGuide(){
   toast('질문을 참고해서 답하듯 써보세요');
 }
 
+/* [1.28.0] 지난주 성찰도 늦게 쓸 수 있다 — 이번 주·지난주만(서버 GAS 1.22.0 과 같은 규칙: 2주차엔 1주차, 3주차엔 2주차 …) */
+function rfWeekSel(){
+  var n=nowWeekNo(), w=Number(ST.rfWeek)||n;
+  return (w===n || (w===n-1 && w>=1)) ? w : n;
+}
+function rfPickWeek(w){ ST.rfWeek=Number(w)||0; var t=document.getElementById('rf-text'); if(t)t.value=''; loadReflect(); }
+function renderRfWeeks(list){
+  var box=document.getElementById('rf-wkpick'); if(!box) return;
+  var n=nowWeekNo();
+  if(n<2){ box.innerHTML=''; return; }
+  var sel=rfWeekSel(), have={};
+  (list||[]).forEach(function(r){ have[Number(r.주차)]=r; });
+  box.innerHTML=[n,n-1].map(function(w){
+    var cur=(w===n), done=!!have[w];
+    return '<button type="button" class="'+(sel===w?'on':'')+(!cur&&!done?' need':'')+'" onclick="rfPickWeek('+w+')">'
+      +'<b>'+(cur?'이번 주':'지난주')+' '+w+'주차</b>'
+      +(done?'<span class="ok">✓ 냈어요</span>':(cur?'<span>아직</span>':'<span class="miss">안 냈어요 · 늦게라도 쓰기</span>'))+'</button>';
+  }).join('');
+}
 /* [1.20.0] 성찰 쓰기 전 «이번 주 운동 다 끝냈나» — 이 폰에서 이번 주차에 «네» 를 누르면 다시 묻지 않는다 */
-function rfKey(){ return 'grofit_rfok_'+(ST.student?ST.student.학번:'')+'_'+nowWeekNo(); }
+function rfKey(){ return 'grofit_rfok_'+(ST.student?ST.student.학번:'')+'_'+rfWeekSel(); }
 function rfOpen(open){
   var g=document.getElementById('rf-gate'), b=document.getElementById('rf-body');
   if(g) g.classList.toggle('hidden',!!open);
@@ -4353,18 +4389,26 @@ function rfAnswer(yes){
   var t=document.getElementById('rf-text'); if(t) t.focus();
 }
 function loadReflect(){
+  var wk=rfWeekSel(), past=(wk<nowWeekNo());                     // [1.28.0] 고른 주차
   document.getElementById('rf-week').textContent=evalShort()+' 성찰';
+  var h2=document.getElementById('rf-h2'); if(h2) h2.textContent=past?(wk+'주차 성찰 · 늦게 쓰기'):'이번 주 성찰';
+  var lt=document.getElementById('rf-late');
+  if(lt){ lt.classList.toggle('hidden',!past);
+    lt.innerHTML=past?('⏰ '+wk+'주차 마감(일요일 밤 10시)이 지나서 <b>늦게 낸 성찰</b>로 남아요. 그래도 꼭 써요!'):''; }
+  renderReflectQ(wk);
   var ok=false; try{ ok=localStorage.getItem(rfKey())==='1'; }catch(e){}
-  rfOpen(ok);                                                     // [1.20.0]
-  call('getWeekSummary',[ST.student.학번],function(w){
+  rfOpen(ok || past);                                             // [1.20.0] · [1.28.0] 지난주는 이미 끝난 주라 묻지 않는다
+  call('getWeekSummary',[ST.student.학번,wk],function(w){
     if(w&&w.기록&&w.기록.length)renderWeek(w,false);
     else renderWeek(sampleWeek(),true);     // 기록 없으면 예시로 보여주기 · [1.26.4] 목표는 지금 설정으로
   });
   call('getReflections',[ST.student.학번],function(list){
-    /* [1.20.0] 이번 주 성찰을 이미 냈으면 확인은 끝난 것 */
-    if((list||[]).some(function(r){ return Number(r.주차)===nowWeekNo(); })) rfOpen(true);
+    renderRfWeeks(list);                                          // [1.28.0]
+    /* [1.20.0] 이번 주 성찰을 이미 냈으면 확인은 끝난 것 · [1.28.0] 고른 주차에 낸 글이 있으면 칸에 채워 고칠 수 있게 */
+    var mine=(list||[]).filter(function(r){ return Number(r.주차)===wk; })[0];
+    if(mine){ rfOpen(true); var tx=document.getElementById('rf-text'); if(tx&&!tx.value.trim()) tx.value=String(mine.내용||''); }
     var html='';(list||[]).forEach(function(r){
-      html+='<div class="card"><div class="row" style="justify-content:space-between"><b>'+r.주차+'주차</b><span class="cap">'+r.작성일+'</span></div>'
+      html+='<div class="card"><div class="row" style="justify-content:space-between"><b>'+r.주차+'주차'+(r.늦게?' <span class="chip late">⏰ 늦게 냄</span>':'')+'</b><span class="cap">'+r.작성일+'</span></div>'
         +'<p style="margin:8px 0 0">'+esc(r.내용)+'</p>'
         +(r.교사코멘트?comicHTML(r.교사코멘트,r.스티커||''):'')+'</div>';
     });
@@ -4374,14 +4418,13 @@ function loadReflect(){
 function saveReflect(){
   var gb=document.getElementById('rf-body'); if(gb&&gb.classList.contains('hidden')){ toast('먼저 «이번 주 운동을 모두 끝냈나요?»에 답해 주세요'); return; }   // [1.20.0]
   var t=document.getElementById('rf-text').value.trim();if(!t){toast('내용을 입력하세요');return;}
-  var wk=ST.config?ST.config.총_주차수:1;
-  call('getStudentHome',[ST.student.학번],function(h){
-    progOpen('성찰 제출');
-    callP('submitReflection',[ST.student.학번,h?h.현재주차:1,t],function(r){
-      progDone('성찰 제출 완료!',function(){
-        toast('✅ 성찰 제출 완료'+savedMsg(r));document.getElementById('rf-text').value='';
-        showSaved('saved-reflect',r&&r.savedAt,true);loadReflect();});});
-  });
+  var wk=rfWeekSel();                                             // [1.28.0] 고른 주차(이번 주 또는 지난주)
+  progOpen(wk+'주차 성찰 제출');
+  callP('submitReflection',[ST.student.학번,wk,t],function(r){
+    if(r&&r.ok===false){ progFail(r.msg||'성찰을 내지 못했어요'); return; }
+    progDone('성찰 제출 완료!',function(){
+      toast('✅ '+wk+'주차 성찰 제출 완료'+(r&&r.늦게?' (늦게 낸 성찰)':'')+savedMsg(r));document.getElementById('rf-text').value='';
+      showSaved('saved-reflect',r&&r.savedAt,true);loadReflect();});});
 }
 
 /* ---------- 점수 ---------- */
