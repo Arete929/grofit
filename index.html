@@ -1,4 +1,11 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.28.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.29.0 -->
+<!--   [1.29.0] 🔁 반려(서버 GAS 1.25.0) — 홈 4주 도장판 그 주 아래 «🔁 반려된 기록 n개» 타일, 운동 탭 «근력 운동하기» 아래 «반려된 기록» 카드,
+        새 화면 s-reject(고칠 점 · 반려한 시각 · «👀 확인했어요» markRejectSeen → 확인한 시각 · «📤 다시 올리기» = 그 주차·날짜를 골라 둔 채
+        유산소/근력 화면, ST.cardioPreset/strPreset). 기록 펼침의 미인정 말풍선 대신 반려 타일.
+        도장판 점 → 이모지(calEmo): 🏃 유산소 · 💪 근력, 둘 다면 세로로 쌓음(칸이 아래로 길어짐), 흐리게 = 확인 중, 보라 = 보류, ⏰ = 늦게 낸 기록
+        (칸 테두리 연빨강), 🔁 = 반려(칸 주황). 도장판 아래 범례.
+        성찰: 머리 배지·제목에 «N주차», 이번 주·지난주 단추를 서버 응답 전에 먼저 그림(«확인 중…»), nowWeekNo() 가 홈을 못 받았으면 설정 기간_시작일로
+        오늘 주차를 셈(예전엔 1주차로 떨어져 «지난주» 단추가 숨었다). 성찰 목록은 ST.rfList 에 두고 다시 열 때 바로 씀. -->
 <!--   [1.28.0] 지난주 성찰 늦게 쓰기 — 성찰 화면 위에 «이번 주 N주차 / 지난주 N-1주차» 고르기(rfWeekSel · renderRfWeeks). 지난주는
         «운동 다 끝냈나» 묻지 않고 «늦게 낸 성찰로 남아요» 안내, 그 주 요약(getWeekSummary 주차)·그 주 질문, 낸 글이 있으면 칸에 채워 고치기.
         지난 성찰 목록에 «⏰ 늦게 냄». 서버 GAS 1.22.0(이번 주·지난주만 받음, 늦게낸시각). -->
@@ -748,6 +755,33 @@ img.ic{width:24px;height:24px;display:block;object-fit:contain;
 .wcell.hold{background:#f7f3fc;border-color:#ddd0ef}                            /* [1.19.0] .on 뒤, .today·.sel 앞 */
 .wcell.today{border:1.5px solid var(--primary);background:var(--primary-tint)}
 .wcell.sel{border:2px solid var(--primary);background:var(--primary-tint)}
+/* [1.29.0] 점 대신 이모지 — 둘 다 한 날은 세로로 쌓는다(가로는 그대로, 칸이 아래로 길어짐) */
+.wcell.em{aspect-ratio:auto;min-height:44px;padding:4px 0 5px;justify-content:flex-start}
+.wcell .ee{display:flex;flex-direction:column;align-items:center;gap:1px;margin-top:2px}
+.wcell .ee i{font-style:normal;font-size:14px;line-height:1.1;display:flex;align-items:center;position:relative}
+.wcell .ee i.pn{opacity:.4;filter:grayscale(.4)}                                /* 선생님 확인 중 */
+.wcell .ee i.hd{opacity:.55;filter:grayscale(.2) drop-shadow(0 0 1px #7c5cd6)}   /* 보류 */
+.wcell .ee i.rj{filter:grayscale(1);opacity:.55}                                /* 반려 */
+.wcell .ee i b{font-size:8.5px;line-height:1;position:absolute;right:-9px;top:-2px;filter:none;opacity:1}
+.wcell .ee i.rj b{font-size:9px;right:-10px}
+.wcell.late{box-shadow:inset 0 0 0 1.5px #f08c8c}                               /* ⏰ 늦게 낸 기록이 있는 날 */
+.wcell.rej{background:#fff6ec;border-color:#f7c58a}
+.callegend{display:flex;flex-wrap:wrap;gap:4px 10px;justify-content:center;font-size:10.5px;color:var(--muted);margin:2px 0 10px}
+.callegend span{white-space:nowrap}
+/* [1.29.0] 🔁 반려 타일 — 도장판 그 주 아래 · 운동 탭 «근력 운동하기» 아래 */
+.rjtile{display:flex;align-items:center;gap:10px;margin-top:8px;padding:10px 12px;border-radius:12px;background:#fff4e6;border:1.5px solid #f7c58a;color:#8a4b00;cursor:pointer;font-size:12.5px;line-height:1.45}
+.rjtile .ic{font-size:20px;flex:none}
+.rjtile b{color:#b85c00}
+.rjtile .go{margin-left:auto;font-weight:800;color:#b85c00;flex:none}
+.card.rjcard{border:1.5px solid #f7c58a;background:#fffaf3}
+.rjitem{border:1px solid #f3dcbc;background:#fff;border-radius:12px;padding:12px;margin-bottom:10px}
+.rjitem .why{background:#fff4e6;border-radius:9px;padding:8px 10px;margin:8px 0;font-size:13px;line-height:1.55;color:#7a4400}
+.rjitem .meta{font-size:11.5px;color:var(--muted);line-height:1.6}
+.rjitem .bt{display:flex;gap:8px;margin-top:10px}
+.rjitem .bt button{flex:1;height:40px;border-radius:10px;font-family:inherit;font-weight:800;font-size:13px;cursor:pointer}
+.rjitem .bt .seen{background:#fff;border:1.5px solid #f7c58a;color:#b85c00}
+.rjitem .bt .seen[disabled]{opacity:.6;cursor:default}
+.rjitem .bt .re{background:#f08c00;border:0;color:#fff}
 .stamps{display:flex;gap:6px;margin-bottom:8px}
 .stamp{flex:1;text-align:center;padding:9px 0;border-radius:10px;background:#f3f5f2;
   font-size:13px;font-weight:800;color:var(--ph)}
@@ -1018,6 +1052,19 @@ body.peek{padding-top:30px}
       <div class="row" style="align-items:center"><img class="ic-big" src="ic-strength.png" alt="">
         <div><h2 style="margin:0">근력 운동하기</h2><p class="cap" style="margin:2px 0 0">운동 사진 + 세트·횟수 입력</p></div></div>
     </div>
+    <!-- [1.29.0] 🔁 반려된 기록 — 있을 때만 보인다 -->
+    <div class="card rjcard hidden" id="cert-rej" style="cursor:pointer" onclick="openRejects()">
+      <div class="row" style="align-items:center"><span style="font-size:34px;line-height:1;width:52px;text-align:center">🔁</span>
+        <div><h2 style="margin:0">반려된 기록 <span id="cert-rej-n" style="color:#b85c00"></span></h2><p class="cap" style="margin:2px 0 0" id="cert-rej-sub">선생님이 다시 올려 달라고 한 기록이 있어요</p></div></div>
+    </div>
+  </section>
+
+  <!-- [1.29.0] 🔁 반려된 기록 모아 보기 -->
+  <section id="s-reject" class="scr">
+    <div class="topbar"><button class="back" onclick="go('cert')">←</button><h1>🔁 반려된 기록</h1></div>
+    <p class="cap" style="margin:0 4px 12px;line-height:1.6">선생님이 <b>고쳐서 다시 올려 달라</b>고 한 기록이에요. 읽고 «확인했어요»를 누른 뒤 «다시 올리기»로 같은 날짜에 올려 주세요.<br>
+      ⏰ <b>그 주 일요일 밤 10시 전</b>에 다시 올리면 그대로 인정받을 수 있고, 지나서 올리면 <b>초과</b>로 남아요.</p>
+    <div id="rj-list"></div>
   </section>
 
   <!-- 3. 유산소 -->
@@ -1484,7 +1531,7 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.28.0';
+var PWA_VER = '1.29.0';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
@@ -1576,9 +1623,10 @@ function go(name, skipLoad){
   if(name==='login'){ tb.classList.add('hidden'); if(av)av.classList.add('hidden'); popClose(); }
   else { tb.classList.remove('hidden'); if(av){av.classList.remove('hidden');paintAppVer();} }
   document.querySelectorAll('.tabbar button').forEach(function(b){
-    b.classList.toggle('on', b.dataset.t===name);
+    b.classList.toggle('on', b.dataset.t===name || (name==='reject' && b.dataset.t==='cert'));   // [1.29.0] 반려 화면은 운동 탭 아래
   });
   if(name==='home' && !skipLoad) loadHome();
+  if(name==='cert') paintRejTile();                                  // [1.29.0]
   if(name==='cardio'){renderDayPicker('cardio');renderRpe('c');renderSat('c');renderPn('c');loadPartners();}
   if(name==='strength'){renderDayPicker('str');renderStrGuide();syncStrRows();renderRpe('s');renderSat('s');renderPn('s');loadPartners();}
   if(name==='inbody'){loadFitness();loadMyStamps();}
@@ -2614,7 +2662,7 @@ function logout(){
   try{ localStorage.removeItem(bundleKey()); }catch(e){}   // [1.15.0]
   localStorage.removeItem('grofit_token');localStorage.removeItem('grofit_student');
   setPeek(false);                                            // [0.99.0]
-  ST.student=null;ST.home=null;ST.myRecords=null;ST.fitness=null;ST.calDay=null;
+  ST.student=null;ST.home=null;ST.myRecords=null;ST.fitness=null;ST.calDay=null;ST.rfList=null;ST.rfWeek=0;   // [1.29.0]
   popClose();
   go('login');toast('로그아웃했습니다');
 }
@@ -2710,7 +2758,7 @@ function paintHome(h){
     document.getElementById('g-week').innerHTML=ring(pct,wk.완료일수+'/'+wk.목표일수,'이번 주');
     ST.home=h; ST.myRecords=null; ST.calDay=null;
     document.getElementById('cal-detail').classList.remove('open');
-    renderCal(h);
+    renderCal(h); paintRejTile();                                   // [1.29.0] 운동 탭 반려 타일도 같이
     renderReadCard(); renderMindCard();
     if(!ST.notices) checkNotices();   // 묶음으로 이미 받았으면 다시 부르지 않는다
     var hv=document.getElementById('home-ver');
@@ -2775,21 +2823,26 @@ function renderCal(h){
       var d=new Date(s); d.setDate(s.getDate()+i);
       var ds=fmtLocal(d), rec=map[ds];
       var pend = !!(rec&&rec.p), hold = !!(rec&&rec.h);       // [1.19.0] 보류 = 보라
-      var pc = hold?'h':'p';
-      var cls='wcell'+(rec?' on':'')+(pend?(hold?' hold':' pend'):'')+(ds===tds?' today':'')+(ST.calDay===ds?' sel':'');
-      var dots = rec ? ('<span class="dd">'
-        +(rec.c?'<i class="'+(pend?pc:'')+'" style="'+(pend?'':'background:var(--cardio)')+'"></i>':'')
-        +(rec.s?'<i class="'+(pend?pc:'')+'" style="'+(pend?'':'background:var(--strength)')+'"></i>':'')+'</span>') : '';
+      var rj = !!(rec&&(rec.rc||rec.rs)), lt = !!(rec&&(rec.lc||rec.ls));   // [1.29.0] 반려 · 늦게 낸 기록
+      var cls='wcell em'+(rec?' on':'')+(pend?(hold?' hold':' pend'):'')+(rj?' rej':'')+(lt?' late':'')+(ds===tds?' today':'')+(ST.calDay===ds?' sel':'');
+      /* [1.29.0] 점 대신 이모지 — 🏃 유산소 / 💪 근력, 둘 다면 세로로. 흐림 = 확인 중 · ⏰ = 늦게 냄 · 🔁 = 반려 */
+      var emo = rec ? ('<span class="ee">'+calEmo(rec,'c','🏃')+calEmo(rec,'s','💪')+'</span>') : '';
       var clk = rec ? ' onclick="toggleCalDay(&quot;'+ds+'&quot;)"' : '';
       cells+='<div class="'+cls+'"'+clk+'><span class="w">'+DOW[d.getDay()]+'</span>'
-        +'<span class="n">'+d.getDate()+'</span>'+dots+'</div>';
+        +'<span class="n">'+d.getDate()+'</span>'+emo+'</div>';
     }
+    var rjw=(h['반려']||[]).filter(function(o){ return Number(o.주차)===w; });   // [1.29.0] 이 주의 반려
     html+='<div class="wrow'+(met?' met':'')+(isNow?' now':'')+(future?' future':'')+'">'
       +'<div class="wh"><span><span class="wt">'+w+'주차</span> '
       +'<span class="wd">'+fmtMd(s)+'~'+fmtMd(e)+left+'</span></span>'
       +'<span class="wb '+bc+'">'+bt+'</span></div>'
-      +'<div class="wcells">'+cells+'</div></div>';
+      +'<div class="wcells">'+cells+'</div>'
+      +(rjw.length?'<div class="rjtile" onclick="openRejects()"><span class="ic">🔁</span><span><b>반려된 기록 '+rjw.length+'개</b> — '
+        +rjw.map(function(o){ return esc(fmtMd(parseYmd(o.날짜)))+' '+esc(o.종류); }).join(', ')
+        +'<br>고쳐서 다시 올려 주세요'+(lateDaysFor(w)>0?' (지금 올리면 초과)':' · 일요일 밤 10시까지')+'</span><span class="go">보기 ›</span></div>':'')
+      +'</div>';
   }
+  html+='<div class="callegend"><span>🏃 유산소</span><span>💪 근력</span><span style="opacity:.55">🏃 흐리게 = 확인 중</span><span>⏰ 늦게 냄</span><span>🔁 반려</span></div>';
   /* [0.91.1] 기록 펼침 상자가 주차 카드 안에 들어가 있으면 innerHTML 로 지워지기 전에 밖으로 빼 둔다 */
   var det=document.getElementById('cal-detail');
   if(det&&box.contains(det)) box.parentNode.insertBefore(det, box.nextSibling);
@@ -2828,6 +2881,65 @@ function renderCal(h){
       : '<div class="lastwk no">지난주는 '+(Number(p['완료일수'])||0)+'일이었어요. 이번 주 다시 도전!</div>';
     else bn.innerHTML='';
   }
+}
+/* [1.29.0] 도장판 한 칸의 이모지 한 줄 — k='c'(유산소)|'s'(근력). 서버 GAS 1.25.0 운동일자: pc/ps 확인 중 · lc/ls 늦게 · rc/rs 반려 */
+function calEmo(rec,k,em){
+  if(rec[k]){
+    var pn = (rec['p'+k]!==undefined) ? !!rec['p'+k] : (!!rec.p && !rec[k+'o']);
+    var cl = pn ? (rec.h?'hd':'pn') : '';
+    return '<i class="'+cl+'" title="'+(k==='c'?'유산소':'근력')+(pn?(rec.h?' · 보류 중':' · 선생님 확인 중'):' · 인정')+(rec['l'+k]?' · 늦게 냄':'')+'">'+em+(rec['l'+k]?'<b>⏰</b>':'')+'</i>';
+  }
+  if(rec['r'+k]) return '<i class="rj" title="'+(k==='c'?'유산소':'근력')+' · 반려 — 다시 올려 주세요">'+em+'<b>🔁</b></i>';
+  return '';
+}
+/* ═══════ [1.29.0] 🔁 반려된 기록 ═══════ */
+function rejList(){ return (ST.home&&ST.home['반려'])||[]; }
+function paintRejTile(){
+  var L=rejList(), el=document.getElementById('cert-rej'); if(!el) return;
+  el.classList.toggle('hidden',!L.length);
+  if(!L.length) return;
+  var n=document.getElementById('cert-rej-n'); if(n) n.textContent=L.length+'개';
+  var un=L.filter(function(o){return !o.확인시각;}).length;
+  var sb=document.getElementById('cert-rej-sub');
+  if(sb) sb.textContent=(un?'아직 안 본 것 '+un+'개 · ':'')+L.map(function(o){ return fmtMd(parseYmd(o.날짜))+' '+o.종류; }).join(', ');
+}
+function openRejects(){ go('reject'); renderRejects(); }
+function renderRejects(){
+  var box=document.getElementById('rj-list'); if(!box) return;
+  var L=rejList();
+  if(!L.length){ box.innerHTML='<div class="card"><p class="muted" style="margin:0">반려된 기록이 없어요 👍</p></div>'; return; }
+  box.innerHTML=L.map(function(o){
+    var d=parseYmd(o.날짜), wk=['일','월','화','수','목','금','토'][d.getDay()], late=lateDaysFor(o.주차);
+    return '<div class="rjitem" id="rji-'+o.row+'"><div class="row" style="justify-content:space-between;align-items:center">'
+      +'<b>'+(d.getMonth()+1)+'/'+d.getDate()+'('+wk+') '+kindChip(o.종류)+'</b><span class="cap">'+o.주차+'주차</span></div>'
+      +'<div class="why">🔁 <b>고칠 점</b> · '+(o.사유?esc(o.사유):'선생님이 다시 올려 달라고 했어요')+'</div>'
+      +'<div class="meta">반려한 시각 '+esc(o.반려시각||'')+'<br><span id="rjs-'+o.row+'">'+(o.확인시각?'👀 확인한 시각 <b>'+esc(o.확인시각)+'</b>':'👀 아직 확인 안 함')+'</span>'
+      +'<br>'+(late>0?'⏰ 마감이 지나서 지금 올리면 <b>'+late+'일 초과</b>로 남아요':'⏰ <b>'+o.주차+'주차 일요일 밤 10시</b>까지 올리면 초과 없이 인정받을 수 있어요')+'</div>'
+      +'<div class="bt"><button class="seen" id="rjb-'+o.row+'" '+(o.확인시각?'disabled':'')+' onclick="rejSeen('+o.row+')">'+(o.확인시각?'✓ 확인했어요':'👀 확인했어요')+'</button>'
+      +'<button class="re" onclick="rejRedo('+o.row+')">📤 다시 올리기</button></div></div>';
+  }).join('');
+}
+function rejSeen(row, then){
+  var o=rejList().filter(function(y){return y.row===row;})[0];
+  if(o&&o.확인시각){ if(then) then(); return; }
+  var b=document.getElementById('rjb-'+row); if(b){ b.disabled=true; b.textContent='저장하는 중…'; }
+  call('markRejectSeen',[ST.student.학번,row],function(r){
+    if(!r||r.ok===false){ if(b){ b.disabled=false; b.textContent='👀 확인했어요'; } toast((r&&r.msg)||'저장하지 못했어요'); return; }
+    if(o) o.확인시각=r.확인||'';
+    var s=document.getElementById('rjs-'+row); if(s) s.innerHTML='👀 확인한 시각 <b>'+esc(r.확인||'')+'</b>';
+    if(b) b.textContent='✓ 확인했어요';
+    paintRejTile();
+    if(then) then(); else toast('✅ 확인했어요 · '+(r.확인||''));
+  });
+}
+/* 다시 올리기 — 확인 표시를 남기고, 그 주차·날짜를 골라 둔 채 유산소/근력 화면으로 */
+function rejRedo(row){
+  var o=rejList().filter(function(y){return y.row===row;})[0]; if(!o) return;
+  var prov=(o.종류==='유산소')?'cardio':'str';                     // 근력 화면의 날짜 상태 이름은 'str'(0.77.0)
+  rejSeen(row, function(){});
+  ST[prov+'Week']=Number(o.주차)||nowWeekNo(); ST[prov+'Preset']=o.날짜;
+  go(prov==='cardio'?'cardio':'strength');
+  toast('📤 '+fmtMd(parseYmd(o.날짜))+' '+o.종류+' — 고쳐서 다시 올려 주세요');
 }
 /* 캘린더 날짜 탭 → 그날 운동기록 아코디언 */
 function toggleCalDay(ds){
@@ -2900,7 +3012,10 @@ function latePenaltyFor(days){
   return Math.min(days*per,cap);
 }
 function nowWeekNo(){
-  var w=Number((ST.home&&ST.home.현재주차)||ST.week||1);
+  var w=Number((ST.home&&ST.home.현재주차)||0);
+  /* [1.29.0] 홈을 아직 못 받았으면(서버가 느릴 때) 설정의 기간_시작일로 오늘 주차를 센다 — 예전엔 1주차로 떨어져 «지난주» 성찰 단추가 숨었다 */
+  if(!w){ var c0=ST.config||{}; if(c0.기간_시작일) w=weekOfDate(fmtLocal(new Date()),c0.기간_시작일,Number(c0.총_주차수)||4); }
+  if(!w) w=Number(ST.week||1);
   var tw=Number((ST.config||{}).총_주차수)||4;
   return Math.min(tw,Math.max(1,w||1));
 }
@@ -2943,6 +3058,9 @@ function renderDayPicker(prov){
   }
   for(var i=0;i<days.length;i++){if(days[i].today){def=days[i];break;}}
   if(!def)def=avail.length?avail[avail.length-1]:days[0];
+  /* [1.29.0] 반려된 기록 «다시 올리기»로 들어오면 그 날짜를 골라 둔다(한 번만) */
+  var pre=ST[prov+'Preset']; ST[prov+'Preset']=null;
+  if(pre){ var pd=days.filter(function(d){return d.date===pre && !d.future;})[0]; if(pd) def=pd; }
   ST[prov+'Date']=def.date;
   var wl=document.getElementById(prov+'-wklab');          // [0.80.0] 고른 주차를 늘 보이게
   if(wl)wl.textContent=ST[prov+'Week']+'주차';
@@ -4365,14 +4483,13 @@ function rfPickWeek(w){ ST.rfWeek=Number(w)||0; var t=document.getElementById('r
 function renderRfWeeks(list){
   var box=document.getElementById('rf-wkpick'); if(!box) return;
   var n=nowWeekNo();
-  if(n<2){ box.innerHTML=''; return; }
-  var sel=rfWeekSel(), have={};
+  var sel=rfWeekSel(), have={}, known=!!list;                       // [1.29.0] 목록을 아직 못 받았어도 단추는 먼저 그린다
   (list||[]).forEach(function(r){ have[Number(r.주차)]=r; });
-  box.innerHTML=[n,n-1].map(function(w){
+  box.innerHTML=(n>=2?[n,n-1]:[n]).map(function(w){
     var cur=(w===n), done=!!have[w];
-    return '<button type="button" class="'+(sel===w?'on':'')+(!cur&&!done?' need':'')+'" onclick="rfPickWeek('+w+')">'
-      +'<b>'+(cur?'이번 주':'지난주')+' '+w+'주차</b>'
-      +(done?'<span class="ok">✓ 냈어요</span>':(cur?'<span>아직</span>':'<span class="miss">안 냈어요 · 늦게라도 쓰기</span>'))+'</button>';
+    return '<button type="button" class="'+(sel===w?'on':'')+(!cur&&!done&&known?' need':'')+'" onclick="rfPickWeek('+w+')">'
+      +'<b>'+(cur?'이번 주':'지난주')+' · '+w+'주차</b>'
+      +(done?'<span class="ok">✓ 냈어요</span>':(!known?'<span>확인 중…</span>':(cur?'<span>아직</span>':'<span class="miss">안 냈어요 · 늦게라도 쓰기</span>')))+'</button>';
   }).join('');
 }
 /* [1.20.0] 성찰 쓰기 전 «이번 주 운동 다 끝냈나» — 이 폰에서 이번 주차에 «네» 를 누르면 다시 묻지 않는다 */
@@ -4390,8 +4507,9 @@ function rfAnswer(yes){
 }
 function loadReflect(){
   var wk=rfWeekSel(), past=(wk<nowWeekNo());                     // [1.28.0] 고른 주차
-  document.getElementById('rf-week').textContent=evalShort()+' 성찰';
-  var h2=document.getElementById('rf-h2'); if(h2) h2.textContent=past?(wk+'주차 성찰 · 늦게 쓰기'):'이번 주 성찰';
+  document.getElementById('rf-week').textContent=wk+'주차 성찰';    // [1.29.0] 몇 주차인지 늘 보이게
+  var h2=document.getElementById('rf-h2'); if(h2) h2.textContent=past?('지난주 · '+wk+'주차 성찰 (늦게 쓰기)'):('이번 주 · '+wk+'주차 성찰');
+  renderRfWeeks(ST.rfList||null);                                 // [1.29.0] 서버가 느려도 이번 주·지난주 단추부터
   var lt=document.getElementById('rf-late');
   if(lt){ lt.classList.toggle('hidden',!past);
     lt.innerHTML=past?('⏰ '+wk+'주차 마감(일요일 밤 10시)이 지나서 <b>늦게 낸 성찰</b>로 남아요. 그래도 꼭 써요!'):''; }
@@ -4403,7 +4521,8 @@ function loadReflect(){
     else renderWeek(sampleWeek(),true);     // 기록 없으면 예시로 보여주기 · [1.26.4] 목표는 지금 설정으로
   });
   call('getReflections',[ST.student.학번],function(list){
-    renderRfWeeks(list);                                          // [1.28.0]
+    if(list) ST.rfList=list;                                      // [1.29.0] 다음에 열 때 바로 쓴다
+    renderRfWeeks(list||ST.rfList||[]);                           // [1.28.0]
     /* [1.20.0] 이번 주 성찰을 이미 냈으면 확인은 끝난 것 · [1.28.0] 고른 주차에 낸 글이 있으면 칸에 채워 고칠 수 있게 */
     var mine=(list||[]).filter(function(r){ return Number(r.주차)===wk; })[0];
     if(mine){ rfOpen(true); var tx=document.getElementById('rf-text'); if(tx&&!tx.value.trim()) tx.value=String(mine.내용||''); }
@@ -4798,7 +4917,9 @@ function recExtraHTML(r){
   var h=polarHTML(r);                                   // [0.95.0]
   if(r.보류) h+='<div class="bubble hold" style="margin-top:6px">⏸ <b>보류 중</b> — 선생님이 확인하고 판정을 잠시 미뤄 둔 기록이에요.'
     +'<br><span class="cap">인정되기 전까지는 운동한 날로 세지 않아요. 궁금하면 선생님께 물어보세요.</span></div>';   // [1.19.0]
-  if(r.인정==='미인정') h+='<div class="bubble bad" style="margin-top:6px">❌ 인정되지 않았어요'+(r.미인정사유?' · '+esc(r.미인정사유):'')+'<br><span class="cap">같은 날짜로 다시 올리면 이전 기록을 덮어써요.</span></div>';
+  if(r.인정==='미인정' && r.반려) h+='<div class="rjtile" style="cursor:pointer" onclick="openRejects()"><span class="ic">🔁</span><span><b>반려 — 고쳐서 다시 올려 주세요</b>'   // [1.29.0]
+    +(r.반려.사유?'<br>고칠 점: '+esc(r.반려.사유):'')+'<br><span class="cap">'+(r.반려.확인시각?'👀 확인한 시각 '+esc(r.반려.확인시각):'«보기»에서 확인하고 다시 올려요')+'</span></span><span class="go">보기 ›</span></div>';
+  else if(r.인정==='미인정') h+='<div class="bubble bad" style="margin-top:6px">❌ 인정되지 않았어요'+(r.미인정사유?' · '+esc(r.미인정사유):'')+'<br><span class="cap">같은 날짜로 다시 올리면 이전 기록을 덮어써요.</span></div>';
   if(r.코멘트||r.스티커) h+=comicHTML(r.코멘트||'',r.스티커||'');
   return h;
 }
