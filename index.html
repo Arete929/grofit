@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.29.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.29.1 -->
+<!--   [1.29.1] 삼성헬스 올릴 화면 = 그 운동을 누른 «첫 기록 화면»(위에 날짜·거리) — «운동 상세정보 >» 안쪽은 날짜가 없어 안 됨(선생님 확인 9/15).
+        유산소 안내 목록·운동 탭 설명·앱 고르기 예시(CAPPS say·note)·공지 [예시:삼성] 이름. NRC «상세정보»·애플 «세부사항» 그대로. help 4.27.0. -->
 <!--   [1.29.0] 🔁 반려(서버 GAS 1.25.0) — 홈 4주 도장판 그 주 아래 «🔁 반려된 기록 n개» 타일, 운동 탭 «근력 운동하기» 아래 «반려된 기록» 카드,
         새 화면 s-reject(고칠 점 · 반려한 시각 · «👀 확인했어요» markRejectSeen → 확인한 시각 · «📤 다시 올리기» = 그 주차·날짜를 골라 둔 채
         유산소/근력 화면, ST.cardioPreset/strPreset). 기록 펼침의 미인정 말풍선 대신 반려 타일.
@@ -1046,7 +1048,7 @@ body.peek{padding-top:30px}
     </div>
     <div class="card" style="cursor:pointer" onclick="go('cardio')">
       <div class="row" style="align-items:center"><img class="ic-big" src="ic-cardio.png" alt="">
-        <div><h2 style="margin:0">유산소 운동하기</h2><p class="cap" style="margin:2px 0 0">삼성 «운동 상세보기» · NRC «상세정보» · 애플 «세부사항» 캡처</p></div></div>
+        <div><h2 style="margin:0">유산소 운동하기</h2><p class="cap" style="margin:2px 0 0">삼성 «날짜 보이는 첫 기록 화면» · NRC «상세정보» · 애플 «세부사항» 캡처</p></div></div>
     </div>
     <div class="card" style="cursor:pointer" onclick="go('strength')">
       <div class="row" style="align-items:center"><img class="ic-big" src="ic-strength.png" alt="">
@@ -1092,8 +1094,9 @@ body.peek{padding-top:30px}
       <b>📱 어느 화면을 올리고, 시간은 무엇을 적나요?</b>
       <p class="cap" style="margin:4px 0 6px"><b>2주차부터</b>는 아래 화면만 인정돼요. 1주차는 그 운동의 기록 화면이면 돼요.</p>
       <ul>
-        <li><b>삼성헬스</b> — 그 운동을 누르고 <b>«운동 상세보기»</b> 화면<br>
-          <span class="cap">움직인 시간 = <b>«운동 시간»</b> · 전체 시간 = <b>«총 시간»</b></span></li>
+        <li><b>삼성헬스</b> — 그 운동을 누른 <b>첫 기록 화면</b> (위에 <b>날짜·거리</b>가 보이는 화면)<br>
+          <span class="cap">⛔ «운동 상세정보 >»를 눌러 들어간 화면은 날짜가 안 보여서 <b>안 돼요</b><br>
+          움직인 시간 = <b>«운동 시간»</b> · 전체 시간 = <b>«총 시간»</b></span></li>
         <li><b>나이키 런클럽</b> — 그 러닝을 누르고 <b>«상세정보»</b> 화면<br>
           <span class="cap">움직인 시간 = <b>«활성 시간»</b>(아이폰은 «러닝 시간») · 전체 시간 = <b>«경과 시간»</b></span></li>
         <li><b>애플 피트니스</b> — 그 운동의 <b>«세부사항»</b> 화면<br>
@@ -1531,7 +1534,7 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.29.0';
+var PWA_VER = '1.29.1';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
@@ -4796,7 +4799,9 @@ function cardioStd(wk){
    앱마다 시간 이름이 다르다 — 움직인 시간(인정·페이스 기준)과 전체 시간(쉰 시간까지). 두 개를 적으면 휴식 시간이 나온다.
    고른 앱은 이 폰에 기억(4주 내내 같은 앱). 1주차는 예전처럼 시간 한 칸. */
 var CAPPS=[   /* [1.25.0] img = 학생이 낸 실제 상세 화면(가림·①②표시) · scr = 올릴 화면 이름 */
-  {k:'삼성헬스',      mv:'운동 시간', tt:'총 시간',   scr:'운동 상세보기', img:'ex-app-samsung.jpg'},
+  /* [1.29.1] 삼성은 «운동 상세정보 >» 안쪽 화면에 날짜가 없다(선생님 확인 9/15) → 밖의 첫 기록 화면(위에 날짜·거리) */
+  {k:'삼성헬스',      mv:'운동 시간', tt:'총 시간',   scr:'날짜가 보이는 첫 기록 화면', say:'그 운동을 누른 <b>첫 기록 화면</b>(위에 날짜·거리가 보이는 화면)을 캡처해 올려요',
+   note:'⛔ «운동 상세정보 >»를 눌러 들어간 화면은 날짜가 안 보여서 인정되지 않아요.', img:'ex-app-samsung.jpg'},
   {k:'Nike Run Club', mv:'활성 시간', tt:'경과 시간', scr:'상세정보',     img:'ex-app-nrc.jpg',
    mvLab:'활성·러닝 시간', note:'아이폰은 «활성 시간» 대신 «러닝 시간»으로 나와요. 그게 움직인 시간이에요.'},
   {k:'애플 피트니스', mv:'운동 시간', tt:'경과 시간', scr:'세부사항',     img:'ex-app-apple.jpg'}];
@@ -4806,7 +4811,7 @@ function cardioPick(){
   pick('cardio-file');
 }
 function cAppExHTML(a, big){
-  return '<div class="appex-in'+(big?' big':'')+'"><p class="appex-t">📱 <b>'+esc(a.k)+'</b> — <b>«'+esc(a.scr)+'»</b> 화면을 캡처해 올려요</p>'
+  return '<div class="appex-in'+(big?' big':'')+'"><p class="appex-t">📱 <b>'+esc(a.k)+'</b> — '+(a.say||('<b>«'+esc(a.scr)+'»</b> 화면을 캡처해 올려요'))+'</p>'
     +'<img src="'+a.img+'" alt="'+esc(a.k)+' '+esc(a.scr)+' 예시" loading="lazy">'
     +'<p class="appex-c"><span class="m1">① 움직인 시간</span> = «'+esc(a.mv)+'»'+(a.mvLab?' (아이폰 «러닝 시간»)':'')
     +' · <span class="m2">② 전체 시간</span> = «'+esc(a.tt)+'»<br>기록 적을 때 <b>두 시간을 모두</b> 적어요. 휴식 시간은 저절로 계산돼요.</p>'
@@ -4946,7 +4951,7 @@ function emoHtml(s){
     return '<img class="emo" src="st-'+k+'.png" alt="">';}));
 }
 /* [1.26.0] 공지 글의 [예시:삼성] · [예시:NRC] · [예시:애플] → 그 앱의 실제 상세 화면(앱에 들어 있는 예시 세 장만) */
-var NT_IMG={'삼성':['ex-app-samsung.jpg','삼성헬스 «운동 상세보기»'],'삼성헬스':['ex-app-samsung.jpg','삼성헬스 «운동 상세보기»'],
+var NT_IMG={'삼성':['ex-app-samsung.jpg','삼성헬스 «날짜 보이는 첫 기록 화면»'],'삼성헬스':['ex-app-samsung.jpg','삼성헬스 «날짜 보이는 첫 기록 화면»'],   // [1.29.1]
   'NRC':['ex-app-nrc.jpg','Nike Run Club «상세정보»'],'나이키':['ex-app-nrc.jpg','Nike Run Club «상세정보»'],
   '애플':['ex-app-apple.jpg','애플 피트니스 «세부사항»'],'애플 피트니스':['ex-app-apple.jpg','애플 피트니스 «세부사항»']};
 function ntImgs(h){
