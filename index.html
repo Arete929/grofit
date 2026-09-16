@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.29.1 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.29.2 -->
+<!--   [1.29.2] 선생님 시험 계정 2410(박신향) — 3277 처럼 모든 주차 미리보기(isTeacher). -->
 <!--   [1.29.1] 삼성헬스 올릴 화면 = 그 운동을 누른 «첫 기록 화면»(위에 날짜·거리) — «운동 상세정보 >» 안쪽은 날짜가 없어 안 됨(선생님 확인 9/15).
         유산소 안내 목록·운동 탭 설명·앱 고르기 예시(CAPPS say·note)·공지 [예시:삼성] 이름. NRC «상세정보»·애플 «세부사항» 그대로. help 4.27.0. -->
 <!--   [1.29.0] 🔁 반려(서버 GAS 1.25.0) — 홈 4주 도장판 그 주 아래 «🔁 반려된 기록 n개» 타일, 운동 탭 «근력 운동하기» 아래 «반려된 기록» 카드,
@@ -1534,7 +1535,7 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.29.1';
+var PWA_VER = '1.29.2';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
@@ -3576,7 +3577,7 @@ function syncStrRows(){
 /* 화면 위 안내문을 이번 주 필수 운동에 맞춰 쓴다 */
 function strWeekNo(){ return Number(ST.strWeek || nowWeekNo()); }
 /* [0.87.0] 선생님 계정(3277)은 다음 주차 내용도 미리 본다 */
-function isTeacher(){ return String((ST.student||{}).학번||'') === '3277'; }
+function isTeacher(){ return ['3277','2410'].indexOf(String((ST.student||{}).학번||'')) >= 0; }   // [1.29.2] 2410(박신향) 시험 계정도
 function lastWeekNo(){ return isTeacher() ? (Number((ST.config||{}).총_주차수)||4) : nowWeekNo(); }
 /* [0.86.0] 안내 상자 접기 — 한 번 접으면 그 폰에서는 계속 접힌 채로 */
 function guideHidden(){ try{ return localStorage.getItem('grofit_guide_hide')==='1'; }catch(e){ return false; } }
