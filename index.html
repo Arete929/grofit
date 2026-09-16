@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.29.2 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.29.3 -->
+<!--   [1.29.3] 진호 캐릭터 5종(st-jhwhite·jhblue·jhred·jhpink·jhretro.png, 320px 투명) — 피드백 말풍선·:이모티콘:·오늘의 인사에 보이게 STK_KEYS 추가. -->
 <!--   [1.29.2] 선생님 시험 계정 2410(박신향) — 3277 처럼 모든 주차 미리보기(isTeacher). -->
 <!--   [1.29.1] 삼성헬스 올릴 화면 = 그 운동을 누른 «첫 기록 화면»(위에 날짜·거리) — «운동 상세정보 >» 안쪽은 날짜가 없어 안 됨(선생님 확인 9/15).
         유산소 안내 목록·운동 탭 설명·앱 고르기 예시(CAPPS say·note)·공지 [예시:삼성] 이름. NRC «상세정보»·애플 «세부사항» 그대로. help 4.27.0. -->
@@ -1535,9 +1536,9 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.29.2';
+var PWA_VER = '1.29.3';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
-var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer';
+var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro';   // [1.29.3] JH.peace 5종
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
 var PWA_BUILD = '2026.09.13 09:44';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
