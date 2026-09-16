@@ -1,4 +1,7 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.29.3 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.30.0 -->
+<!--   [1.30.0] 서버 부담 줄이기 1단계 — ① 다시 시도 1.2·3초 → 2.5·7초 안팎(±30% 어긋나게, 붐빌 때 같은 박자로 몰리지 않게)
+        ② 화면 먼저(callCached): 체력·주간 성찰·주간 요약·점수·내 기록·공지 목록을 이 폰에 저장해 둔 지난 값으로 곧바로 그리고, 서버 값이 오면 다시 그림
+        (학번별 grofit_c_*, 로그아웃하면 지움, 체력 저장 직후엔 옛 값 건너뜀) ③ 체력 탭 주차 단추는 서버를 기다리지 않고 먼저 그림(느리거나 실패하면 안 보이던 것). -->
 <!--   [1.29.3] 진호 캐릭터 5종(st-jhwhite·jhblue·jhred·jhpink·jhretro.png, 320px 투명) — 피드백 말풍선·:이모티콘:·오늘의 인사에 보이게 STK_KEYS 추가. -->
 <!--   [1.29.2] 선생님 시험 계정 2410(박신향) — 3277 처럼 모든 주차 미리보기(isTeacher). -->
 <!--   [1.29.1] 삼성헬스 올릴 화면 = 그 운동을 누른 «첫 기록 화면»(위에 날짜·거리) — «운동 상세정보 >» 안쪽은 날짜가 없어 안 됨(선생님 확인 9/15).
@@ -1536,7 +1539,7 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.29.3';
+var PWA_VER = '1.30.0';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro';   // [1.29.3] JH.peace 5종
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
@@ -2636,12 +2639,14 @@ function callOnce(fn,args){
 /* [1.26.2] 9/13 밤 1주차 마감(22:00) 뒤에도 «서버 응답 이상 404» 가 두 번 연달아 나 알림이 떴다 → 3초 뒤 한 번 더(모두 세 번) */
 function callRetry_(fn,args,ms){
   return function(e){ console.warn('[혜원핏] '+fn+' 다시', (e&&e.why)||e);
-    return new Promise(function(ok){ setTimeout(ok,ms); }).then(function(){ return callOnce(fn,args); }); };
+    /* [1.30.0] 붐빌 때 모두가 같은 박자로 다시 보내면 몰림이 더 커진다 — 기다림을 늘리고 ±30% 어긋나게 */
+    var wait=Math.round(ms*(0.7+Math.random()*0.6));
+    return new Promise(function(ok){ setTimeout(ok,wait); }).then(function(){ return callOnce(fn,args); }); };
 }
 function call(fn,args,cb){
   callOnce(fn,args)
-   .catch(callRetry_(fn,args,1200))
-   .catch(callRetry_(fn,args,3000))
+   .catch(callRetry_(fn,args,2500))                                  // [1.30.0] 1.2초 → 2.5초 안팎
+   .catch(callRetry_(fn,args,7000))                                  // [1.30.0] 3초 → 7초 안팎
    .catch(function(e){                                               // 세 번 다 실패했을 때만 여기
      var why=(e&&e.why)||'연결 실패';
      console.error('[혜원핏] '+fn+' 실패 · '+why, e&&e.body||e);
@@ -2653,6 +2658,20 @@ function call(fn,args,cb){
      try{ cb&&cb(x); }catch(err){ console.error('[혜원핏] '+fn+' 처리 중 오류', err); }
    });
 }
+/* [1.30.0] 화면 먼저 — 지난번에 받은 값을 이 폰에 두었다가 곧바로 그리고(cb(값,true)), 서버 값이 오면 다시 그린다(cb(값,false)).
+   서버가 붐벼 늦거나 실패해도 빈 화면이 안 된다. 학번마다 따로, 로그아웃하면 지운다. */
+function cacheKey_(fn,args){ return 'grofit_c_'+((ST.student&&ST.student.학번)||'')+'_'+fn+'_'+JSON.stringify((args||[]).slice(1)); }
+function callCached(fn,args,cb,fresh){
+  var k=cacheKey_(fn,args);
+  if(!fresh){ try{ var v=localStorage.getItem(k); if(v){ try{ cb(JSON.parse(v),true); }catch(err){ console.error('[혜원핏] '+fn+' 저장본 그리기 오류',err); } } }catch(e){} }
+  call(fn,args,function(x){
+    if(x!==undefined && x!==null && !(x.ok===false)){
+      try{ localStorage.setItem(k,JSON.stringify(x)); }catch(e){ cacheClear_(); }   // 자리가 모자라면 비우고 다음에 다시
+    }
+    cb(x,false);
+  });
+}
+function cacheClear_(){ try{ var ks=[]; for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); if(k&&k.indexOf('grofit_c_')===0) ks.push(k); } ks.forEach(function(k){ localStorage.removeItem(k); }); }catch(e){} }
 /* [0.99.0] 마스터코드 둘러보기 표시 — 새로고침해도 유지되게 폰에 기억 */
 function setPeek(on){
   try{ on?localStorage.setItem('grofit_peek','1'):localStorage.removeItem('grofit_peek'); }catch(e){}
@@ -2665,6 +2684,7 @@ function logout(){
   if(!confirm('로그아웃할까요? 다시 쓰려면 학번과 학생코드를 입력해야 합니다.'))return;
   /* 토큰·학생정보만 지우고 고른 테마(grofit_theme)는 그대로 둔다 */
   try{ localStorage.removeItem(bundleKey()); }catch(e){}   // [1.15.0]
+  cacheClear_();                                             // [1.30.0] 화면 먼저 저장본도
   localStorage.removeItem('grofit_token');localStorage.removeItem('grofit_student');
   setPeek(false);                                            // [0.99.0]
   ST.student=null;ST.home=null;ST.myRecords=null;ST.fitness=null;ST.calDay=null;ST.rfList=null;ST.rfWeek=0;   // [1.29.0]
@@ -4063,7 +4083,8 @@ function fillFitForm(){
   setWhrMode(direct?1:0);
 }
 function loadFitness(cb){
-  call('getFitness',[ST.student.학번],function(r){
+  renderFitRounds();                                           // [1.30.0] 주차 단추는 서버를 기다리지 않는다(목록이 앱 안에 있다)
+  callCached('getFitness',[ST.student.학번],function(r){
     ST.fitness=(r&&r.기록)||[];
     if(!ST.fitRound){
       var next=null;ST.fitness.forEach(function(x){if(!next&&!x.있음)next=x;});
@@ -4071,8 +4092,8 @@ function loadFitness(cb){
     }
     renderFitRounds();fillFitForm();
     showSaved('saved-fitness',r&&r.savedAt,false);
-    if(cb)cb();
-  });
+    if(cb&&!arguments[1])cb();                                  // [1.30.0] 저장본으로 먼저 그린 때는 뒤처리 안 함
+  }, !!cb);                                                    // 저장 직후(cb 있음)엔 옛 저장본을 먼저 그리지 않는다
 }
 function saveFitness(){
   if(!ST.fitRound){toast('측정 회차를 선택하세요');return;}
@@ -4521,11 +4542,11 @@ function loadReflect(){
   renderReflectQ(wk);
   var ok=false; try{ ok=localStorage.getItem(rfKey())==='1'; }catch(e){}
   rfOpen(ok || past);                                             // [1.20.0] · [1.28.0] 지난주는 이미 끝난 주라 묻지 않는다
-  call('getWeekSummary',[ST.student.학번,wk],function(w){
+  callCached('getWeekSummary',[ST.student.학번,wk],function(w){   // [1.30.0]
     if(w&&w.기록&&w.기록.length)renderWeek(w,false);
     else renderWeek(sampleWeek(),true);     // 기록 없으면 예시로 보여주기 · [1.26.4] 목표는 지금 설정으로
   });
-  call('getReflections',[ST.student.학번],function(list){
+  callCached('getReflections',[ST.student.학번],function(list){   // [1.30.0]
     if(list) ST.rfList=list;                                      // [1.29.0] 다음에 열 때 바로 쓴다
     renderRfWeeks(list||ST.rfList||[]);                           // [1.28.0]
     /* [1.20.0] 이번 주 성찰을 이미 냈으면 확인은 끝난 것 · [1.28.0] 고른 주차에 낸 글이 있으면 칸에 채워 고칠 수 있게 */
@@ -4553,7 +4574,7 @@ function saveReflect(){
 
 /* ---------- 점수 ---------- */
 function loadScore(){
-  call('getMyScore',[ST.student.학번],function(s){
+  callCached('getMyScore',[ST.student.학번],function(s){   // [1.30.0]
     if(!s)return;
     document.getElementById('g-score').innerHTML=ring(s.성취율,s.성취율+'%','성취율',true);
     document.getElementById('sc-rate').textContent=s.성취율+'%';
@@ -4577,7 +4598,7 @@ function diaryGridHTML(list){
   return '<div class="dgrid">'+d.map(function(r){return polarHTML(r);}).join('')+'</div>';
 }
 function loadMyRecords(){
-  call('getMyExercises',[ST.student.학번],function(list){
+  callCached('getMyExercises',[ST.student.학번],function(list){   // [1.30.0]
     ST.myRecords=list||[];
     var bar=document.getElementById('my-diary-bar');
     if(bar) bar.innerHTML='<button type="button" class="howbtn shotbtn" onclick="toggleDiaryAll()">'
@@ -4626,7 +4647,7 @@ function closeZoom(){document.getElementById('fit-zoom').classList.add('hidden')
 
 /* ---------- 공지사항 ---------- */
 function loadNoticesStudent(){
-  call('getNotices',[ST.student?ST.student.학번:''],function(list){var html='';
+  callCached('getNotices',[ST.student?ST.student.학번:''],function(list){var html='';   // [1.30.0]
     (list||[]).forEach(function(n){
       html+='<div class="card"><div class="row" style="justify-content:space-between"><b>'+(n.개별?'<span class="pchip">개인</span> ':'')+esc(n.제목)+'</b>'
         +'<span>'+(n.읽음?'<span class="chip ok">읽음</span>':'<span class="chip bad">새 공지</span>')
