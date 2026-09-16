@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.30.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.31.0 -->
+<!--   [1.31.0] 내 사진 앱 안에서 보기 — 운동 사진 📷(달력 펼침·기록 목록)은 드라이브 새 탭 대신 화면 위에(openMyPhoto), 사진일기는 서버(getMyPhoto, GAS 1.32.0)에서
+        하나씩 받아 채움(hydratePhotos, w400). 사진이 창고에 비공개라 학생은 드라이브 주소로 못 열었다(로그인해도 권한 없음 · 사진일기는 조용히 숨어 있었음). -->
 <!--   [1.30.0] 서버 부담 줄이기 1단계 — ① 다시 시도 1.2·3초 → 2.5·7초 안팎(±30% 어긋나게, 붐빌 때 같은 박자로 몰리지 않게)
         ② 화면 먼저(callCached): 체력·주간 성찰·주간 요약·점수·내 기록·공지 목록을 이 폰에 저장해 둔 지난 값으로 곧바로 그리고, 서버 값이 오면 다시 그림
         (학번별 grofit_c_*, 로그아웃하면 지움, 체력 저장 직후엔 옛 값 건너뜀) ③ 체력 탭 주차 단추는 서버를 기다리지 않고 먼저 그림(느리거나 실패하면 안 보이던 것). -->
@@ -843,6 +845,15 @@ body.peek{padding-top:30px}
 .dgone{margin-top:6px;height:28px;padding:0 12px;border-radius:8px;border:1px solid var(--line2);background:#fff;color:var(--muted);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
 .polar{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 8px 10px;margin-top:8px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
 .polar img{width:100%;border-radius:8px;display:block}
+.polar img.phwait,.polar img:not([src]){min-height:120px;background:linear-gradient(90deg,#eef1ec,#f6f8f5,#eef1ec);background-size:200% 100%;animation:phsh 1.2s linear infinite}   /* [1.31.0] */
+@keyframes phsh{0%{background-position:200% 0}100%{background-position:0 0}}
+.phbtn{background:var(--cardio-tint);color:var(--cardio);padding:4px 9px;border-radius:8px;border:0;font-family:inherit;cursor:pointer}
+.phview{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;padding:16px}
+.phview.hidden{display:none}
+.phview .phin{max-width:560px;width:100%;text-align:center}
+.phview img{max-width:100%;max-height:78vh;border-radius:10px;display:block;margin:0 auto;background:#111}
+.phview .phmsg{color:#fff;font-size:14px;line-height:1.6;margin:30px 0}
+.phview .phx{margin-top:12px;height:42px;padding:0 18px;border-radius:12px;border:0;background:#fff;color:#111;font-family:inherit;font-weight:800;font-size:14px;cursor:pointer}
 .polar .cap2{font-size:12.5px;color:var(--ink2);line-height:1.55;margin:8px 2px 0;white-space:pre-wrap}
 .polar .dt{font-size:11px;color:var(--muted2);margin:6px 2px 0}
 .dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
@@ -1539,7 +1550,7 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.30.0';
+var PWA_VER = '1.31.0';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro';   // [1.29.3] JH.peace 5종
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
@@ -2685,6 +2696,7 @@ function logout(){
   /* 토큰·학생정보만 지우고 고른 테마(grofit_theme)는 그대로 둔다 */
   try{ localStorage.removeItem(bundleKey()); }catch(e){}   // [1.15.0]
   cacheClear_();                                             // [1.30.0] 화면 먼저 저장본도
+  PHOTO_MEM={};                                              // [1.31.0]
   localStorage.removeItem('grofit_token');localStorage.removeItem('grofit_student');
   setPeek(false);                                            // [0.99.0]
   ST.student=null;ST.home=null;ST.myRecords=null;ST.fitness=null;ST.calDay=null;ST.rfList=null;ST.rfWeek=0;   // [1.29.0]
@@ -2983,11 +2995,12 @@ function toggleCalDay(ds){
         +((r.휴식시간!==''&&r.휴식시간!=null)?' · 휴식 '+r.휴식시간+'분':'')):(r.내용||'');   // [1.24.0]
       html+='<div class="it"><div class="row" style="justify-content:space-between;align-items:center">'
         +'<span>'+chip+' <span class="cap">'+esc(sub)+'</span></span>'
-        +(r.사진?'<a class="cap" style="background:var(--cardio-tint);color:var(--cardio);padding:3px 8px;border-radius:8px;text-decoration:none" href="'+r.사진+'" target="_blank" rel="noopener">📷</a>':'')
+        +(r.사진?'<button type="button" class="cap phbtn" onclick="openMyPhoto(&quot;'+esc(fidOfUrl(r.사진))+'&quot;)">📷</button>':'')   // [1.31.0] 앱 안에서
         +'</div>'+(r.성찰?'<div class="bubble" style="margin-top:6px">✍️ '+esc(r.성찰)+'</div>':'')
         +recExtraHTML(r)+'</div>';
     });
     document.getElementById('cal-detail').innerHTML=html+'</div>';
+    setTimeout(hydratePhotos,0);                                     // [1.31.0]
     box.classList.add('open');
   };
   if(ST.myRecords) show(ST.myRecords);
@@ -4603,7 +4616,7 @@ function loadMyRecords(){
     var bar=document.getElementById('my-diary-bar');
     if(bar) bar.innerHTML='<button type="button" class="howbtn shotbtn" onclick="toggleDiaryAll()">'
       +(DIARY_ON?'📋 기록 목록으로 돌아가기':'📷 나의 사진일기 모아 보기')+'</button>';
-    if(DIARY_ON){ document.getElementById('my-records').innerHTML=diaryGridHTML(list); return; }
+    if(DIARY_ON){ document.getElementById('my-records').innerHTML=diaryGridHTML(list); setTimeout(hydratePhotos,0); return; }
     var html='';(list||[]).forEach(function(r){
       var chip=kindChip(r.종류);
       var sub=(r.종류==='유산소' && (r.거리||r.시간))?((r.거리?r.거리+'km ':'')+(r.시간?r.시간+'분':'')):'';
@@ -4617,10 +4630,11 @@ function loadMyRecords(){
         +(r.성찰?'<div class="bubble" style="margin-top:6px">✍️ '+esc(r.성찰)+'</div>':'')
         +recExtraHTML(r)
         +'</div>'
-        +(r.사진?'<a class="cap" style="background:var(--cardio-tint);color:var(--cardio);padding:4px 9px;border-radius:8px;text-decoration:none;white-space:nowrap" href="'+r.사진+'" target="_blank" rel="noopener">📷 사진</a>':'')
+        +(r.사진?'<button type="button" class="cap phbtn" style="white-space:nowrap" onclick="openMyPhoto(&quot;'+esc(fidOfUrl(r.사진))+'&quot;)">📷 사진</button>':'')   // [1.31.0]
         +'</div>';
     });
     document.getElementById('my-records').innerHTML=html||'<p class="muted" style="padding:6px 0">아직 올린 기록이 없습니다.</p>';
+    setTimeout(hydratePhotos,0);                                     // [1.31.0]
   });
 }
 
@@ -4932,13 +4946,49 @@ function setv(id,v){if(v!=null&&v!=='')document.getElementById(id).value=v;}
 /* [0.52.0] 선생님 코멘트 = 캐릭터가 말풍선으로 말하는 만화 형태 */
 /* [0.92.0] 기록 하나에 붙는 선생님 코멘트(진호 말풍선) + 미인정 사유 */
 /* [0.95.0] 사진일기 폴라로이드 — 사진 + 그날 성찰 + 날짜 */
+/* [1.31.0] 학생 사진 보기 — 사진은 창고에 비공개라 드라이브 주소로는 안 열린다(로그인해도 권한 없음).
+   서버(getMyPhoto)가 «내 기록 사진»인지 확인하고 보내 준다. 이 화면을 쓰는 동안만 메모리에 둔다. */
+var PHOTO_MEM={};
+function fidOfUrl(u){ var m=String(u||'').match(/[-\w]{25,}/); return m?m[0]:''; }
+function myPhoto(fid,size,cb){
+  var k=fid+'|'+size;
+  if(PHOTO_MEM[k]){ cb(PHOTO_MEM[k]); return; }
+  call('getMyPhoto',[ST.student.학번,fid,size],function(r){
+    if(!r||r.ok===false||!r.base64){ cb(null,(r&&r.msg)||''); return; }
+    PHOTO_MEM[k]='data:'+(r.mime||'image/jpeg')+';base64,'+r.base64; cb(PHOTO_MEM[k]);
+  });
+}
+function openMyPhoto(fid){
+  if(!fid){ toast('사진이 없어요'); return; }
+  var v=document.getElementById('phview');
+  if(!v){ v=document.createElement('div'); v.id='phview'; v.className='phview'; v.onclick=function(e){ if(e.target===v) v.classList.add('hidden'); }; document.body.appendChild(v); }
+  v.innerHTML='<div class="phin"><p class="phmsg">사진을 불러오는 중…</p><button type="button" class="phx" onclick="document.getElementById(&quot;phview&quot;).classList.add(&quot;hidden&quot;)">✕ 닫기</button></div>';
+  v.classList.remove('hidden');
+  myPhoto(fid,'w1000',function(src,msg){
+    var box=v.querySelector('.phin'); if(!box) return;
+    box.innerHTML=(src?'<img src="'+src+'" alt="내가 올린 사진">':'<p class="phmsg">사진을 불러오지 못했어요'+(msg?' · '+esc(msg):'')+'<br>잠시 뒤 다시 눌러 주세요.</p>')
+      +'<button type="button" class="phx" onclick="document.getElementById(&quot;phview&quot;).classList.add(&quot;hidden&quot;)">✕ 닫기</button>';
+  });
+}
+/* 사진일기 자리(img[data-fid])를 하나씩 차례로 채운다 — 한꺼번에 부르면 서버가 붐빈다 */
+var PH_BUSY=false;
+function hydratePhotos(){
+  if(PH_BUSY) return;
+  var img=document.querySelector('img.phwait[data-fid]'); if(!img) return;
+  PH_BUSY=true; img.classList.remove('phwait');
+  myPhoto(img.getAttribute('data-fid'),'w400',function(src){
+    PH_BUSY=false;
+    if(src) img.src=src; else if(img.parentNode) img.parentNode.style.display='none';
+    setTimeout(hydratePhotos,50);
+  });
+}
 function driveImg(url){
   var m=String(url||'').match(/[-\w]{25,}/);
   return m?('https://drive.google.com/thumbnail?id='+m[0]+'&sz=w800'):String(url||'');
 }
 function polarHTML(r){
   if(!r.일기사진)return '';
-  return '<div class="polar"><img src="'+driveImg(r.일기사진)+'" alt="사진일기" loading="lazy" onerror="this.parentNode.style.display=&quot;none&quot;">'
+  return '<div class="polar"><img data-fid="'+esc(fidOfUrl(r.일기사진))+'" alt="사진일기" class="phwait">'   // [1.31.0] 비공개 사진 — hydratePhotos 가 채움
     +(r.성찰?'<p class="cap2">'+esc(r.성찰)+'</p>':'')+'<p class="dt">'+esc(r.날짜)+'</p></div>';
 }
 function recExtraHTML(r){
