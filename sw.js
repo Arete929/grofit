@@ -6,8 +6,20 @@
    처음 이 판으로 바뀔 때도 옛 캐시에 있던 그림을 옮겨 담으므로 다시 받지 않는다.
    ★그림 파일을 «같은 이름»으로 바꿔 넣었으면 STATIC 숫자를 올릴 것 — 그래야 새 그림을 받는다.
    ★그림 한 장을 못 받아도 설치는 계속된다(예전 addAll 은 한 장만 없어도 설치가 통째로 실패했다). */
-var CACHE = 'grofit-v1.33.0';
+var CACHE = 'grofit-v1.34.0';
 var STATIC = 'grofit-static-1';
+
+/* [1.34.0] 푸시 알림(FCM) — 앱이 닫혀 있어도 알림이 뜨게. FCM_CONFIG 가 비어 있으면(파이어베이스 설정 전) 조용히 건너뛴다.
+   ★ index.html 위쪽의 FCM_CONFIG 와 반드시 «똑같이» 채운다. */
+try {
+  importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
+  importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js');
+  var FCM_CONFIG = { apiKey: '', authDomain: '', projectId: '', storageBucket: '', messagingSenderId: '', appId: '' };
+  if (FCM_CONFIG.apiKey) {
+    firebase.initializeApp(FCM_CONFIG);
+    firebase.messaging();   // 백그라운드 수신 · 알림 표시 · 클릭 시 열기까지 SDK가 처리
+  }
+} catch (e) {}
 var PAGES = ['./', './index.html'];
 var ASSETS = [
   './tab-home.png', './tab-cert.png', './tab-exercise.png', './tab-fit.png', './tab-reflect.png', './tab-score.png', './tab-notice.png', './ic-cardio.png', './ic-strength.png',

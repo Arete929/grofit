@@ -603,6 +603,7 @@ h2{font-size:15px;font-weight:700;margin:0 0 10px}
   font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 6px 16px rgba(25,195,125,.30)}
 .btn:active{transform:scale(.99)}
 .btn.sec{background:#fff;color:var(--ink2);border:1.5px solid var(--line2);box-shadow:none}
+.btn.sec.on{background:var(--primary-tint,#EDFAD6);border-color:var(--primary);color:var(--primary)}   /* [1.34.0] 🔔 알림 켜짐 */
 .btn.sm{height:44px;font-size:14px;border-radius:12px}
 .row{display:flex;gap:10px}
 .chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600}
@@ -1463,6 +1464,8 @@ body.ap::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;le
   <section id="s-notice" class="scr">
     <h1 style="margin-bottom:14px">공지사항</h1>
     <button class="btn sec" style="margin-bottom:14px" onclick="go('inquiry')">🙋 김진호 선생님께 문의하기</button>
+    <button class="btn sec hidden" id="noti-btn" onclick="notiToggle()" style="margin-bottom:4px">🔔 알림 받기</button>   <!-- [1.34.0] -->
+    <p class="muted" id="noti-stat" style="font-size:12px;margin:-2px 0 14px"></p>
     <div id="nt-list"></div>
   </section>
 
@@ -1598,11 +1601,15 @@ body.ap::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;le
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.33.0';
+var PWA_VER = '1.34.0';
+/* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
+   sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
+var FCM_CONFIG = { apiKey:'', authDomain:'', projectId:'', storageBucket:'', messagingSenderId:'', appId:'' };
+var FCM_VAPID_KEY = '';   // 파이어베이스 콘솔 «프로젝트 설정 → Cloud Messaging → 웹 푸시 인증서» 의 키 쌍
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro';   // [1.29.3] JH.peace 5종
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.17 13:15';
+var PWA_BUILD = '2026.09.17 21:35';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -1700,7 +1707,7 @@ function go(name, skipLoad){
   if(name==='inbody-graph')loadFitChart();
   if(name==='reflect'){loadReflect();loadMyStamps();renderReflectQ();}
   if(name==='score') loadScore();
-  if(name==='notice') loadNoticesStudent();
+  if(name==='notice'){ loadNoticesStudent(); notiPaint(); }   // [1.34.0]
   if(name==='inquiry'){ renderIqType(); renderIqPrev(); loadMyInq(); }
   if(name==='read') renderReading();
   if(name==='mind') renderMind();
@@ -5111,6 +5118,78 @@ function mock(fn,args){
   if(fn==='markNoticeRead')return{ok:true};
   if(fn==='getNotices')return[{날짜:'2026-07-15',제목:'1주차 시작!',내용:'주 3일 이상 운동, 유산소 2일 필수예요. 화이팅! 💪'}];
   return {ok:true};
+}
+
+/* ---------- 🔔 푸시 알림(FCM) — [1.34.0] 앱을 닫아 놔도 공지·피드백·반려가 폰에 뜨게 ---------- */
+function loadScript_(src){
+  return new Promise(function(res,rej){
+    if(document.querySelector('script[src="'+src+'"]')){ res(); return; }
+    var s=document.createElement('script'); s.src=src;
+    s.onload=function(){res();}; s.onerror=function(){rej(new Error('load fail '+src));};
+    document.head.appendChild(s);
+  });
+}
+function notiOn_(){ try{ return Notification.permission==='granted' && localStorage.getItem('grofit_noti_on')==='1'; }catch(e){ return false; } }
+function notiPaint(){
+  var b=document.getElementById('noti-btn'), s=document.getElementById('noti-stat');
+  if(!b||!s) return;
+  if(!('serviceWorker' in navigator) || !('Notification' in window) || !FCM_CONFIG.apiKey){
+    b.classList.add('hidden'); s.textContent=''; return;
+  }
+  b.classList.remove('hidden');
+  var perm=Notification.permission, on=notiOn_();
+  b.textContent = on ? '🔔 알림 받는 중 (끄려면 다시 누르세요)' : '🔔 알림 받기';
+  b.classList.toggle('on', on);
+  s.textContent = perm==='denied' ? '⚠️ 알림 권한이 꺼져 있어요 — 브라우저·기기 설정에서 이 앱 알림을 켜주세요.'
+    : on ? '앱을 닫아 놔도 공지·피드백·반려 알림이 폰에 떠요.'
+    : '켜면 앱을 닫아 놔도 공지·피드백 알림을 받을 수 있어요. (홈 화면에 설치한 뒤 사용)';
+}
+function notiToggle(){
+  if(!ST.student){ toast('로그인 먼저 해주세요'); return; }
+  notiOn_() ? notiDisable() : notiEnable();
+}
+function notiEnable(){
+  if(!isStandalone()){ toast('먼저 홈 화면에 앱을 설치한 뒤에 켤 수 있어요'); return; }
+  var b=document.getElementById('noti-btn'); if(b) b.disabled=true;
+  Promise.resolve()
+    .then(function(){
+      if(window.firebase && firebase.messaging) return;
+      return loadScript_('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js')
+        .then(function(){ return loadScript_('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js'); });
+    })
+    .then(function(){ return Notification.requestPermission(); })
+    .then(function(perm){
+      if(perm!=='granted'){ toast('알림 권한을 허용해야 켤 수 있어요'); throw new Error('__denied'); }
+      if(!firebase.apps || !firebase.apps.length) firebase.initializeApp(FCM_CONFIG);
+      return navigator.serviceWorker.ready.then(function(reg){
+        return firebase.messaging().getToken({ vapidKey: FCM_VAPID_KEY, serviceWorkerRegistration: reg });
+      });
+    })
+    .then(function(tok){
+      if(!tok) throw new Error('알림 토큰을 받지 못했어요');
+      return new Promise(function(res){ call('saveNotiToken',[ST.student.학번, tok, navigator.userAgent], res); });
+    })
+    .then(function(r){
+      if(r && r.ok){ localStorage.setItem('grofit_noti_on','1'); toast('🔔 알림을 켰어요'); }
+      else toast((r&&r.msg)||'알림 켜기에 실패했어요');
+    })
+    .catch(function(e){ if(!e || e.message!=='__denied'){ console.warn('[혜원핏] 알림 켜기 실패', e); toast('알림을 켜지 못했어요'); } })
+    .then(function(){ if(b) b.disabled=false; notiPaint(); });
+}
+function notiDisable(){
+  localStorage.setItem('grofit_noti_on','0');
+  try{
+    if(window.firebase && firebase.apps && firebase.apps.length){
+      firebase.messaging().getToken({ vapidKey: FCM_VAPID_KEY }).then(function(tok){
+        if(tok){
+          if(ST.student) call('removeNotiToken',[ST.student.학번, tok], function(){});
+          firebase.messaging().deleteToken().catch(function(){});
+        }
+      }).catch(function(){});
+    }
+  }catch(e){}
+  toast('알림을 껐어요');
+  notiPaint();
 }
 
 /* ---------- 초기화 ---------- */
