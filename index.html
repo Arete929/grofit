@@ -1473,21 +1473,30 @@ body.ap::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;le
     <div id="nt-list"></div>
   </section>
 
-  <!-- [1.35.2] 🎮 쉬는 시간 게임 — 3277 시험용. 넘버헌터부터 -->
+  <!-- [1.35.3] 🎮 쉬는 시간 게임 — 3277 시험용. 카메라로 손 인식(넘버헌터) -->
   <section id="s-game" class="scr">
     <h1 style="margin-bottom:6px">🎮 쉬는 시간 게임</h1>
-    <p class="muted" style="font-size:12.5px;margin:0 0 14px">시험 중입니다 · 넘버헌터만 있어요</p>
+    <p class="muted" style="font-size:12.5px;margin:0 0 14px">시험 중입니다 · 넘버헌터만 있어요 · 카메라로 손을 인식해요</p>
     <div class="card" id="gm-intro">
       <h3 style="margin-top:0">🔢 넘버헌터</h3>
-      <p class="muted" style="font-size:13px;margin:-4px 0 14px">1→2→3→4 순서대로 눌러요. 45초 동안 몇 세트나 할 수 있을까요?</p>
-      <button class="btn" onclick="gmStart()">▶ 시작</button>
+      <p class="muted" style="font-size:13px;margin:-4px 0 10px">카메라 앞에서 손가락으로 1→2→3→4 순서를 짚어요. 45초 동안 몇 세트나 할 수 있을까요?</p>
+      <p class="muted" style="font-size:11.5px;margin:0 0 14px">🔒 영상은 이 기기 안에서만 처리되고 저장·전송되지 않아요</p>
+      <button class="btn" onclick="gmStart()">▶ 카메라 켜고 시작</button>
+      <p class="muted hidden" id="gm-err" style="font-size:12.5px;margin-top:10px;color:#c0392b"></p>
+    </div>
+    <div class="card hidden" id="gm-load">
+      <p class="muted" style="text-align:center;padding:24px 0" id="gm-load-txt">준비하는 중…</p>
     </div>
     <div class="card hidden" id="gm-play">
       <div class="row" style="justify-content:space-between;margin-bottom:10px">
         <span style="font-weight:800;font-size:15px">⏱ <span id="gm-time">45</span>초</span>
         <span style="font-weight:800;font-size:15px">✅ <span id="gm-sets">0</span>세트</span>
       </div>
-      <div id="gm-board" style="position:relative;width:100%;height:280px;background:var(--bg);border-radius:14px;overflow:hidden"></div>
+      <div id="gm-board" style="position:relative;width:100%;aspect-ratio:3/4;background:#111;border-radius:14px;overflow:hidden">
+        <video id="gm-video" playsinline muted style="display:none"></video>
+        <canvas id="gm-canvas" style="width:100%;height:100%;display:block"></canvas>
+      </div>
+      <p class="muted" style="font-size:11.5px;margin-top:8px">화면에 손이 잘 보이게 카메라에서 조금 떨어져 주세요</p>
     </div>
     <div class="card hidden" id="gm-result">
       <h3 style="margin-top:0">🏁 결과</h3>
@@ -1634,7 +1643,7 @@ body.ap::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;le
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.35.2';
+var PWA_VER = '1.35.3';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -1642,7 +1651,7 @@ var FCM_VAPID_KEY = 'BGmB7kEsyxjKRGk6olSRAaw0e-gkGUFE7B7LNPY_IyR5u-wHAay3_mdM-MA
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro';   // [1.29.3] JH.peace 5종
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.17 23:38';
+var PWA_BUILD = '2026.09.17 23:55';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -1723,6 +1732,7 @@ function dismissInstall(){localStorage.setItem('grofit_install_dismissed','1');d
 /* ---------- 화면 전환 ---------- */
 var TABS = {home:1,cert:1,inbody:1,reflect:1,score:1,notice:1};
 function go(name, skipLoad){
+  if(name!=='game' && typeof GM!=='undefined' && GM.playing) gmAbort();   // [1.35.3] 게임 탭을 벗어나면 카메라 끄기
   document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on')});
   var el = document.getElementById('s-'+name); if(el) el.classList.add('on');
   var tb = document.getElementById('tabbar');
@@ -5257,21 +5267,80 @@ function notiDisable(){
   notiPaint();
 }
 
-/* ---------- 🎮 넘버헌터 미니게임 — [1.35.2] 3277 시험용 ---------- */
-var GM = { tickT:null, sets:0, next:1, secLeft:45, playing:false };
+/* ---------- 🎮 넘버헌터 미니게임 — [1.35.3] 3277 시험용. 카메라로 손가락 위치 인식(MediaPipe HandLandmarker, 온디바이스) ---------- */
+var GM = { tickT:null, sets:0, next:1, secLeft:45, playing:false,
+  stream:null, video:null, canvas:null, ctx:null, landmarker:null, targets:[], raf:null, lastVideoTime:-1, cursor:null };
+var GM_DWELL=450;   // 손끝을 이 시간(ms)만큼 대고 있어야 인정 — 스쳐 지나가는 오인식 방지
 function gmEnter(){
   document.getElementById('gm-intro').classList.remove('hidden');
+  document.getElementById('gm-load').classList.add('hidden');
   document.getElementById('gm-play').classList.add('hidden');
   document.getElementById('gm-result').classList.add('hidden');
   gmLoadRank();
 }
+/* 게임 탭을 벗어나면 카메라를 반드시 끈다(켜 둔 채 다른 탭 가면 안 됨) */
+function gmAbort(){
+  if(!GM.playing) return;
+  GM.playing=false;
+  clearInterval(GM.tickT);
+  if(GM.raf) cancelAnimationFrame(GM.raf);
+  gmStopCamera();
+}
+function gmStopCamera(){
+  try{ if(GM.stream) GM.stream.getTracks().forEach(function(tr){ tr.stop(); }); }catch(e){}
+  GM.stream=null;
+  if(GM.video) GM.video.srcObject=null;
+}
+function gmSetLoad(t){ var el=document.getElementById('gm-load-txt'); if(el) el.textContent=t; }
+function gmLoadHandModel(){
+  if(GM.landmarker) return Promise.resolve();
+  return import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/vision_bundle.mjs').then(function(vision){
+    return vision.FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm').then(function(fileset){
+      return vision.HandLandmarker.createFromOptions(fileset, {
+        baseOptions:{ modelAssetPath:'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task' },
+        runningMode:'VIDEO', numHands:1
+      });
+    });
+  }).then(function(lm){ GM.landmarker=lm; });
+}
 function gmStart(){
-  GM.sets=0; GM.next=1; GM.secLeft=45; GM.playing=true;
+  var err=document.getElementById('gm-err'); if(err){ err.classList.add('hidden'); err.textContent=''; }
   document.getElementById('gm-intro').classList.add('hidden');
   document.getElementById('gm-result').classList.add('hidden');
+  document.getElementById('gm-load').classList.remove('hidden');
+  gmSetLoad('카메라를 켜는 중…');
+  navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user', width:{ideal:480}, height:{ideal:640} }, audio:false })
+    .then(function(stream){
+      GM.stream=stream;
+      GM.video=document.getElementById('gm-video');
+      GM.video.srcObject=stream;
+      return GM.video.play();
+    })
+    .then(function(){
+      gmSetLoad('AI를 불러오는 중… (처음 한 번만 몇 초 걸려요)');
+      return gmLoadHandModel();
+    })
+    .then(function(){
+      document.getElementById('gm-load').classList.add('hidden');
+      gmPlayBegin();
+    })
+    .catch(function(e){
+      gmStopCamera();
+      document.getElementById('gm-load').classList.add('hidden');
+      document.getElementById('gm-intro').classList.remove('hidden');
+      var msg=(e&&e.name==='NotAllowedError')?'카메라 권한을 허용해야 할 수 있어요.':('카메라를 켤 수 없어요: '+((e&&e.message)||e));
+      if(err){ err.textContent=msg; err.classList.remove('hidden'); }
+    });
+}
+function gmPlayBegin(){
+  GM.sets=0; GM.next=1; GM.secLeft=45; GM.playing=true; GM.cursor=null; GM.lastVideoTime=-1;
   document.getElementById('gm-play').classList.remove('hidden');
   document.getElementById('gm-sets').textContent='0';
   document.getElementById('gm-time').textContent='45';
+  var board=document.getElementById('gm-board');
+  GM.canvas=document.getElementById('gm-canvas');
+  GM.ctx=GM.canvas.getContext('2d');
+  GM.canvas.width=board.clientWidth||360; GM.canvas.height=board.clientHeight||480;
   gmLayout();
   clearInterval(GM.tickT);
   GM.tickT=setInterval(function(){
@@ -5279,48 +5348,80 @@ function gmStart(){
     var t=document.getElementById('gm-time'); if(t) t.textContent=GM.secLeft;
     if(GM.secLeft<=0) gmEnd();
   },1000);
+  gmLoop();
 }
 function gmLayout(){
-  var board=document.getElementById('gm-board'); if(!board) return;
+  var W=GM.canvas.width, H=GM.canvas.height, R=44;
   var nums=[1,2,3,4].sort(function(){return Math.random()-0.5;});
-  var W=board.clientWidth||300, H=board.clientHeight||280, R=54;
   var placed=[];
-  board.innerHTML='';
-  nums.forEach(function(n){
+  GM.targets=nums.map(function(n){
     var x,y,ok,tries=0;
     do{
-      x=Math.random()*(W-R)+R/2; y=Math.random()*(H-R)+R/2; ok=true; tries++;
-      for(var i=0;i<placed.length;i++){ var dx=placed[i][0]-x, dy=placed[i][1]-y; if(Math.sqrt(dx*dx+dy*dy)<R){ ok=false; break; } }
+      x=Math.random()*(W-2*R)+R; y=Math.random()*(H-2*R)+R; ok=true; tries++;
+      for(var i=0;i<placed.length;i++){ var dx=placed[i][0]-x, dy=placed[i][1]-y; if(Math.sqrt(dx*dx+dy*dy)<R*2.1){ ok=false; break; } }
     } while(!ok && tries<30);
     placed.push([x,y]);
-    var b=document.createElement('button');
-    b.type='button'; b.textContent=n; b.dataset.n=n;
-    b.style.cssText='position:absolute;width:'+R+'px;height:'+R+'px;border-radius:50%;border:none;'
-      +'left:'+(x-R/2)+'px;top:'+(y-R/2)+'px;font-size:22px;font-weight:900;color:#fff;'
-      +'background:var(--primary);box-shadow:0 4px 10px rgba(0,0,0,.18);cursor:pointer';
-    b.onclick=function(){ gmTap(Number(this.dataset.n), this); };
-    board.appendChild(b);
+    return { n:n, x:x, y:y, r:R, dwell:0, done:false };
   });
 }
-function gmTap(n, el){
+/* 매 프레임: 영상(거울모드) 그리기 → 손끝 인식 → 과녁·손끝 그리기 → 판정 */
+function gmLoop(){
   if(!GM.playing) return;
-  if(n===GM.next){
-    if(GM.next===4){
-      GM.sets++; GM.next=1;
-      var s=document.getElementById('gm-sets'); if(s) s.textContent=GM.sets;
-      gmLayout();
-    } else {
-      GM.next++;
-      el.disabled=true; el.style.opacity=.35;
-    }
-  } else {
-    el.style.background='#e0574a';
-    setTimeout(function(){ if(GM.playing) el.style.background='var(--primary)'; },150);
+  GM.raf=requestAnimationFrame(gmLoop);
+  var video=GM.video, ctx=GM.ctx, canvas=GM.canvas;
+  if(!video || video.readyState<2) return;
+  ctx.save(); ctx.scale(-1,1);
+  ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+  ctx.restore();
+  if(GM.landmarker && video.currentTime!==GM.lastVideoTime){
+    GM.lastVideoTime=video.currentTime;
+    var res=GM.landmarker.detectForVideo(video, performance.now());
+    if(res && res.landmarks && res.landmarks[0]){
+      var tip=res.landmarks[0][8];   // 검지 손끝
+      GM.cursor=[(1-tip.x)*canvas.width, tip.y*canvas.height];
+    } else GM.cursor=null;
   }
+  GM.targets.forEach(function(t){
+    if(t.done) return;
+    var active=(t.n===GM.next);
+    ctx.beginPath(); ctx.arc(t.x,t.y,t.r,0,Math.PI*2);
+    ctx.fillStyle=active?'rgba(31,164,99,.88)':'rgba(120,120,120,.55)';
+    ctx.fill();
+    if(active && t.dwell>0){
+      ctx.beginPath(); ctx.arc(t.x,t.y,t.r+6,-Math.PI/2,-Math.PI/2+Math.PI*2*(t.dwell/GM_DWELL));
+      ctx.strokeStyle='#fff'; ctx.lineWidth=5; ctx.stroke();
+    }
+    ctx.fillStyle='#fff'; ctx.font='800 26px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(String(t.n), t.x, t.y+1);
+  });
+  if(GM.cursor){
+    ctx.beginPath(); ctx.arc(GM.cursor[0],GM.cursor[1],10,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,210,0,.9)'; ctx.fill();
+  }
+  if(GM.cursor){
+    var cur=GM.targets.filter(function(t){ return !t.done && t.n===GM.next; })[0];
+    if(cur){
+      var dx=cur.x-GM.cursor[0], dy=cur.y-GM.cursor[1];
+      if(Math.sqrt(dx*dx+dy*dy) < cur.r+14){
+        cur.dwell+=16;
+        if(cur.dwell>=GM_DWELL) gmHit(cur);
+      } else cur.dwell=Math.max(0, cur.dwell-24);
+    }
+  }
+}
+function gmHit(t){
+  t.done=true;
+  if(GM.next===4){
+    GM.sets++; GM.next=1;
+    var s=document.getElementById('gm-sets'); if(s) s.textContent=GM.sets;
+    gmLayout();
+  } else GM.next++;
 }
 function gmEnd(){
   GM.playing=false;
   clearInterval(GM.tickT);
+  if(GM.raf) cancelAnimationFrame(GM.raf);
+  gmStopCamera();
   document.getElementById('gm-play').classList.add('hidden');
   document.getElementById('gm-result').classList.remove('hidden');
   document.getElementById('gm-final').textContent=GM.sets+'세트';
