@@ -14,7 +14,7 @@ var STATIC = 'grofit-static-1';
 try {
   importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
   importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js');
-  var FCM_CONFIG = { apiKey: '', authDomain: '', projectId: '', storageBucket: '', messagingSenderId: '', appId: '' };
+  var FCM_CONFIG = { apiKey: 'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain: 'heywonfit.firebaseapp.com', projectId: 'heywonfit', storageBucket: 'heywonfit.firebasestorage.app', messagingSenderId: '541314853089', appId: '1:541314853089:web:38220f47a5cb68ac696fa0' };
   if (FCM_CONFIG.apiKey) {
     firebase.initializeApp(FCM_CONFIG);
     firebase.messaging();   // 백그라운드 수신 · 알림 표시 · 클릭 시 열기까지 SDK가 처리
