@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.31.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.32.0 -->
+<!--   [1.32.0] 사진일기 적극 활용 안내 — 사진 넣기 칸 아래 «📘 4주 보고서에 그날 기록·성찰과 함께 실려요» 한 줄, 도움말에 보고서·매번 한 장·주소 안 보이게. -->
 <!--   [1.31.0] 내 사진 앱 안에서 보기 — 운동 사진 📷(달력 펼침·기록 목록)은 드라이브 새 탭 대신 화면 위에(openMyPhoto), 사진일기는 서버(getMyPhoto, GAS 1.32.0)에서
         하나씩 받아 채움(hydratePhotos, w400). 사진이 창고에 비공개라 학생은 드라이브 주소로 못 열었다(로그인해도 권한 없음 · 사진일기는 조용히 숨어 있었음). -->
 <!--   [1.30.0] 서버 부담 줄이기 1단계 — ① 다시 시도 1.2·3초 → 2.5·7초 안팎(±30% 어긋나게, 붐빌 때 같은 박자로 몰리지 않게)
@@ -834,6 +835,7 @@ body.peek{padding-top:30px}
 .days button .lk{position:absolute;top:2px;right:4px;font-size:9.5px;font-style:normal;opacity:.85}
 .days button{position:relative}
 .drop.diary{border-style:dashed;background:#FFFDF5;border-color:#EBD9A6;color:#7A5A00;margin-top:6px}
+.diarynote{margin:8px 2px 0;padding:8px 10px;border-radius:10px;background:#EEF4FF;color:#2F4F8A;font-size:12.5px;line-height:1.55}   /* [1.32.0] */
 /* [1.07.0] 앱별 안내 */
 .appguide{background:#F2F7FF;border:1px solid #CFE0F6;border-radius:14px;padding:12px 14px;margin:10px 0 2px}
 .appguide>b{display:block;font-size:13.5px;color:#1F5FA8;margin-bottom:7px}
@@ -1171,6 +1173,7 @@ body.peek{padding-top:30px}
       <button type="button" class="howbtn shotbtn" onclick="toggleDiaryHelp(this)">📸 사진일기가 뭔가요? · 도움말</button>
       <div class="howbox hidden" id="diary-help"></div>
       <div class="drop diary" id="diary-drop" onclick="pick('diary-file')">📸 오늘의 사진 한 장 넣기 <span class="chip">선택</span><br><span class="cap">그날을 기억할 사진 · 안 넣어도 저장됩니다</span></div>
+      <p class="diarynote">📘 사진일기는 4주가 끝나면 <b>나의 4주 보고서</b>에 그날 운동 기록·성찰과 함께 실려요. 감상문 쓸 때 가장 좋은 재료예요!</p>   <!-- [1.32.0] -->
       <input type="file" id="diary-file" accept="image/*" class="hidden" onchange="onDiaryImg(this)">
       <div id="diary-box" class="hidden">
         <img id="diary-prev" class="diaryimg">
@@ -1550,7 +1553,7 @@ body.peek{padding-top:30px}
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.31.0';
+var PWA_VER = '1.32.0';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro';   // [1.29.3] JH.peace 5종
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
@@ -3212,10 +3215,11 @@ function diaryHelpHTML(){
     + pic('운동 끝, 물 한 잔','#F3EEE4','<rect x="38" y="26" width="24" height="40" rx="4" fill="#9CC7E8"/><rect x="38" y="40" width="24" height="26" rx="3" fill="#5FA8DC"/><rect x="44" y="18" width="12" height="8" rx="2" fill="#7FB6DE"/>')
     +'</div>'
     +'<ul style="margin:10px 0 0;padding-left:16px;font-size:13px;line-height:1.7">'
-    +'<li><b>얼굴은 안 나와도 됩니다.</b></li>'
-    +'<li><b>안 넣어도 저장됩니다</b> — 성찰 글만 있으면 돼요.</li>'
+    +'<li>📘 4주가 끝나면 <b>나의 4주 보고서</b>에 그날 기록·성찰과 함께 실려요. <b>감상문</b> 쓸 때 돌아보는 재료가 됩니다.</li>'   // [1.32.0]
+    +'<li>📸 <b>운동할 때마다 한 장씩</b> 남기면 4주의 변화가 사진으로 이어져요.</li>'
+    +'<li><b>얼굴은 안 나와도 됩니다.</b> 집 주소·아파트 동 번호·학교 이름이 보이는 사진은 피해요.</li>'
     +'<li>운동 앱 캡처(기록 사진)와는 <b>다른 사진</b>이에요.</li>'
-    +'<li>4주 뒤 <b>감상문</b> 쓸 때 돌아보는 재료가 됩니다.</li>'
+    +'<li>선택이라 <b>안 넣어도 저장됩니다</b> — 하지만 넣을수록 보고서가 풍성해져요.</li>'
     +'</ul></div>';
 }
 /* [0.54.0] 자동 분석을 뺐다 — 학생이 자기 손으로 적는 것에 뜻을 둔다.
