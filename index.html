@@ -1051,6 +1051,7 @@ body.ap::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;le
     <div class="hm-head">
       <div class="hm-txt">
         <h1 id="hi-name">안녕하세요</h1>
+        <p class="hm-sub hidden" id="hi-code" style="margin-top:-4px"></p>   <!-- [1.35.8] 관리자가 켜면 학생코드 표시 -->
         <p class="hm-sub" id="hi-sub"></p>
         <div class="hm-row">
           <span class="chip ok" id="hi-week">1주차</span>
@@ -1604,7 +1605,7 @@ body.ap::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;le
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.35.5';
+var PWA_VER = '1.35.8';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -1612,7 +1613,7 @@ var FCM_VAPID_KEY = 'BGmB7kEsyxjKRGk6olSRAaw0e-gkGUFE7B7LNPY_IyR5u-wHAay3_mdM-MA
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro';   // [1.29.3] JH.peace 5종
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.18 00:39';
+var PWA_BUILD = '2026.09.18 19:05';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2834,6 +2835,11 @@ function paintHome(h){
     if(!h)return; ST.config=h.config; ST.week=h.현재주차||1;
     document.getElementById('hi-name').textContent=ST.student.학번+' '+ST.student.이름;
     var who=document.getElementById('who');if(who)who.textContent=ST.student.학번+' '+ST.student.이름;
+    var codeEl=document.getElementById('hi-code');   // [1.35.8] 관리자가 켜면 학생코드 표시(본인 것만, 서버가 판단)
+    if(codeEl){
+      if(h.학생코드){ codeEl.textContent='🔑 내 학생코드 '+h.학생코드; codeEl.classList.remove('hidden'); }
+      else codeEl.classList.add('hidden');
+    }
     // 부제(작게) = 학년도·학기·평가명 / 아래 줄 = N주차 · D-N
     var c=h.config||{};
     var nm=String(c.평가명||'').trim();
