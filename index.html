@@ -1695,7 +1695,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.40.0';
+var PWA_VER = '1.40.1';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -1703,7 +1703,7 @@ var FCM_VAPID_KEY = 'BGmB7kEsyxjKRGk6olSRAaw0e-gkGUFE7B7LNPY_IyR5u-wHAay3_mdM-MA
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro';   // [1.29.3] JH.peace 5종
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.19 23:50';
+var PWA_BUILD = '2026.09.20 00:12';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2890,18 +2890,19 @@ function call(fn,args,cb){
    서버가 붐벼 늦거나 실패해도 빈 화면이 안 된다. 학번마다 따로, 로그아웃하면 지운다. */
 function cacheKey_(fn,args){ return 'grofit_c_'+((ST.student&&ST.student.학번)||'')+'_'+fn+'_'+JSON.stringify((args||[]).slice(1)); }
 /* [1.39.1] 저장본을 먼저 보여 줄 때는 «🔄 갱신 중…» 을 띄우고 서버 값이 오면(실패해도) 내린다.
-   마스터코드 둘러보기 중에는 저장본을 아예 안 쓴다 — 여러 학생을 돌려 보는 폰에 옛 값이 남아 «0%» 처럼 잘못 보였다. */
+   [1.40.1] 마스터코드 둘러보기에서도 저장본을 다시 쓴다 — 안 쓰니 학생마다 구글 왕복(2.5~3초+)을 그대로 기다려 «엄청 느렸다».
+   옛 값이 최신처럼 보이는 문제는 위 «갱신 중» 표시가 막는다. */
 var STALE_N=0;
 function stalePill_(){
   var el=document.getElementById('stale-pill'); if(!el)return;
   el.classList.toggle('on',STALE_N>0);
 }
 function callCached(fn,args,cb,fresh){
-  var k=cacheKey_(fn,args), peek=isPeek(), shown=false;
-  if(!fresh && !peek){ try{ var v=localStorage.getItem(k); if(v){ try{ cb(JSON.parse(v),true); shown=true; STALE_N++; stalePill_(); setTimeout(function(){ if(shown){ shown=false; STALE_N=Math.max(0,STALE_N-1); stalePill_(); } },20000); }catch(err){ console.error('[혜원핏] '+fn+' 저장본 그리기 오류',err); } } }catch(e){} }
+  var k=cacheKey_(fn,args), shown=false;
+  if(!fresh){ try{ var v=localStorage.getItem(k); if(v){ try{ cb(JSON.parse(v),true); shown=true; STALE_N++; stalePill_(); setTimeout(function(){ if(shown){ shown=false; STALE_N=Math.max(0,STALE_N-1); stalePill_(); } },20000); }catch(err){ console.error('[혜원핏] '+fn+' 저장본 그리기 오류',err); } } }catch(e){} }
   call(fn,args,function(x){
     if(shown){ shown=false; STALE_N=Math.max(0,STALE_N-1); stalePill_(); }
-    if(!peek && x!==undefined && x!==null && !(x.ok===false)){
+    if(x!==undefined && x!==null && !(x.ok===false)){
       try{ localStorage.setItem(k,JSON.stringify(x)); }catch(e){ cacheClear_(); }   // 자리가 모자라면 비우고 다음에 다시
     }
     cb(x,false);
@@ -4834,12 +4835,12 @@ function loadScore(){
   callCached('getMyScore',[ST.student.학번],function(s){   // [1.30.0]
     if(!s)return;
     /* [1.40.0] 성취율은 «지금까지» 기준(끝난 주 + 달성한 이번 주). 4주 전체 기준 값·점수는 작게 덧붙인다 */
-    var g=s.지금까지, T=s.총주차;
-    var rate=g?g.성취율:s.성취율;
+    var T=s.총주차, legacy=(s.지금까지===undefined);   // legacy = 옛 응답/저장본(지금까지 값이 없음)
+    var g=legacy?{성취율:s.성취율,운동달성률:s.운동달성률,정시성:s.정시성,기준주차수:T,기준주차:[1,T],legacy:true}:s.지금까지;
     document.getElementById('g-score').innerHTML=ring(g?g.성취율:0,g?(g.성취율+'%'):'—','성취율',true);
-    document.getElementById('sc-lab').textContent=g?'지금까지 성취율':'성취율';
+    document.getElementById('sc-lab').textContent=(g&&!g.legacy)?'지금까지 성취율':'성취율';
     document.getElementById('sc-rate').textContent=g?(g.성취율+'%'):'—';
-    document.getElementById('sc-base').textContent=g?(g.기준주차수===1?(g.기준주차[0]+'주차'):(g.기준주차[0]+'~'+g.기준주차[g.기준주차.length-1]+'주차'))+'까지 기준':'이번 주 운동을 마치면 계산돼요';
+    document.getElementById('sc-base').textContent=g&&g.legacy?'':g?(g.기준주차수===1?(g.기준주차[0]+'주차'):(g.기준주차[0]+'~'+g.기준주차[g.기준주차.length-1]+'주차'))+'까지 기준':'이번 주 운동을 마치면 계산돼요';
     document.getElementById('sc-scoreline').innerHTML='4주 전체 기준 '+s.성취율+'% · 자동 점수 <b style="color:var(--primary-dark)">'+s.점수+' / '+s.급간배점+'</b><br><span class="cap">최종 점수는 '+T+'주가 끝나야 정해져요</span>';
     var html='', ST_={'달성':['ok','✓ 달성'],'미달':['no','✕ 미달'],'진행중':['go','… 진행 중'],'전':['wait','운동 전']};
     var list=s.주차별||[]; if(!list.length){ for(var w0=1;w0<=T;w0++) list.push({주차:w0,상태:w0<=s.달성주차?'달성':'미달'}); }   // 옛 서버 응답 대비
@@ -4848,7 +4849,7 @@ function loadScore(){
     document.getElementById('sc-weeks').innerHTML=html;
     document.getElementById('sc-ex').textContent=(g?g.운동달성률:s.운동달성률)+'%';
     document.getElementById('sc-sub').textContent=(g?g.정시성:s.정시성)+'%';
-    var bt=g?('('+g.기준주차수+'주 기준)'):'';
+    var bt=(g&&!g.legacy)?('('+g.기준주차수+'주 기준)'):'';
     document.getElementById('sc-exb').textContent=bt; document.getElementById('sc-subb').textContent=bt;
     var lt=Number(s.늦은건수)||0, el=document.getElementById('sc-late');   // [0.69.0]
     if(el)el.innerHTML=lt?('<b style="color:var(--warning)">총 '+(s.총초과일||0)+'일 초과</b> <span class="cap">('+lt+'건)</span>'):'없음 (모두 제때 제출)';
