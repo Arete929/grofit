@@ -976,49 +976,121 @@ body.peek{padding-top:30px}
 .logo{width:56px;height:56px;border-radius:16px;background:var(--primary-tint);display:flex;align-items:center;
   justify-content:center;font-size:28px;margin:0 auto 14px}
 /* [1.33.0] 🍎 애플 스타일 시범 — 3277 로그인일 때만 body.ap (apTrial). 학생 화면은 그대로.
-   기준: awesome-design-md brands/apple.md — 파치먼트 바탕 #f5f5f7 · 잉크 #1d1d1f · 파랑 하나 #0071e3 ·
-   테두리·그림자·그라데이션을 걷어내고 흰 카드(18px)만 · 알약 단추 · 반투명(블러) 아래 탭 줄.
+   [1.38.0] 더 과감하게 — 큰 제목 · 회색 배경 위 흰 «묶음 카드»(24px) · 떠 있는 알약 탭 줄 · 큰 알약 단추 · 다크 모드(휴대폰 설정 따라감).
+   기준: awesome-design-md brands/apple.md. 색은 변수로만 바꾼다(라이트/다크 두 벌) — 하드코딩 색은 아래에서 따로 덮는다.
    ★ 테마 색(applyTheme 이 :root 에 거는 --primary)보다 body 에 건 값이 이긴다. 끄려면 apTrial 한 줄만 막으면 된다. */
 body.ap{
   --primary:#0071e3; --primary-dark:#0066cc; --primary-tint:#e8f2fd;
   --cardio:#007aff; --cardio-tint:#e5f1ff; --strength:#ff9500; --strength-dark:#c46a00; --strength-tint:#fff2df;
   --danger:#ff3b30; --danger-tint:#ffebea; --warning:#c46a00; --warning-tint:#fff4e5; --gold:#ffcc00;
   --ink:#1d1d1f; --ink2:#3a3a3c; --muted:#6e6e73; --muted2:#86868b; --ph:#aeaeb2;
-  --line:#e5e5ea; --line2:#d2d2d7; --divider:#f2f2f7; --surface:#fff; --bg:#f5f5f7; --canvas:#f5f5f7;
+  --line:#e5e5ea; --line2:#d2d2d7; --divider:#f2f2f7; --surface:#fff; --bg:#f2f2f7; --canvas:#f2f2f7;
   --mind:#af52de; --mind-dark:#8e3fb8; --mind-tint:#f6ecfb;
-  background:#f5f5f7; letter-spacing:-.01em;
+  --fill:#e8e8ed; --glass:rgba(250,250,252,.78); --hair:rgba(0,0,0,.12); --soft:#f3f4f6; --pop:#fff; --okc:#1f8a3c; --okt:#e6f6ea;
+  color-scheme:light; background:var(--bg); color:var(--ink); letter-spacing:-.011em;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Pretendard",system-ui,sans-serif;
 }
-body.ap .app{background:#f5f5f7}
-body.ap h1{font-size:28px;font-weight:700;letter-spacing:-.025em}
-body.ap h2{font-size:17px;font-weight:600;letter-spacing:-.015em}
-/* 카드 — 테두리·그림자 없이 흰 판만, 둥글게 */
-body.ap .card{border:none;border-radius:18px;box-shadow:none}
-body.ap .rdcard,body.ap .rdcard.mindcard{background:#fff;border:none;border-radius:18px}
-body.ap .rdcard .rd-tag{background:var(--primary-tint);color:var(--primary-dark);letter-spacing:0}
+@media(prefers-color-scheme:dark){
+  body.ap{
+    --primary:#0a84ff; --primary-dark:#64a8ff; --primary-tint:rgba(10,132,255,.20);
+    --cardio:#0a84ff; --cardio-tint:rgba(10,132,255,.20); --strength:#ff9f0a; --strength-dark:#ffb340; --strength-tint:rgba(255,159,10,.20);
+    --danger:#ff453a; --danger-tint:rgba(255,69,58,.20); --warning:#ffb340; --warning-tint:rgba(255,159,10,.18); --gold:#ffd60a;
+    --ink:#f5f5f7; --ink2:#d1d1d6; --muted:#a1a1a6; --muted2:#8e8e93; --ph:#636366;
+    --line:#38383a; --line2:#48484a; --divider:#2c2c2e; --surface:#1c1c1e; --bg:#000; --canvas:#000;
+    --mind:#bf5af2; --mind-dark:#d290f7; --mind-tint:rgba(191,90,242,.20);
+    --fill:#2c2c2e; --glass:rgba(28,28,30,.78); --hair:rgba(255,255,255,.14); --soft:#2c2c2e; --pop:#3a3a3c; --okc:#63e68a; --okt:rgba(48,209,88,.18);
+    color-scheme:dark;
+  }
+}
+body.ap .app{background:var(--bg)}
+body.ap .scr{padding:12px 20px 128px}
+/* 제목 — 큰 제목 */
+body.ap h1{font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1.12}
+body.ap h2{font-size:22px;font-weight:700;letter-spacing:-.02em}
+body.ap h3{letter-spacing:-.015em}
+body.ap .hm-sub{color:var(--muted);font-size:15px}
+/* 카드 — 테두리·그림자 없이, 넉넉하게, 24px */
+body.ap .card{background:var(--surface);border:none;border-radius:24px;box-shadow:none;padding:20px;margin-bottom:14px}
+body.ap .rdcard,body.ap .rdcard.mindcard{background:var(--surface);border:none;border-radius:24px;padding:20px;margin-bottom:14px}
+body.ap .rdcard b,body.ap .rdcard q{font-size:19px;line-height:1.35;letter-spacing:-.02em}
+body.ap .rdcard .rd-tag{background:var(--primary-tint);color:var(--primary-dark);letter-spacing:0;border-radius:999px}
 body.ap .rdcard.mindcard .rd-tag{background:var(--mind-tint);color:var(--mind-dark)}
-body.ap .rdcard .rd-go{color:var(--primary)}
+body.ap .rdcard .rd-go{color:var(--primary);font-weight:600}
 body.ap .rdcard.mindcard .rd-go{color:var(--mind-dark)}
-body.ap .rdsec.mind{background:#fff}
-/* 단추 — 파랑 알약, 그림자 없음 · 보조 단추는 옅은 회색 알약 */
-body.ap .btn{border-radius:999px;font-weight:600;box-shadow:none;letter-spacing:-.01em}
+body.ap .rdsec.mind{background:var(--surface)}
+body.ap .list-item{padding:14px 0;border-bottom:.5px solid var(--hair)}
+body.ap .list-item:last-child{border-bottom:none}
+/* 단추 — 큰 알약, 그림자 없음 */
+body.ap .btn{border-radius:999px;font-weight:600;font-size:17px;height:56px;box-shadow:none;letter-spacing:-.01em}
 body.ap .btn:active{transform:scale(.97);filter:brightness(.92)}
-body.ap .btn.sec{background:#e8e8ed;color:var(--primary);border:none}
-body.ap .btn.sm{border-radius:999px}
+body.ap .btn.sec{background:var(--fill);color:var(--primary);border:none}
+body.ap .btn.sm{border-radius:999px;height:44px;font-size:15px}
 body.ap .chip{font-weight:600}
-/* 입력 칸 — 테두리 대신 옅은 회색 판 */
-body.ap input,body.ap textarea{border:1px solid transparent;background:#fff;border-radius:12px}
-body.ap input:focus,body.ap textarea:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(0,113,227,.15)}
+body.ap .chip.ok{background:var(--primary-tint);color:var(--primary-dark)}
+/* 입력 — 회색 판, 선택하면 파란 후광 */
+body.ap input,body.ap textarea{border:1px solid transparent;background:var(--fill);color:var(--ink);border-radius:14px}
+body.ap input::placeholder,body.ap textarea::placeholder{color:var(--ph)}
+body.ap input:focus,body.ap textarea:focus{border-color:var(--primary);background:var(--surface);box-shadow:0 0 0 4px rgba(10,132,255,.22)}
 body.ap label{color:var(--muted);font-weight:500}
-/* 아래 탭 줄 — 반투명 유리 */
-body.ap .tabbar{background:rgba(250,250,252,.8);-webkit-backdrop-filter:saturate(180%) blur(20px);
-  backdrop-filter:saturate(180%) blur(20px);border-top:.5px solid rgba(0,0,0,.12)}
-body.ap .tabbar button{font-weight:500;color:#8e8e93}
-body.ap .tabbar button.on{color:var(--primary)}
-body.ap .topbar .back{border:none;background:#e8e8ed;border-radius:999px}
-/* 시범 표시 — 누가 봐도 3277 전용 시범임을 */
-body.ap::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;left:50%;transform:translateX(-50%);bottom:calc(100px + env(safe-area-inset-bottom));z-index:19;white-space:nowrap;
-  font-size:10.5px;font-weight:600;color:#6e6e73;background:rgba(255,255,255,.8);padding:3px 9px;border-radius:999px;
-  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 0 0 .5px rgba(0,0,0,.1);pointer-events:none}
+/* 아래 탭 줄 — 화면에 떠 있는 반투명 유리 알약 */
+body.ap .tabbar{width:calc(100% - 24px);bottom:calc(10px + env(safe-area-inset-bottom));padding:6px 6px;border-radius:30px;
+  background:var(--glass);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);
+  border:.5px solid var(--hair);box-shadow:0 8px 30px rgba(0,0,0,.14)}
+body.ap .tabbar button{font-weight:600;color:var(--muted2);border-radius:22px;padding:6px 0 5px}
+body.ap .tabbar button.on{color:var(--primary);background:var(--primary-tint)}
+body.ap .tabbar button img.ic{filter:grayscale(1) opacity(.55)}
+body.ap .tabbar button.on img.ic{filter:none}
+body.ap .topbar .back{border:none;background:var(--fill);color:var(--ink);border-radius:999px}
+/* 도장판·달력·칩 줄 — 흰 판 위 옅은 회색 칸 */
+body.ap .stamp,body.ap .wcard,body.ap .wk{background:var(--soft)}
+body.ap .stamp{border-radius:14px}
+body.ap .wgrid .d,body.ap .wgrid button{border-radius:12px}
+body.ap .bubble{background:var(--soft);color:var(--ink)}
+body.ap .cap{color:var(--muted)}
+body.ap .muted{color:var(--muted)}
+/* 팝업·확인창·공지 타일 */
+body.ap .adlg-in,body.ap .pop-in,body.ap .ntile{background:var(--surface);color:var(--ink)}
+body.ap .ntile{border:none;border-radius:20px;box-shadow:0 0 0 .5px var(--hair)}
+/* ── 하드코딩 색 덮기: :where() 로 낮은 우선순위 — 선택됨(.on) 같은 원래 규칙이 그대로 이긴다 ── */
+/* 링(진행 원) — SVG 속성 색을 CSS 로 덮는다 */
+:where(body.ap) svg circle:nth-child(1){stroke:var(--fill)}
+:where(body.ap) svg circle:nth-child(2):not([stroke="#f2b134"]){stroke:var(--primary)}
+:where(body.ap) #g-week text:nth-of-type(1){fill:var(--ink)}
+:where(body.ap) #g-week text:nth-of-type(2){fill:var(--muted2)}
+/* 카드 속 옅은 칸 */
+:where(body.ap) .exrow,:where(body.ap) .exrow.c-p1,:where(body.ap) .exrow.c-p2,:where(body.ap) .exrow.c-p3,:where(body.ap) .howbox,:where(body.ap) .appex-in,
+:where(body.ap) .polar,:where(body.ap) .wk.demo,:where(body.ap) .cal .d,:where(body.ap) .wcell,:where(body.ap) .wb.miss,:where(body.ap) .wb.wait,
+:where(body.ap) .lastwk.no,:where(body.ap) #c-rest,:where(body.ap) .rfgate-no,:where(body.ap) .adlg-no{background:var(--soft);border-color:transparent;color:var(--ink)}
+:where(body.ap) .wcell.on,:where(body.ap) .wk{background:var(--pop)}
+:where(body.ap) .wk{border-color:var(--line)}
+:where(body.ap) .wcell .n{color:var(--ink2)}
+:where(body.ap) .cal .d.today{background:var(--primary-tint);border-color:var(--primary);color:var(--primary-dark)}
+:where(body.ap) .wcell.today,:where(body.ap) .wcell.sel{background:var(--primary-tint)}
+/* 누르는 칸 — 회색 판 */
+:where(body.ap) .rpe button,:where(body.ap) .sat button,:where(body.ap) .pnmode button,:where(body.ap) .pntag,:where(body.ap) .gbtn,:where(body.ap) .pofsel button,
+:where(body.ap) .toc button,:where(body.ap) .seg button,:where(body.ap) .chiprow .dbtn,:where(body.ap) .daysel button,:where(body.ap) .wksel button,:where(body.ap) .dgone,
+:where(body.ap) .sgn,:where(body.ap) .setrow .sdel,:where(body.ap) .addset,:where(body.ap) .rjitem .bt .seen{background:var(--fill);color:var(--ink);border-color:transparent}
+/* 안내·경고 상자 — 색 종류별로 */
+:where(body.ap) .restart,:where(body.ap) .howbox .hwarn,:where(body.ap) .shoot,:where(body.ap) .rjtile,:where(body.ap) .card.rjcard,:where(body.ap) .rjitem .why,
+:where(body.ap) .latewarn.dup,:where(body.ap) .grbar,:where(body.ap) .rfgate,:where(body.ap) .rflate,:where(body.ap) .drop.diary,:where(body.ap) .rdmyth,:where(body.ap) .wb.go,
+:where(body.ap) .wcell.rej,:where(body.ap) .clive.bad,:where(body.ap) .bubble.bad,:where(body.ap) #c-rest.bad{background:var(--warning-tint);border-color:transparent;color:var(--warning)}
+:where(body.ap) .rjitem{background:var(--soft);border-color:transparent}
+:where(body.ap) .diarynote,:where(body.ap) .appguide,:where(body.ap) .wb.pend,:where(body.ap) .wcell.pend,:where(body.ap) .pchip,:where(body.ap) .partlab.p1{background:var(--primary-tint);border-color:transparent;color:var(--primary-dark)}
+:where(body.ap) .wb.hold,:where(body.ap) .wcell.hold,:where(body.ap) .bubble.hold,:where(body.ap) .chip.pn{background:var(--mind-tint);border-color:transparent;color:var(--mind-dark)}
+:where(body.ap) .latewarn.dup.ok,:where(body.ap) .days button.okday,:where(body.ap) .clive,:where(body.ap) .partlab.p3{background:var(--okt);border-color:transparent;color:var(--okc)}
+:where(body.ap) .partlab.p2{background:var(--warning-tint);color:var(--warning)}
+/* 팝업·말풍선·입력 */
+:where(body.ap) .pop-in,:where(body.ap) .pg-in,:where(body.ap) .adlg-in,:where(body.ap) .cmc-say{background:var(--surface);color:var(--ink)}
+:where(body.ap) .cmc-say{border-color:var(--primary)}
+:where(body.ap) .btn.sec,:where(body.ap) .seg button{background:var(--fill);color:var(--primary)}
+:where(body.ap) #install-bar{background:var(--primary-tint);color:var(--ink);border-color:transparent}
+:where(body.ap) .bubble{background:var(--soft)}
+:where(body.ap) .drop{background:var(--soft);border-color:var(--line2);color:var(--muted)}
+:where(body.ap) .drop.diary{background:var(--warning-tint);border-color:transparent}
+/* 시범 표시 — 누가 봐도 3277 전용 시범임을 (탭 줄 위에 얇게) */
+body.ap::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom));z-index:19;white-space:nowrap;
+  font-size:10.5px;font-weight:600;color:var(--muted);background:var(--glass);padding:3px 9px;border-radius:999px;
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 0 0 .5px var(--hair);pointer-events:none}
 </style>
 </head>
 <body>
@@ -1611,7 +1683,7 @@ body.ap::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;le
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.37.1';
+var PWA_VER = '1.38.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -1619,7 +1691,7 @@ var FCM_VAPID_KEY = 'BGmB7kEsyxjKRGk6olSRAaw0e-gkGUFE7B7LNPY_IyR5u-wHAay3_mdM-MA
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro';   // [1.29.3] JH.peace 5종
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.19 00:41';
+var PWA_BUILD = '2026.09.19 14:14';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -3753,7 +3825,8 @@ function apTrial(){
   var on=String((ST.student||{}).학번||'')==='3277';
   document.body.classList.toggle('ap',on);
   var mt=document.querySelector('meta[name=theme-color]');
-  if(on){ if(mt)mt.setAttribute('content','#f5f5f7'); } else { try{applyTheme(myTheme());}catch(e){} }
+  var dk=false; try{ dk=window.matchMedia('(prefers-color-scheme: dark)').matches; }catch(e){}
+  if(on){ if(mt)mt.setAttribute('content',dk?'#000000':'#f2f2f7'); } else { try{applyTheme(myTheme());}catch(e){} }   // [1.38.0] 다크면 상태줄도 검정
 }
 function isTeacher(){ return ['3277','2410'].indexOf(String((ST.student||{}).학번||'')) >= 0; }   // [1.29.2] 2410(박신향) 시험 계정도
 function lastWeekNo(){ return isTeacher() ? (Number((ST.config||{}).총_주차수)||4) : nowWeekNo(); }
