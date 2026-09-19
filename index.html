@@ -601,6 +601,9 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 #lg-logo{width:min(190px,46vw);height:min(190px,46vw);border-radius:22%;display:block;margin:0 auto 16px;box-shadow:0 10px 26px rgba(0,0,0,.16)}
 #s-login #ver{position:absolute;left:0;right:0;bottom:14px;margin:0}
 .hidden{display:none!important}
+#stale-pill{position:fixed;left:50%;top:calc(8px + env(safe-area-inset-top));transform:translateX(-50%) translateY(-8px);z-index:150;opacity:0;pointer-events:none;
+  font-size:11.5px;font-weight:700;color:#fff;background:rgba(30,30,32,.82);padding:5px 12px;border-radius:999px;white-space:nowrap;transition:opacity .2s,transform .2s}
+#stale-pill.on{opacity:1;transform:translateX(-50%) translateY(0)}
 h1{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0}
 h2{font-size:15px;font-weight:700;margin:0 0 10px}
 .muted{color:var(--muted)} .cap{color:var(--muted2);font-size:12px}
@@ -1680,11 +1683,12 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
   </div>
 </div>
 <div class="toast" id="toast"></div>
+<div id="stale-pill">🔄 최신 값 불러오는 중…</div>   <!-- [1.39.1] 저장본을 먼저 보여 주는 동안 -->
 
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.39.0';
+var PWA_VER = '1.39.1';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -1692,7 +1696,7 @@ var FCM_VAPID_KEY = 'BGmB7kEsyxjKRGk6olSRAaw0e-gkGUFE7B7LNPY_IyR5u-wHAay3_mdM-MA
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro';   // [1.29.3] JH.peace 5종
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.19 23:00';
+var PWA_BUILD = '2026.09.19 23:28';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2878,11 +2882,19 @@ function call(fn,args,cb){
 /* [1.30.0] 화면 먼저 — 지난번에 받은 값을 이 폰에 두었다가 곧바로 그리고(cb(값,true)), 서버 값이 오면 다시 그린다(cb(값,false)).
    서버가 붐벼 늦거나 실패해도 빈 화면이 안 된다. 학번마다 따로, 로그아웃하면 지운다. */
 function cacheKey_(fn,args){ return 'grofit_c_'+((ST.student&&ST.student.학번)||'')+'_'+fn+'_'+JSON.stringify((args||[]).slice(1)); }
+/* [1.39.1] 저장본을 먼저 보여 줄 때는 «🔄 갱신 중…» 을 띄우고 서버 값이 오면(실패해도) 내린다.
+   마스터코드 둘러보기 중에는 저장본을 아예 안 쓴다 — 여러 학생을 돌려 보는 폰에 옛 값이 남아 «0%» 처럼 잘못 보였다. */
+var STALE_N=0;
+function stalePill_(){
+  var el=document.getElementById('stale-pill'); if(!el)return;
+  el.classList.toggle('on',STALE_N>0);
+}
 function callCached(fn,args,cb,fresh){
-  var k=cacheKey_(fn,args);
-  if(!fresh){ try{ var v=localStorage.getItem(k); if(v){ try{ cb(JSON.parse(v),true); }catch(err){ console.error('[혜원핏] '+fn+' 저장본 그리기 오류',err); } } }catch(e){} }
+  var k=cacheKey_(fn,args), peek=isPeek(), shown=false;
+  if(!fresh && !peek){ try{ var v=localStorage.getItem(k); if(v){ try{ cb(JSON.parse(v),true); shown=true; STALE_N++; stalePill_(); setTimeout(function(){ if(shown){ shown=false; STALE_N=Math.max(0,STALE_N-1); stalePill_(); } },20000); }catch(err){ console.error('[혜원핏] '+fn+' 저장본 그리기 오류',err); } } }catch(e){} }
   call(fn,args,function(x){
-    if(x!==undefined && x!==null && !(x.ok===false)){
+    if(shown){ shown=false; STALE_N=Math.max(0,STALE_N-1); stalePill_(); }
+    if(!peek && x!==undefined && x!==null && !(x.ok===false)){
       try{ localStorage.setItem(k,JSON.stringify(x)); }catch(e){ cacheClear_(); }   // 자리가 모자라면 비우고 다음에 다시
     }
     cb(x,false);
