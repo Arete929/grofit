@@ -472,6 +472,7 @@ body{margin:0;font-family:Pretendard,-apple-system,system-ui,sans-serif;backgrou
 .qbub{display:flex;align-items:flex-start;gap:8px;margin:12px 0}
 .qbub .ch{width:62px;flex:none;align-self:flex-end}
 .qbub .ch img{width:100%;display:block}
+.qbub .ch.sq{width:76px}                                   /* [1.39.0] 정사각 스티커형은 조금 크게 */
 .qbub .say{position:relative;flex:1;background:var(--primary-tint);border:1.5px solid var(--primary);
   border-radius:16px;padding:12px 14px}
 .qbub .say:before{content:'';position:absolute;left:-11px;bottom:16px;
@@ -1683,7 +1684,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.38.2';
+var PWA_VER = '1.39.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -1691,7 +1692,7 @@ var FCM_VAPID_KEY = 'BGmB7kEsyxjKRGk6olSRAaw0e-gkGUFE7B7LNPY_IyR5u-wHAay3_mdM-MA
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro';   // [1.29.3] JH.peace 5종
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.19 22:55';
+var PWA_BUILD = '2026.09.19 23:00';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2708,8 +2709,11 @@ function markRead(kind){
   if(ST.student)call('markReading',[ST.student.학번,w,kind],function(r){ if(r&&r.reads)ST.reads=r.reads; });
 }
 /* [0.73.0] 진호 선생님이 묻는 말풍선 — 세 화면이 같이 쓴다 */
+/* [1.39.0] 주차마다 다른 진호 — 2주차 variant-11 · 3주차 variant-44 · 4주차 variant-33 (1주차·그 밖은 예전 jinho.png) */
+var QB_ICON={2:'jinho-w2.png',3:'jinho-w3.png',4:'jinho-w4.png'};
 function qBubble(week, q, lab){
-  return '<div class="qbub"><span class="ch"><img src="jinho.png" alt="김진호 선생님"></span>'
+  var ic=QB_ICON[Number(week)];
+  return '<div class="qbub"><span class="ch'+(ic?' sq':'')+'"><img src="'+(ic||'jinho.png')+'" alt="김진호 선생님"></span>'
     + '<div class="say"><span class="lab">'+esc(lab || (week+'주차 성찰 질문'))+'</span>'
     + '<p class="q">'+esc(q)+'</p>'
     + '<span class="who">김진호 선생님</span></div></div>';
