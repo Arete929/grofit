@@ -621,6 +621,9 @@ h2{font-size:15px;font-weight:700;margin:0 0 10px}
 .stchip.no{background:#fde2df;color:#b3261e}
 .stchip.go{background:#fff0d1;color:#8a5200}
 .stchip.wait{background:#eceef0;color:#6b7280}
+.stleft{flex-basis:100%;margin-top:6px;font-size:13px;line-height:1.5;color:var(--ink2,#3a3a3c)}   /* [1.41.0] 진행 중 — 남은 조건 */
+.stleft b{color:#8a5200}.stleft.tight b{color:#b3261e}
+@media(prefers-color-scheme:dark){body.ap .stleft b{color:#ffc266}body.ap .stleft.tight b{color:#ff8f88}}
 @media(prefers-color-scheme:dark){body.ap .stchip.ok{background:rgba(48,209,88,.20);color:#63e68a}body.ap .stchip.no{background:rgba(255,69,58,.22);color:#ff8f88}body.ap .stchip.go{background:rgba(255,159,10,.20);color:#ffc266}body.ap .stchip.wait{background:#2c2c2e;color:#a1a1a6}}
 .chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600}
 .chip.strength{background:var(--strength-tint,#FFEADF);color:var(--strength,#B1542A)}
@@ -1695,7 +1698,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.40.1';
+var PWA_VER = '1.41.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -1703,7 +1706,7 @@ var FCM_VAPID_KEY = 'BGmB7kEsyxjKRGk6olSRAaw0e-gkGUFE7B7LNPY_IyR5u-wHAay3_mdM-MA
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro';   // [1.29.3] JH.peace 5종
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.20 00:12';
+var PWA_BUILD = '2026.09.21 15:30';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -4845,7 +4848,16 @@ function loadScore(){
     var html='', ST_={'달성':['ok','✓ 달성'],'미달':['no','✕ 미달'],'진행중':['go','… 진행 중'],'전':['wait','운동 전']};
     var list=s.주차별||[]; if(!list.length){ for(var w0=1;w0<=T;w0++) list.push({주차:w0,상태:w0<=s.달성주차?'달성':'미달'}); }   // 옛 서버 응답 대비
     list.forEach(function(x){ var c=ST_[x.상태]||ST_['전'];
-      html+='<div class="list-item"><span>'+x.주차+'주차</span><span class="stchip '+c[0]+'">'+c[1]+'</span></div>'; });
+      var lf=x.남음, ex2='';
+      if(x.상태==='진행중' && lf){           /* [1.41.0] 진행 중인 주 — 달성까지 남은 조건 */
+        var need=[]; if(lf.유산소>0) need.push('유산소 '+lf.유산소+'일'); if(lf.근력>0) need.push('근력 '+lf.근력+'일');
+        var what=need.length?need.join(' · '):('운동 '+lf.일+'일');
+        var tight=lf.남은날>0 && lf.일>lf.남은날;
+        ex2='<div class="stleft'+(tight?' tight':'')+'"><b>'+what+' 더</b> 하면 달성'
+          +'<span class="cap"> · 이번 주 '+lf.남은날+'일 남음'+(tight?' (남은 날이 모자라요)':'')+'</span>'
+          +(lf.검토대기>0?'<span class="cap"><br>검토 대기 '+lf.검토대기+'일은 선생님이 확인해야 세어져요</span>':'')+'</div>';
+      }
+      html+='<div class="list-item"'+(ex2?' style="flex-wrap:wrap"':'')+'><span>'+x.주차+'주차</span><span class="stchip '+c[0]+'">'+c[1]+'</span>'+ex2+'</div>'; });
     document.getElementById('sc-weeks').innerHTML=html;
     document.getElementById('sc-ex').textContent=(g?g.운동달성률:s.운동달성률)+'%';
     document.getElementById('sc-sub').textContent=(g?g.정시성:s.정시성)+'%';
