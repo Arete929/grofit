@@ -621,6 +621,8 @@ h2{font-size:15px;font-weight:700;margin:0 0 10px}
 .stchip.no{background:#fde2df;color:#b3261e}
 .stchip.go{background:#fff0d1;color:#8a5200}
 .stchip.wait{background:#eceef0;color:#6b7280}
+.ruleln{margin:2px 0 10px;padding:9px 12px;border-radius:12px;background:var(--soft,#f3f4f6);font-size:12.5px;line-height:1.55;color:var(--ink2,#3a3a3c)}   /* [1.42.0] 홈 주간 카드 — 4일 규칙 */
+.ruleln b{color:var(--ink,#1d1d1f)}
 .stleft{flex-basis:100%;margin-top:6px;font-size:13px;line-height:1.5;color:var(--ink2,#3a3a3c)}   /* [1.41.0] 진행 중 — 남은 조건 */
 .stleft b{color:#8a5200}.stleft.tight b{color:#b3261e}
 @media(prefers-color-scheme:dark){body.ap .stleft b{color:#ffc266}body.ap .stleft.tight b{color:#ff8f88}}
@@ -1161,6 +1163,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
           <div class="list-item" style="padding:6px 0" id="g-str-row"><span>근력 필수</span><span class="chip strength" id="g-str-c">0/2</span></div>
         </div>
       </div>
+      <p class="ruleln hidden" id="hm-rule" style="margin:12px 0 0">📌 <b>3일 + 하루 몰아서 ≠ 4일.</b> 근력과 유산소를 하루에 몰아 해도 <b>1일</b>로 세요. 몰아 하면 근육통으로 다음 운동량도 줄어요.</p>
     </div>
     <button class="rdcard mindcard" id="mind-card" onclick="openMind(0)">
       <span class="rd-tag" id="mind-tag">♥ 이번 주 마음 한 줄</span>
@@ -1698,7 +1701,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.41.0';
+var PWA_VER = '1.42.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -1706,7 +1709,7 @@ var FCM_VAPID_KEY = 'BGmB7kEsyxjKRGk6olSRAaw0e-gkGUFE7B7LNPY_IyR5u-wHAay3_mdM-MA
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
 var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro';   // [1.29.3] JH.peace 5종
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
-var PWA_BUILD = '2026.09.21 15:30';
+var PWA_BUILD = '2026.09.21 17:00';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
 /* [0.82.0] 화면 맨 아래 줄 — 앱 버전·배포 시각, 서버 버전이 오면 함께 */
 function paintAppVer(){
@@ -2489,6 +2492,7 @@ var READINGS = {
            +'스쿼트 한 개, 달리기 100미터, 플랭크 5초. 4주 뒤에 그 1퍼센트가 쌓여 있고, 몸은 그것을 알아챕니다.']}
       ],
       인용: '남과 비교하면 오늘 그만두고, 어제의 나와 비교하면 내일도 합니다.',
+      링크: {t:'📊 내 체력 변화 그래프 보기', to:'inbody-graph'},     /* [1.42.0] 글에서 바로 그래프로 */
       질문: '방학 전의 나와 비교해서, 지금 가장 나아지고 있는 부분은 무엇이라고 생각하나요? 그 이유는 무엇인가요?'
     },
     지식: [KN.신발, KN.사흘, KN.무유]     /* [1.36.0] 신발·자세 · [1.37.0] 72시간의 법칙 */
@@ -2623,6 +2627,7 @@ function renderMind(){
   var h='<div class="rdsec mind">';
   m.본문.forEach(function(s){ h+=s.p.map(function(t){return '<p>'+t+'</p>';}).join(''); });
   if(m.인용)h+='<div class="pull">'+esc(m.인용)+'</div>';
+  if(m.링크)h+='<button type="button" class="btn sec" style="margin-top:12px" onclick="go(&quot;'+m.링크.to+'&quot;)">'+esc(m.링크.t)+'</button>';
   h+='</div>';
   h+=qBubble(w, m.질문);
   document.getElementById('mv-body').innerHTML=h;
@@ -3022,6 +3027,7 @@ function paintHome(h){
     var wk=h.이번주;
     document.getElementById('g-total-l').textContent='주 '+wk.목표일수+'일 목표';
     document.getElementById('g-total-c').textContent=wk.완료일수+'/'+wk.목표일수;
+    var hr=document.getElementById('hm-rule'); if(hr) hr.classList.toggle('hidden', !!wk.충족);   /* [1.42.0] 이번 주가 아직 안 채워졌을 때만 */
     document.getElementById('g-cardio-c').textContent=wk.유산소일수+'/'+wk.유산소필수;
     // [0.55.0] 근력도 최소 일수가 생겼다 — 0이면 줄을 감춘다
     var 근필=Number(wk.근력필수)||0, 근일=Number(wk.근력일수)||0;
