@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.37.1 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.42.1 -->
+<!--   [1.42.1] 제출 오류 알림(토스트)이 다크모드에서 흰 바탕에 흰 글씨로 보이던 문제 — 배경을 화면 모드와 상관없이 짙은 색으로 고정.
+        긴 오류 문구는 자동으로 더 오래 보이게(최대 5.2초), 눌러서 바로 닫을 수 있게. -->
 <!--   [1.37.1] «나는 하루에 에너지를 얼마나 쓸까»(KN.에너지)를 3주차 → 4주차 맨 앞으로. 3주차 지식 = 신발 · 72시간 · 무산소와 유산소. -->
 <!--   [1.37.0] 3주차 지식 읽을거리 «사흘 넘게 쉬지 않기 — 72시간의 법칙»(KN.사흘) — 한 번 운동한 효과(혈압·혈당)는 24~72시간 ·
         초과회복의 계단 · 근력 48시간 쉬고 72시간 넘기지 않기 · 주 4일 나누기 예. OX 2. 3주차 지식 4편(신발 → 72시간 → 에너지 → 무유). -->
@@ -956,9 +958,10 @@ body.peek{padding-top:30px}
 .adlg-btns button{flex:1;border:0;border-radius:12px;padding:12px 10px;font-size:14px;font-weight:700;font-family:inherit}
 .adlg-no{background:#EDEFEC;color:#4A544C}
 .adlg-ok{background:var(--p);color:#fff}
-.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;
-  border-radius:12px;font-size:13px;z-index:50;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90%}
-.toast.on{opacity:1}
+.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:#1c1c1e;color:#fff;padding:13px 20px;
+  border-radius:12px;font-size:14px;line-height:1.5;z-index:50;opacity:0;transition:opacity .2s;pointer-events:none;
+  max-width:min(90%,420px);box-shadow:0 8px 28px rgba(0,0,0,.35);text-align:center}
+.toast.on{opacity:1;pointer-events:auto}
 #install-bar{display:flex;align-items:center;gap:8px;background:var(--primary-tint);color:var(--primary-dark);padding:11px 14px;font-size:13px;font-weight:600;border-bottom:1px solid var(--primary)}
 #install-bar #install-btn{border:none;background:var(--primary);color:#fff;border-radius:8px;padding:7px 13px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
 #install-bar .x{border:none;background:none;color:var(--primary-dark);font-size:17px;padding:2px 4px;cursor:pointer;line-height:1}
@@ -1701,7 +1704,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.42.0';
+var PWA_VER = '1.42.1';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -2851,7 +2854,9 @@ function showUp(id,at,just){
   el.className='savedat'+(just?' just':'');
 }
 function toast(m,ms){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');
-  clearTimeout(toast._t); toast._t=setTimeout(function(){t.classList.remove('on')},ms||1900);}   // [1.22.0] 오류는 오래 보이게
+  t.onclick=function(){t.classList.remove('on');clearTimeout(toast._t);};                          // [1.42.1] 눌러서 바로 닫기
+  var dur=ms||Math.max(2400,Math.min(5200,1500+String(m||'').length*40));                          // [1.42.1] 긴 오류 문구는 더 오래 보이게
+  clearTimeout(toast._t); toast._t=setTimeout(function(){t.classList.remove('on')},dur);}
 function pick(id){document.getElementById(id).click();}
 /* [1.23.1] 구글이 결과를 넘겨주는 주소(googleusercontent)가 가끔 404·HTML 을 준다(9/12 밤 실측).
    한 번 실패하면 1.2초 뒤 한 번 더 보낸다 — call 로 부르는 것은 읽기이거나 같은 값을 다시 적는 것뿐이라 두 번 가도 된다. */
