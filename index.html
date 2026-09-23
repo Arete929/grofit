@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.45.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.46.0 -->
+<!--   [1.46.0] 점수 구성의 «제출 초과일»도 아코디언 — 어느 기록이 며칠 늦었는지(날짜·주차·종류·마감·낸 시각) 펼쳐 본다. 서버 getMyScore.초과내역(GAS 1.36.16). -->
 <!--   [1.45.0] 기록 탭 목록을 아코디언으로 — 제목은 «날짜 · 종류 · 간단한 운동량»(근력은 운동 이름 두 개 + 외 N개)과 상태 꼬리표(🔁 반려 · ❌ 미인정 · ⏸ 보류 · 💬 피드백 · ✍️).
         성찰 · 선생님 피드백 · 사진일기 · 저장시각 · 지우기는 눌러야 펼쳐진다. 반려 · 미인정 · 보류 기록은 처음부터 펼친 채로. 목록이 길어 안 보이던 것. -->
 <!--   [1.44.0] 4주차 필수 운동 자세 그림 9장 — 베어 워킹 니 푸시업(ex-bear-1·2·3, 난이도 DOWN/UP), 크로스 백 런지(ex-cross-1·2), 힐 터치(ex-heel-1·2). 1~3주차와 같은 방식. -->
@@ -1571,7 +1572,15 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
       <h2>점수 구성</h2>
       <div class="list-item"><span>운동 달성률 <span class="cap" id="sc-exb"></span></span><span id="sc-ex">—</span></div>
       <div class="list-item"><span>제출 정시성 <span class="cap" id="sc-subb"></span></span><span id="sc-sub">—</span></div>
-      <div class="list-item"><span>제출 초과일</span><span id="sc-late">—</span></div>
+      <div class="rec" id="sc-latewrap">
+        <div class="rec-hd" onclick="scLateToggle(this)" id="sc-latehd">
+          <div class="main"><div class="ttl"><span class="dt">제출 초과일</span></div>
+            <span class="sum" id="sc-latesum"></span></div>
+          <span id="sc-late" style="font-size:14px">—</span>
+          <span class="caret" id="sc-latecaret" style="display:none">▾</span>
+        </div>
+        <div class="rec-bd hidden" id="sc-latebd"></div>
+      </div>
     </div>
     <div class="card">
       <h2>내가 올린 운동 기록</h2>
@@ -1724,7 +1733,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.45.0';
+var PWA_VER = '1.46.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -4896,6 +4905,7 @@ function loadScore(){
     document.getElementById('sc-exb').textContent=bt; document.getElementById('sc-subb').textContent=bt;
     var lt=Number(s.늦은건수)||0, el=document.getElementById('sc-late');   // [0.69.0]
     if(el)el.innerHTML=lt?('<b style="color:var(--warning)">총 '+(s.총초과일||0)+'일 초과</b> <span class="cap">('+lt+'건)</span>'):'없음 (모두 제때 제출)';
+    renderLateDetail(s);                                                 // [1.46.0] 어느 기록이 며칠 늦었는지 — 눌러서 펼침
   });
   loadMyRecords();
 }
@@ -4946,6 +4956,36 @@ function loadMyRecords(){
     document.getElementById('my-records').innerHTML=html||'<p class="muted" style="padding:6px 0">아직 올린 기록이 없습니다.</p>';
     setTimeout(hydratePhotos,0);                                     // [1.31.0]
   });
+}
+/* [1.46.0] «제출 초과일» 세부 내역 — 눌러서 펼친다 */
+function renderLateDetail(s){
+  var wrap=document.getElementById('sc-latewrap'), bd=document.getElementById('sc-latebd');
+  var sum=document.getElementById('sc-latesum'), ct=document.getElementById('sc-latecaret');
+  if(!wrap||!bd) return;
+  var list=(s&&s.초과내역)||[];
+  if(!list.length){                                    // 초과가 없거나 옛 서버 응답이면 그냥 한 줄로
+    bd.innerHTML=''; bd.classList.add('hidden');
+    if(sum) sum.textContent=(Number(s&&s.늦은건수)||0)?'':'마감(일요일 밤 10시)을 넘긴 기록이 없어요';
+    if(ct) ct.style.display='none';
+    wrap.querySelector('.rec-hd').style.cursor='default';
+    return;
+  }
+  if(ct){ ct.style.display=''; ct.textContent='▾'; }
+  wrap.querySelector('.rec-hd').style.cursor='pointer';
+  if(sum) sum.textContent='어느 기록이 며칠 늦었는지 보기 ('+list.length+'건)';
+  bd.innerHTML=list.map(function(x){
+    return '<div class="list-item" style="align-items:flex-start">'
+      +'<span>'+esc(x.날짜)+' '+kindChip(x.종류)
+      +'<span class="cap" style="display:block;margin-top:3px">'+x.주차+'주차 · 마감 '+esc(x.마감||'')+(x.낸시각?(' · 낸 시각 '+esc(x.낸시각)):'')+'</span></span>'
+      +'<span class="chip late" style="white-space:nowrap">⏰ '+x.초과일+'일 초과</span></div>';
+  }).join('')
+   +'<p class="cap" style="margin:8px 0 0">마감은 그 주 <b>일요일 밤 10시</b>예요. 넘겨 낸 날수만큼 초과로 남고, 총 초과일에 따라 점수가 달라져요.</p>';
+  bd.classList.add('hidden');
+}
+function scLateToggle(hd){
+  var ct=document.getElementById('sc-latecaret');
+  if(ct && ct.style.display==='none') return;          // 초과가 없으면 펼칠 것이 없다
+  recToggle(hd);
 }
 /* [1.45.0] 제목에 쓸 한 줄 요약 — 유산소는 «6.3km 34분», 근력은 «암 워킹 · 리버스 런지 외 1개» */
 function recSum(r){
