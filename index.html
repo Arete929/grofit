@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.44.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.45.0 -->
+<!--   [1.45.0] 기록 탭 목록을 아코디언으로 — 제목은 «날짜 · 종류 · 간단한 운동량»(근력은 운동 이름 두 개 + 외 N개)과 상태 꼬리표(🔁 반려 · ❌ 미인정 · ⏸ 보류 · 💬 피드백 · ✍️).
+        성찰 · 선생님 피드백 · 사진일기 · 저장시각 · 지우기는 눌러야 펼쳐진다. 반려 · 미인정 · 보류 기록은 처음부터 펼친 채로. 목록이 길어 안 보이던 것. -->
 <!--   [1.44.0] 4주차 필수 운동 자세 그림 9장 — 베어 워킹 니 푸시업(ex-bear-1·2·3, 난이도 DOWN/UP), 크로스 백 런지(ex-cross-1·2), 힐 터치(ex-heel-1·2). 1~3주차와 같은 방식. -->
 <!--   [1.43.0] 추석 스티커 3종(st-chuseok 송편 · st-chuseokhi 만세 · st-chuseokrun 한복 달리기, 320px 투명) — 피드백 말풍선 · :이모티콘: · 오늘의 인사에 쓸 수 있게 STK_KEYS 추가. -->
 <!--   [1.42.2] «🔔 알림 받기»가 안 눌리던 것 — 이미 «허용»인데도 권한을 다시 물어 삼성 인터넷 등에서 default 가 돌아왔다.
@@ -913,6 +915,20 @@ body.peek{padding-top:30px}
 .dayrec .it{padding:8px 0;border-top:1px solid var(--divider)}
 .dayrec .it:first-of-type{border-top:none}
 .bubble{background:#f0f7f2;border-radius:4px 14px 14px 14px;padding:10px 12px;font-size:13px;color:var(--ink2);margin-top:8px}
+/* [1.45.0] 기록 목록 아코디언 — 제목(날짜·종류·운동량)만 보이고, 성찰·피드백은 눌러서 펼친다 */
+.rec{border-bottom:1px solid var(--divider)}
+.rec:last-child{border-bottom:none}
+.rec-hd{display:flex;align-items:center;gap:8px;padding:13px 0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rec-hd .main{flex:1;min-width:0}
+.rec-hd .ttl{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rec-hd .dt{font-weight:800;font-size:15px}
+.rec-hd .sum{display:block;margin-top:3px;font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec-hd .caret{flex:0 0 auto;color:var(--muted);font-size:13px;padding:4px 2px}
+.rec-bd{padding:0 0 14px}
+.rec-bd.hidden{display:none}
+.rec .mk{flex:0 0 auto;font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px;background:var(--soft);color:var(--ink2)}
+.rec .mk.rj{background:var(--danger-tint,#ffe6e3);color:var(--danger,#c0392b)}
+.rec .mk.cm{background:var(--primary-tint);color:var(--primary-dark)}
 .list-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--divider)}
 .list-item:last-child{border-bottom:none}
 .ver{text-align:center;color:var(--muted2);font-size:11px;padding:8px 0 4px}
@@ -1708,7 +1724,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.44.0';
+var PWA_VER = '1.45.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -4898,27 +4914,59 @@ function loadMyRecords(){
     if(bar) bar.innerHTML='<button type="button" class="howbtn shotbtn" onclick="toggleDiaryAll()">'
       +(DIARY_ON?'📋 기록 목록으로 돌아가기':'📷 나의 사진일기 모아 보기')+'</button>';
     if(DIARY_ON){ document.getElementById('my-records').innerHTML=diaryGridHTML(list); setTimeout(hydratePhotos,0); return; }
-    var html='';(list||[]).forEach(function(r){
+    var html='';(list||[]).forEach(function(r,i){
       var chip=kindChip(r.종류);
-      var sub=(r.종류==='유산소' && (r.거리||r.시간))?((r.거리?r.거리+'km ':'')+(r.시간?r.시간+'분':'')):'';
-      html+='<div class="list-item" style="align-items:flex-start">'
-        +'<div style="flex:1"><div>'+r.날짜+' '+chip+pnChip(r.파트너)+lateChip(r.초과일)+'</div>'
-        +'<div class="cap" style="margin-top:3px">'+esc(sub||r.내용||'')+'</div>'
-        +(r.저장시각?'<div class="cap" style="margin-top:2px;opacity:.8">🕒 저장 '+esc(r.저장시각)+'</div>':'')
-        +(r.자각도||r.만족도?'<div style="margin-top:4px">'
-          +(r.자각도?'<span class="chip" style="background:'+rpeColor(r.자각도)+'22;color:'+rpeColor(r.자각도)+'">'+esc(rpeName(r.자각도))+'</span> ':'')
-          +(r.만족도?'<span class="chip ok">'+satEmoji(r.만족도)+' '+esc(r.만족도)+'</span>':'')+'</div>':'')
-        +(r.성찰?'<div class="bubble" style="margin-top:6px">✍️ '+esc(r.성찰)+'</div>':'')
-        +recExtraHTML(r)
+      /* [1.45.0] 제목엔 «날짜 · 종류 · 간단한 운동량»만. 성찰·피드백·사진일기는 펼쳐야 보인다.
+         단, 반려·미인정·보류처럼 «학생이 꼭 봐야 하는» 기록은 처음부터 펼쳐 둔다. */
+      var must=(r.인정==='미인정'||r.보류);
+      var marks=(r.인정==='미인정'&&r.반려?'<span class="mk rj">🔁 반려</span>':'')
+        +(r.인정==='미인정'&&!r.반려?'<span class="mk rj">❌ 미인정</span>':'')
+        +(r.보류?'<span class="mk">⏸ 보류</span>':'')
+        +((r.코멘트||r.스티커)?'<span class="mk cm">💬 피드백</span>':'')
+        +(r.성찰?'<span class="mk">✍️</span>':'');
+      html+='<div class="rec">'
+        +'<div class="rec-hd" onclick="recToggle(this)">'
+          +'<div class="main"><div class="ttl"><span class="dt">'+esc(r.날짜)+'</span>'+chip+lateChip(r.초과일)+marks+'</div>'
+          +'<span class="sum">'+esc(recSum(r))+'</span></div>'
+          +(r.사진?'<button type="button" class="cap phbtn" style="white-space:nowrap" onclick="event.stopPropagation();openMyPhoto(&quot;'+esc(fidOfUrl(r.사진))+'&quot;)">📷</button>':'')
+          +'<span class="caret">'+(must?'▴':'▾')+'</span>'
         +'</div>'
-        +(r.사진?'<button type="button" class="cap phbtn" style="white-space:nowrap" onclick="openMyPhoto(&quot;'+esc(fidOfUrl(r.사진))+'&quot;)">📷 사진</button>':'')   // [1.31.0]
-        +((!r.인정||r.인정==='검토')?'<button type="button" class="cap phbtn" style="white-space:nowrap;color:#c0392b" '   // [1.34.0] 검토 전 기록만 — 잘못 올렸을 때 직접 지우기
-          +'onclick="delMyRecord('+r.row+',&quot;'+esc(r.날짜)+'&quot;,&quot;'+esc(r.종류)+'&quot;)">🗑 지우기</button>':'')
-        +'</div>';
+        +'<div class="rec-bd'+(must?'':' hidden')+'">'
+        +'<div>'+pnChip(r.파트너)
+          +(r.자각도?' <span class="chip" style="background:'+rpeColor(r.자각도)+'22;color:'+rpeColor(r.자각도)+'">'+esc(rpeName(r.자각도))+'</span>':'')
+          +(r.만족도?' <span class="chip ok">'+satEmoji(r.만족도)+' '+esc(r.만족도)+'</span>':'')+'</div>'
+        +(r.종류!=='유산소'&&r.내용?'<div class="cap" style="margin-top:6px">'+esc(r.내용)+'</div>':'')
+        +(r.저장시각?'<div class="cap" style="margin-top:4px;opacity:.8">🕒 저장 '+esc(r.저장시각)+'</div>':'')
+        +(r.성찰?'<div class="bubble" style="margin-top:8px">✍️ '+esc(r.성찰)+'</div>':'')
+        +recExtraHTML(r)
+        +((!r.인정||r.인정==='검토')?'<div style="margin-top:8px"><button type="button" class="cap phbtn" style="color:#c0392b" '
+          +'onclick="delMyRecord('+r.row+',&quot;'+esc(r.날짜)+'&quot;,&quot;'+esc(r.종류)+'&quot;)">🗑 이 기록 지우기</button></div>':'')
+        +'</div></div>';
     });
     document.getElementById('my-records').innerHTML=html||'<p class="muted" style="padding:6px 0">아직 올린 기록이 없습니다.</p>';
     setTimeout(hydratePhotos,0);                                     // [1.31.0]
   });
+}
+/* [1.45.0] 제목에 쓸 한 줄 요약 — 유산소는 «6.3km 34분», 근력은 «암 워킹 · 리버스 런지 외 1개» */
+function recSum(r){
+  if(r.종류==='유산소'){
+    var a=(r.거리?Number(r.거리)+'km':'')+(r.시간?(r.거리?' ':'')+Math.round(Number(r.시간))+'분':'');
+    return a||String(r.내용||'');
+  }
+  var t=String(r.내용||'').trim(); if(!t) return '';
+  var names=t.split(/,\s*/).map(function(x){
+    return x.replace(/^\[[^\]]*\]\s*/,'').replace(/\s*\d+\s*세트.*$/,'').replace(/\s*\d+\s*회.*$/,'').trim();
+  }).filter(Boolean);
+  if(!names.length) return t;
+  var n=names.length;
+  return names.slice(0,2).join(' · ')+(n>2?' 외 '+(n-2)+'개':'');
+}
+/* [1.45.0] 기록 카드 펼치기 · 접기 */
+function recToggle(hd){
+  var bd=hd.nextElementSibling; if(!bd) return;
+  var willOpen=bd.classList.contains('hidden');
+  bd.classList.toggle('hidden');
+  var c=hd.querySelector('.caret'); if(c) c.textContent=willOpen?'▴':'▾';
 }
 /* [1.34.0] 잘못 올린 기록(예: 날짜 실수) — 검토 전이면 학생이 직접 지울 수 있게 */
 function delMyRecord(row, 날짜, 종류){
