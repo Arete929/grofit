@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.42.2 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.43.0 -->
+<!--   [1.43.0] 추석 스티커 3종(st-chuseok 송편 · st-chuseokhi 만세 · st-chuseokrun 한복 달리기, 320px 투명) — 피드백 말풍선 · :이모티콘: · 오늘의 인사에 쓸 수 있게 STK_KEYS 추가. -->
 <!--   [1.42.2] «🔔 알림 받기»가 안 눌리던 것 — 이미 «허용»인데도 권한을 다시 물어 삼성 인터넷 등에서 default 가 돌아왔다.
         이미 허용이면 묻지 않고 바로 켠다. 콜백만 받는 옛 브라우저도 처리. 안 되면 지금 상태와 «자물쇠 🔒 → 알림 → 허용» 안내를 보여 준다. -->
 <!--   [1.42.1] 제출 오류 알림(토스트)이 다크모드에서 흰 바탕에 흰 글씨로 보이던 문제 — 배경을 화면 모드와 상관없이 짙은 색으로 고정.
@@ -1706,13 +1707,13 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.42.2';
+var PWA_VER = '1.43.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
 var FCM_VAPID_KEY = 'BGmB7kEsyxjKRGk6olSRAaw0e-gkGUFE7B7LNPY_IyR5u-wHAay3_mdM-MABq2jHKHfshLQS4TICZT6zrgl5Z7s';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
-var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro';   // [1.29.3] JH.peace 5종
+var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro|chuseokrun|chuseokhi|chuseok';   // [1.29.3] JH.peace 5종 · [1.43.0] 추석 3종(긴 이름 먼저)
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
 var PWA_BUILD = '2026.09.21 17:00';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }

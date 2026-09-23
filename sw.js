@@ -6,7 +6,7 @@
    처음 이 판으로 바뀔 때도 옛 캐시에 있던 그림을 옮겨 담으므로 다시 받지 않는다.
    ★그림 파일을 «같은 이름»으로 바꿔 넣었으면 STATIC 숫자를 올릴 것 — 그래야 새 그림을 받는다.
    ★그림 한 장을 못 받아도 설치는 계속된다(예전 addAll 은 한 장만 없어도 설치가 통째로 실패했다). */
-var CACHE = 'grofit-v1.42.2';
+var CACHE = 'grofit-v1.43.0';
 var STATIC = 'grofit-static-1';
 
 /* [1.34.0] 푸시 알림(FCM) — 앱이 닫혀 있어도 알림이 뜨게. FCM_CONFIG 가 비어 있으면(파이어베이스 설정 전) 조용히 건너뛴다.
@@ -26,6 +26,7 @@ var ASSETS = [
   './jinho.png', './jinho-w2.png', './jinho-w3.png', './jinho-w4.png', './tm-1-job.jpg', './tm-2-perm.jpg', './tm-3-template.jpg', './tm-4-edit.jpg', './tm-5-done.jpg', './ex-squat.jpg', './ex-wave-1.jpg', './ex-wave-2.jpg', './ex-wave-3.jpg', './ex-wave-4.jpg', './ex-wave-warn.jpg', './ex-armwalk-1.jpg', './ex-armwalk-2.jpg', './ex-armwalk-warn1.jpg', './ex-armwalk-warn2.jpg', './ex-lunge-1.jpg', './ex-lunge-2.jpg', './ex-lunge-warn.jpg', './ex-wide-1.jpg', './ex-wide-2.jpg', './ex-wide-3.jpg', './ex-wide-warn.jpg', './ex-side-1.jpg', './ex-side-2.jpg', './ex-side-warn.jpg', './ex-push-std.jpg', './ex-push-narrow.jpg', './ex-push-elbow.jpg', './ex-squat-knee.jpg', './ex-squat-back.jpg', './ex-squat-wall.jpg', './ex-plank.jpg', './ex-legraise.jpg',
   './st-verygood.png','./st-good.png','./st-nice.png','./st-peace.png','./st-regret.png','./st-frustration.png','./st-sob.png','./st-wail.png','./st-no.png', './st-workout.png', './st-watch.png', './st-cheer.png',
   './st-jhwhite.png','./st-jhblue.png','./st-jhred.png','./st-jhpink.png','./st-jhretro.png',   // [1.29.3] JH.peace 5종(새 이름이라 STATIC 그대로)
+  './st-chuseok.png','./st-chuseokhi.png','./st-chuseokrun.png',   // [1.43.0] 추석 3종(새 이름이라 STATIC 그대로)
   './splash-locke.jpg','./ic-flex.png','./ic-body.png',
   './ex-app-samsung.jpg','./ex-app-nrc.jpg','./ex-app-apple.jpg'];   // [1.25.0] 앱별 실제 상세 화면 예시(새 이름이라 STATIC 은 그대로)
 /* 테마 6종의 manifest·아이콘·로고도 오프라인 캐시 (설치 아이콘이 테마별로 다름) */
