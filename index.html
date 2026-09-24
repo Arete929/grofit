@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.46.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.47.0 -->
+<!--   [1.47.0] 로그인 화면 «학생코드» 를 한 칸씩 입력하는 박스 9개(3-3-3)로 — 한 글자 치면 다음 칸으로, 백스페이스면 앞 칸으로,
+        붙여넣으면 칸마다 나눠 담김. 실제 값은 숨은 in-pin 에 모아 doLogin() 은 그대로 읽는다(로그아웃하면 비움). -->
 <!--   [1.46.0] 점수 구성의 «제출 초과일»도 아코디언 — 어느 기록이 며칠 늦었는지(날짜·주차·종류·마감·낸 시각) 펼쳐 본다. 서버 getMyScore.초과내역(GAS 1.36.16). -->
 <!--   [1.45.0] 기록 탭 목록을 아코디언으로 — 제목은 «날짜 · 종류 · 간단한 운동량»(근력은 운동 이름 두 개 + 외 N개)과 상태 꼬리표(🔁 반려 · ❌ 미인정 · ⏸ 보류 · 💬 피드백 · ✍️).
         성찰 · 선생님 피드백 · 사진일기 · 저장시각 · 지우기는 눌러야 펼쳐진다. 반려 · 미인정 · 보류 기록은 처음부터 펼친 채로. 목록이 길어 안 보이던 것. -->
@@ -646,6 +648,14 @@ h2{font-size:15px;font-weight:700;margin:0 0 10px}
 .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
 input,textarea,select{width:100%;font-family:inherit;font-size:16px;border:1.5px solid var(--line2);border-radius:12px;
   padding:13px 14px;background:#fff;color:var(--ink);outline:none}
+/* [1.47.0] 학생코드 — 한 칸씩 입력하는 코드 박스(3-3-3) */
+.codebox{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:2px}
+.codebox .cb-gap{width:12px;flex:0 0 auto}
+.codebox .cb{width:34px;height:44px;flex:0 0 auto;padding:0;text-align:center;font-size:19px;font-weight:800;
+  border:1.5px solid var(--line2);border-radius:10px;background:#fff;color:var(--ink);letter-spacing:0}
+.codebox .cb:focus{border-color:var(--primary)}
+.codebox .cb.filled{border-color:var(--primary);background:var(--primary-tint)}
+@media (max-width:360px){.codebox{gap:5px}.codebox .cb{width:29px;height:40px;font-size:17px}.codebox .cb-gap{width:9px}}
 input:focus,textarea:focus{border-color:var(--primary)}
 label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0 6px}
 .field{margin-bottom:14px}
@@ -1149,7 +1159,22 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
     <p class="muted" style="text-align:center;margin:6px 0 26px" id="lg-sub">운동처방일지</p>
     <div class="card">
       <div class="field"><label>학번</label><input id="in-sid" inputmode="numeric" placeholder="예: 3277"></div>
-      <div class="field"><label>학생코드</label><input id="in-pin" placeholder="예: A001"></div>
+      <div class="field"><label>학생코드</label>
+        <div class="codebox" id="pin-box" role="group" aria-label="학생코드 9자리">
+          <input class="cb" maxlength="1" inputmode="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="1번째 칸">
+          <input class="cb" maxlength="1" inputmode="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="2번째 칸">
+          <input class="cb" maxlength="1" inputmode="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="3번째 칸">
+          <span class="cb-gap"></span>
+          <input class="cb" maxlength="1" inputmode="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="4번째 칸">
+          <input class="cb" maxlength="1" inputmode="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="5번째 칸">
+          <input class="cb" maxlength="1" inputmode="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="6번째 칸">
+          <span class="cb-gap"></span>
+          <input class="cb" maxlength="1" inputmode="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="7번째 칸">
+          <input class="cb" maxlength="1" inputmode="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="8번째 칸">
+          <input class="cb" maxlength="1" inputmode="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="9번째 칸">
+        </div>
+        <input type="hidden" id="in-pin">
+      </div>
       <button class="btn" id="btn-login" onclick="doLogin()">로그인</button>
       <p class="cap" style="text-align:center;margin:14px 0 0">학생코드는 <b>[다했어요]에서 쓰던 코드</b>를 그대로 사용합니다.</p>
       <div id="theme-pick" class="hidden" style="margin-top:16px;border-top:1px solid var(--divider);padding-top:14px">
@@ -1733,7 +1758,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.46.0';
+var PWA_VER = '1.47.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -2960,6 +2985,7 @@ function setPeek(on){
 }
 function isPeek(){ if(ST.peek!==undefined)return !!ST.peek; try{ return localStorage.getItem('grofit_peek')==='1'; }catch(e){ return false; } }
 function logout(){
+  pinClear();
   if(!confirm('로그아웃할까요? 다시 쓰려면 학번과 학생코드를 입력해야 합니다.'))return;
   /* 토큰·학생정보만 지우고 고른 테마(grofit_theme)는 그대로 둔다 */
   try{ localStorage.removeItem(bundleKey()); }catch(e){}   // [1.15.0]
@@ -2974,6 +3000,39 @@ function logout(){
 }
 
 /* ---------- 로그인 ---------- */
+/* [1.47.0] 학생코드 박스(3-3-3) — 한 칸에 한 글자, 다 채우면 다음 칸으로, 지우면 앞 칸으로.
+   여러 글자를 한 번에 붙여넣으면 칸마다 나눠 담는다. 실제 값은 숨은 in-pin 에 모아 두므로 로그인 처리는 그대로다. */
+function pinBoxes_(){ return Array.prototype.slice.call(document.querySelectorAll('#pin-box .cb')); }
+function pinSync_(){
+  var v=pinBoxes_().map(function(b){return b.value;}).join('');
+  var h=document.getElementById('in-pin'); if(h) h.value=v;
+}
+function pinInit(){
+  var boxes=pinBoxes_(); if(!boxes.length) return;
+  boxes.forEach(function(b,i){
+    b.addEventListener('input',function(){
+      b.value=b.value.slice(-1);                       // 한 글자만
+      b.classList.toggle('filled',!!b.value);
+      if(b.value && boxes[i+1]) boxes[i+1].focus();
+      pinSync_();
+    });
+    b.addEventListener('keydown',function(e){
+      if(e.key==='Backspace' && !b.value && boxes[i-1]){ boxes[i-1].focus(); boxes[i-1].value=''; boxes[i-1].classList.remove('filled'); pinSync_(); }
+      if(e.key==='ArrowLeft' && boxes[i-1]) boxes[i-1].focus();
+      if(e.key==='ArrowRight' && boxes[i+1]) boxes[i+1].focus();
+      if(e.key==='Enter') doLogin();
+    });
+    b.addEventListener('paste',function(e){
+      var t=(e.clipboardData||window.clipboardData).getData('text').replace(/\s+/g,'');
+      if(!t) return;
+      e.preventDefault();
+      for(var k=0;k<t.length && (i+k)<boxes.length;k++){ boxes[i+k].value=t[k]; boxes[i+k].classList.toggle('filled',!!t[k]); }
+      var last=Math.min(i+t.length,boxes.length-1); boxes[last].focus();
+      pinSync_();
+    });
+  });
+}
+function pinClear(){ pinBoxes_().forEach(function(b){ b.value=''; b.classList.remove('filled'); }); pinSync_(); var f=pinBoxes_()[0]; if(f) f.focus(); }
 function doLogin(){
   var sid=document.getElementById('in-sid').value.trim();
   var pin=document.getElementById('in-pin').value.trim();
@@ -5564,6 +5623,7 @@ function notiDisable(){
   [['c-reflect','c-reflect-n'],['st-reflect','st-reflect-n']].forEach(function(p){
     var t=document.getElementById(p[0]); if(t)t.addEventListener('input',function(){countReflect(p[0],p[1]);});
   });
+  pinInit();                       // [1.47.0] 학생코드 박스(3-3-3) 초기화
   // 미설치 상태면: 로그인 버튼 + 상단 배너를 항상 표시(로그인/홈 어디서든 보이게)
   if(!isStandalone()){
     var li=document.getElementById('login-install');if(li)li.classList.remove('hidden');
