@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.47.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.47.1 -->
+<!--   [1.47.1] 학생코드 박스 9칸이 폰 화면 밖으로 잘리던 것 — 칸을 고정 34px 에서 «남는 너비를 나눠 갖는» 칸(flex:1, 최대 38px)으로 바꿔 어느 폰에서도 한 줄에 다 들어온다. -->
 <!--   [1.47.0] 로그인 화면 «학생코드» 를 한 칸씩 입력하는 박스 9개(3-3-3)로 — 한 글자 치면 다음 칸으로, 백스페이스면 앞 칸으로,
         붙여넣으면 칸마다 나눠 담김. 실제 값은 숨은 in-pin 에 모아 doLogin() 은 그대로 읽는다(로그아웃하면 비움). -->
 <!--   [1.46.0] 점수 구성의 «제출 초과일»도 아코디언 — 어느 기록이 며칠 늦었는지(날짜·주차·종류·마감·낸 시각) 펼쳐 본다. 서버 getMyScore.초과내역(GAS 1.36.16). -->
@@ -649,13 +650,14 @@ h2{font-size:15px;font-weight:700;margin:0 0 10px}
 input,textarea,select{width:100%;font-family:inherit;font-size:16px;border:1.5px solid var(--line2);border-radius:12px;
   padding:13px 14px;background:#fff;color:var(--ink);outline:none}
 /* [1.47.0] 학생코드 — 한 칸씩 입력하는 코드 박스(3-3-3) */
-.codebox{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:2px}
-.codebox .cb-gap{width:12px;flex:0 0 auto}
-.codebox .cb{width:34px;height:44px;flex:0 0 auto;padding:0;text-align:center;font-size:19px;font-weight:800;
-  border:1.5px solid var(--line2);border-radius:10px;background:#fff;color:var(--ink);letter-spacing:0}
+.codebox{display:flex;align-items:center;justify-content:center;gap:4px;width:100%;margin-top:2px}
+.codebox .cb-gap{flex:0 0 6px}
+/* [1.47.1] 화면 너비에 맞춰 줄어든다 — 예전엔 34px 고정이라 9칸이 폰 화면(카드 안쪽 ≈320px)보다 넓어 잘렸다 */
+.codebox .cb{flex:1 1 0;min-width:0;width:auto;max-width:38px;height:46px;padding:0;text-align:center;font-size:18px;font-weight:800;
+  border:1.5px solid var(--line2);border-radius:9px;background:#fff;color:var(--ink);letter-spacing:0}
 .codebox .cb:focus{border-color:var(--primary)}
 .codebox .cb.filled{border-color:var(--primary);background:var(--primary-tint)}
-@media (max-width:360px){.codebox{gap:5px}.codebox .cb{width:29px;height:40px;font-size:17px}.codebox .cb-gap{width:9px}}
+@media (max-width:340px){.codebox{gap:3px}.codebox .cb{height:42px;font-size:16px;border-radius:8px}.codebox .cb-gap{flex-basis:4px}}
 input:focus,textarea:focus{border-color:var(--primary)}
 label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0 6px}
 .field{margin-bottom:14px}
@@ -1758,7 +1760,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.47.0';
+var PWA_VER = '1.47.1';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
