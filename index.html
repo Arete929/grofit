@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.48.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.48.1 -->
+<!--   [1.48.1] 새 4주차 읽을거리를 전원에게 연다 — NEW4_ON=true (선생님 «모두 반영», 9/27). 3277 이 아닌 학생 화면도 시험 통과(마음 4편 · 지식 0편 · 성찰 질문 그대로). -->
 <!--   [1.48.0] 4주차 읽을거리 개편 — «4주가 끝나도 이어서 운동하기». 마음단단 네 편(모죽 + 타고난 재능보다 매일 쌓이는 하루 · 실패는 그저 경험일 뿐 · 1만 시간의 법칙), 지식단단은 4주차 없음(홈 지식 카드·지식 화면·지난 주 목록에서 빠짐). 마음 화면이 여러 편(칩 목차 + 편마다 원리)을 그림, 성찰 질문은 끝에 한 번. ★3277 로그인일 때만 먼저 보인다(new4On / NEW4_ON) — 모두에게 열 때 NEW4_ON=true. 다른 학생은 예전 4주차(마음 1 + 지식 4) 그대로. -->
 <!--   [1.47.1] 학생코드 박스 9칸이 폰 화면 밖으로 잘리던 것 — 칸을 고정 34px 에서 «남는 너비를 나눠 갖는» 칸(flex:1, 최대 38px)으로 바꿔 어느 폰에서도 한 줄에 다 들어온다. -->
 <!--   [1.47.0] 로그인 화면 «학생코드» 를 한 칸씩 입력하는 박스 9개(3-3-3)로 — 한 글자 치면 다음 칸으로, 백스페이스면 앞 칸으로,
@@ -1761,7 +1762,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.48.0';
+var PWA_VER = '1.48.1';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -2583,7 +2584,7 @@ READINGS[2].지식 = [OLDR[3], OLDR[2]];
 
 /* [1.48.0] 4주차 새 읽을거리 — «4주가 끝나도 이어서 운동하기». 마음단단 네 편(모죽 + 새 세 편), 지식단단은 이번 주 없음.
    ★ 3277 로그인일 때만 먼저 보인다(선생님 «3277에만 먼저 반영»). 모두에게 열려면 NEW4_ON 을 true 로. */
-var NEW4_ON = false;
+var NEW4_ON = true;                 // [1.48.1] 9/27 선생님 «모두 반영» — 전원에게 새 4주차 읽을거리를 연다(예전엔 3277 만)
 function new4On(){ return NEW4_ON || String((ST.student||{}).학번||'')==='3277'; }
 var NEW4_MORE = [
   { 제목: '타고난 재능보다 매일 쌓이는 하루',
