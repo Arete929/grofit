@@ -1,4 +1,9 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.48.1 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.49.0 -->
+<!--   [1.49.0] «나의 4주 보고서» 화면 추가(읽기 전용 — 요약·주차별 실천·성취율·체력측정 변화·성찰+선생님 코멘트. 감상문 입력·사진일기는 아직 없음, 추후 결정되면 추가).
+        서버 getMyReport(sid) 사용(관리자 adminGetReport 를 본인 전용으로 재사용). ★관리자 설정(메뉴_운동·체력·성찰·기록·공지·보고서)으로 하단 탭을 켜고 끌 수 있게 —
+        꺼진 탭은 숨기고, 홈의 바로가기 카드로 들어가려 해도 go() 단계에서 막아 홈으로 돌려보낸다(MENU_GATE).
+        ★같이 발견한 버그: 학생 체력 탭의 fitVal() 이 관리자 보고서와 같은 결함 — 팔굽혀펴기·골격근량 판정 자리가 등급 객체라 Number() 가 NaN 이 되어
+        그래프·표에서 늘 «–» 로 빠졌다(전체 기간 동안 계속). 원본 수치로 대체하도록 수정. -->
 <!--   [1.48.1] 새 4주차 읽을거리를 전원에게 연다 — NEW4_ON=true (선생님 «모두 반영», 9/27). 3277 이 아닌 학생 화면도 시험 통과(마음 4편 · 지식 0편 · 성찰 질문 그대로). -->
 <!--   [1.48.0] 4주차 읽을거리 개편 — «4주가 끝나도 이어서 운동하기». 마음단단 네 편(모죽 + 타고난 재능보다 매일 쌓이는 하루 · 실패는 그저 경험일 뿐 · 1만 시간의 법칙), 지식단단은 4주차 없음(홈 지식 카드·지식 화면·지난 주 목록에서 빠짐). 마음 화면이 여러 편(칩 목차 + 편마다 원리)을 그림, 성찰 질문은 끝에 한 번. ★3277 로그인일 때만 먼저 보인다(new4On / NEW4_ON) — 모두에게 열 때 NEW4_ON=true. 다른 학생은 예전 4주차(마음 1 + 지식 4) 그대로. -->
 <!--   [1.47.1] 학생코드 박스 9칸이 폰 화면 밖으로 잘리던 것 — 칸을 고정 34px 에서 «남는 너비를 나눠 갖는» 칸(flex:1, 최대 38px)으로 바꿔 어느 폰에서도 한 줄에 다 들어온다. -->
@@ -1628,6 +1633,13 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
     <div id="nt-list"></div>
   </section>
 
+  <!-- [1.49.0] 나의 4주 보고서 -->
+  <section id="s-report" class="scr">
+    <h1 style="margin-bottom:4px">나의 4주 보고서</h1>
+    <p class="muted" style="font-size:12.5px;margin:0 0 14px" id="rpt-sub"></p>
+    <div id="rpt-body"><p class="muted" style="text-align:center;padding:26px 0">불러오는 중…</p></div>
+  </section>
+
 
   <!-- 주차별 읽을거리 -->
   <!-- [0.67.0] 마음단단 -->
@@ -1743,6 +1755,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
     <button data-t="reflect" onclick="go('reflect')"><img class="ic" src="tab-reflect.png" alt="">성찰</button>
     <button data-t="score" onclick="go('score')"><img class="ic" src="tab-score.png" alt="">기록</button>
     <button data-t="notice" onclick="go('notice')"><img class="ic" src="tab-notice.png" alt="">공지</button>
+    <button data-t="report" onclick="go('report')"><span class="ic">📄</span>보고서</button>
   </nav>
 </div>
 <div class="peekbar hidden" id="peekbar">🔑 <b>마스터코드로 보는 중</b> · 읽음 표시가 남지 않아요</div>
@@ -1762,7 +1775,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.48.1';
+var PWA_VER = '1.49.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -1851,7 +1864,21 @@ function dismissInstall(){localStorage.setItem('grofit_install_dismissed','1');d
 
 /* ---------- 화면 전환 ---------- */
 var TABS = {home:1,cert:1,inbody:1,reflect:1,score:1,notice:1};
+/* [1.49.0] 관리자 설정(메뉴_운동 등)으로 막힌 화면은 홈으로 돌려보낸다 — 탭바뿐 아니라 홈의 바로가기 카드로도 못 들어가게 */
+var MENU_GATE={cert:'운동',cardio:'운동',strength:'운동',reject:'운동','inbody':'체력','inbody-graph':'체력',reflect:'성찰',score:'기록',notice:'공지',report:'보고서'};
+function menuOn(key){ var c=ST.config||{}, v=c['메뉴_'+key]; if(v===undefined) return key!=='보고서'; return String(v)!=='off'; }
+function applyMenuSwitches(){
+  document.querySelectorAll('#tabbar button[data-t]').forEach(function(b){
+    var g=MENU_GATE[b.dataset.t]; if(!g) return;   // 홈은 늘 켜짐
+    b.classList.toggle('hidden', !menuOn(g));
+  });
+  var cur=null;
+  document.querySelectorAll('.scr.on').forEach(function(sec){ var g=MENU_GATE[sec.id.replace('s-','')]; if(g) cur=g; });
+  if(cur && !menuOn(cur)) go('home');
+}
 function go(name, skipLoad){
+  var gate=MENU_GATE[name];
+  if(gate && !menuOn(gate)){ toast(gate+' 메뉴는 지금 닫혀 있어요'); name='home'; }
   document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on')});
   var el = document.getElementById('s-'+name); if(el) el.classList.add('on');
   var tb = document.getElementById('tabbar');
@@ -1871,6 +1898,7 @@ function go(name, skipLoad){
   if(name==='score') loadScore();
   if(name==='notice'){ loadNoticesStudent(); notiPaint(); }   // [1.34.0]
   if(name==='inquiry'){ renderIqType(); renderIqPrev(); loadMyInq(); }
+  if(name==='report') loadReport();   // [1.49.0]
   if(name==='read') renderReading();
   if(name==='mind') renderMind();
   if(name==='home') ST.readWeek=null;   // [0.67.0] 홈으로 오면 «이번 주 글»로 되돌린다
@@ -3138,7 +3166,7 @@ function applyBundle(b, fromCache){
   setTimeout(paintAppVer,0);        // [0.82.0] 서버 버전이 오면 맨 아랫줄을 다시 쓴다
   if(b.reads) ST.reads=b.reads;   // [0.67.0] 서버 읽음 기록
   if(!fromCache && b.reads) setTimeout(syncReads,1500);   // [1.16.0] 폰에만 있는 읽음을 서버로
-  if(b.config) ST.config=b.config;
+  if(b.config){ ST.config=b.config; try{applyMenuSwitches();}catch(e){} }
   if(b.home){ paintHome(b.home); }
   if(b.stamps){ var s=b.stamps;
     showSaved('saved-reflect',s.reflect,false); showSaved('saved-inbody',s.inbody,false);
@@ -4575,6 +4603,7 @@ var FIT_METRICS=[
 function fitVal(rec,k){
   if(!rec||!rec.있음)return null;
   var v=(rec.판정&&rec.판정[k]!==undefined&&rec.판정[k]!=='')?rec.판정[k]:rec[k];
+  if(v&&typeof v==='object') v=rec[k];   // [1.49.0] 판정 자리에 등급 객체({등급,라벨} 등)가 든 항목(팔굽혀펴기·골격근량) — 원본 수치로. 전엔 Number(객체)=NaN 이라 그래프·표에서 늘 «–» 로 빠졌다
   if(v===''||v===null||v===undefined)return null;
   v=Number(v);return isNaN(v)?null:v;
 }
@@ -4674,6 +4703,47 @@ function renderFitTable(){
   html+='</tbody></table></div>';
   document.getElementById('fit-table').innerHTML=html;
 }
+
+/* [1.49.0] 나의 4주 보고서 — 읽기 전용(감상문 입력·사진일기는 아직 없음) */
+function loadReport(){
+  var box=document.getElementById('rpt-body');
+  call('getMyReport',[ST.student.학번],function(d){
+    if(!d||!d.ok){ box.innerHTML='<p class="muted" style="text-align:center;padding:26px 0">'+esc((d&&d.msg)||'불러오지 못했어요')+'</p>'; return; }
+    document.getElementById('rpt-sub').textContent=(d.평가명||'')+' · '+(d.기간||'');
+    var h='';
+    h+='<div class="card"><div style="display:flex;flex-wrap:wrap;gap:10px 18px">'
+      +rptStat(d.총운동일,'총 운동일수')+rptStat((d.달성주차||0)+'/'+(d.총주차||0),'목표 달성 주차')
+      +rptStat(d.총거리,'총 달린 거리(km)')+rptStat(d.총시간,'총 운동시간(분)')+'</div></div>';
+    h+='<div class="card"><h2 style="margin:0 0 10px">주차별 운동 실천</h2><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:380px">'
+      +'<thead><tr><th style="text-align:left;padding:6px 4px;color:#8a978c">주차</th><th style="padding:6px 4px;color:#8a978c">운동일수</th>'
+      +'<th style="padding:6px 4px;color:#8a978c">유산소</th><th style="padding:6px 4px;color:#8a978c">근력</th><th style="padding:6px 4px;color:#8a978c">목표</th></tr></thead><tbody>'
+      +(d.주차||[]).map(function(w){ return '<tr><td style="padding:6px 4px;border-top:1px solid var(--divider)">'+w.주차+'주</td>'
+        +'<td style="text-align:center;padding:6px 4px;border-top:1px solid var(--divider)">'+w.운동일수+'일</td>'
+        +'<td style="text-align:center;padding:6px 4px;border-top:1px solid var(--divider)">'+w.유산소일수+'일</td>'
+        +'<td style="text-align:center;padding:6px 4px;border-top:1px solid var(--divider)">'+w.근력일수+'일</td>'
+        +'<td style="text-align:center;padding:6px 4px;border-top:1px solid var(--divider)"><span class="chip '+(w.달성?'ok':'bad')+'">'+(w.달성?'달성':'미달')+'</span></td></tr>'; }).join('')
+      +'</tbody></table></div></div>';
+    var sc=d.점수||{};
+    h+='<div class="card"><h2 style="margin:0 0 10px">성취율과 점수</h2><div style="display:flex;flex-wrap:wrap;gap:10px 18px">'
+      +rptStat((sc.운동달성률!=null?sc.운동달성률+'%':'—'),'운동 달성률')+rptStat((sc.정시성!=null?sc.정시성+'%':'—'),'제출 정시성')
+      +rptStat((sc.성취율!=null?sc.성취율+'%':'—'),'최종 성취율')+rptStat((sc.점수!=null?sc.점수+' / '+(sc.급간배점||d.총점):'—'),'점수')+'</div></div>';
+    if((d.체력||[]).some(function(f){return f.있음;})){
+      h+='<div class="card"><h2 style="margin:0 0 10px">체력측정 변화</h2><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11.5px;min-width:430px">'
+        +'<thead><tr><th style="text-align:left;padding:6px 4px;color:#8a978c">항목</th>'
+        +(d.체력||[]).map(function(f){return '<th style="padding:6px 3px;color:#8a978c;font-size:10px">'+esc(f.회차).replace('주차','주')+'</th>';}).join('')+'</tr></thead><tbody>'
+        +FIT_METRICS.map(function(m){ return '<tr><td style="padding:6px 4px;border-top:1px solid var(--divider)">'+m.n+'</td>'
+          +(d.체력||[]).map(function(f){ var v=fitVal(f,m.k); return '<td style="text-align:center;padding:6px 3px;border-top:1px solid var(--divider)">'+(v===null?'<span class="muted">–</span>':v)+'</td>'; }).join('')
+          +'</tr>'; }).join('')
+        +'</tbody></table></div></div>';
+    }
+    h+='<div class="card"><h2 style="margin:0 0 10px">주차별 성찰</h2>'
+      +((d.성찰&&d.성찰.length)?d.성찰.map(function(r){ return '<div style="margin-bottom:12px"><b>'+r.주차+'주차</b> <span class="cap">'+esc(r.작성일||'')+'</span>'
+          +'<p style="margin:4px 0 0">'+esc(r.내용||'')+'</p>'+(r.교사코멘트?comicHTML(r.교사코멘트,r.스티커||''):'')+'</div>'; }).join('')
+        :'<p class="muted">작성한 성찰이 없어요.</p>')+'</div>';
+    box.innerHTML=h;
+  });
+}
+function rptStat(v,label){ return '<div style="flex:1 1 40%;min-width:120px"><div style="font-size:24px;font-weight:800">'+v+'</div><div class="cap">'+label+'</div></div>'; }
 
 /* ---------- 성찰 ---------- */
 /* ---------- 운동자각도 · 만족도 ---------- */
@@ -5727,7 +5797,7 @@ function notiDisable(){
   }
 })();
 /* [1.26.3] 설정 받은 뒤 — 테마·로그인 화면 제목 (예전엔 앱 켤 때 getPublicConfig 콜백 안에 있었다) */
-function applyPubCfg(c){ if(c){ST.config=c; try{apTrial();}catch(e){}   // [1.38.0] 관리자가 애플 스타일을 켰는지 다시 본다
+function applyPubCfg(c){ if(c){ST.config=c; try{apTrial();}catch(e){}try{applyMenuSwitches();}catch(e){}   // [1.38.0] 관리자가 애플 스타일을 켰는지 다시 본다
 
     var mine=null; try{mine=localStorage.getItem('grofit_theme');}catch(e){}
     var allow=(String(c.학생_테마선택)!=='off');   // 관리자가 잠그면 학교 지정 테마로 통일
