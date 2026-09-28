@@ -1,4 +1,7 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.51.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.51.1 -->
+<!--   [1.51.1] ★«네» 단추가 안 보이던 버그 — 확인 대화상자(askP)의 .adlg-ok 가 background:var(--p) 였는데 --p 는 앱 어디에도 정의된 적이 없는 변수다.
+        배경이 안 칠해져 흰 카드 위에 흰 글씨가 되어, 학생 눈에는 «아니요» 하나만 보였다(문의로 접수). var(--primary)+var(--onp) 로 고침.
+        영향: 페이스 경고·기준 미달 경고·지난 주차 제출 경고 등 되묻는 모든 곳. 라이트·다크·애플 스타일 모두 해당. -->
 <!--   [1.51.0] 4주차 한정 도장 2종 — st-finish(FINISH 피켓) · st-week4(4 WEEKS COMPLETE 트로피), 320px 투명.
         피드백 말풍선 · :이모티콘: · 오늘의 인사에 쓰이도록 STK_KEYS 에 추가하고 sw.js 오프라인 캐시에도 넣었다.
         원본은 작업폴더 아이콘\진호아이콘 의 jinho-peace-finish-emoji-upper-body.png · jinho-peace-challenge-4weeks-success.png.
@@ -1002,7 +1005,7 @@ body.peek{padding-top:30px}
 .adlg-btns{display:flex;gap:8px;margin-top:16px}
 .adlg-btns button{flex:1;border:0;border-radius:12px;padding:12px 10px;font-size:14px;font-weight:700;font-family:inherit}
 .adlg-no{background:#EDEFEC;color:#4A544C}
-.adlg-ok{background:var(--p);color:#fff}
+.adlg-ok{background:var(--primary);color:var(--onp,#fff)}   /* [1.51.1] var(--p) 는 어디에도 없는 변수였다 — 흰 카드에 흰 글씨라 «네» 단추가 안 보였다 */
 .toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:#1c1c1e;color:#fff;padding:13px 20px;
   border-radius:12px;font-size:14px;line-height:1.5;z-index:50;opacity:0;transition:opacity .2s;pointer-events:none;
   max-width:min(90%,420px);box-shadow:0 8px 28px rgba(0,0,0,.35);text-align:center}
@@ -1780,7 +1783,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.51.0';
+var PWA_VER = '1.51.1';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
