@@ -1,4 +1,8 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.50.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.51.0 -->
+<!--   [1.51.0] 4주차 한정 도장 2종 — st-finish(FINISH 피켓) · st-week4(4 WEEKS COMPLETE 트로피), 320px 투명.
+        피드백 말풍선 · :이모티콘: · 오늘의 인사에 쓰이도록 STK_KEYS 에 추가하고 sw.js 오프라인 캐시에도 넣었다.
+        원본은 작업폴더 아이콘\진호아이콘 의 jinho-peace-finish-emoji-upper-body.png · jinho-peace-challenge-4weeks-success.png.
+        선생님이 관리자 피드백에서 고를 수 있어야 하므로 admin.html STK 목록에도 같이 넣는다. -->
 <!--   [1.50.0] 학생 화면에서 «점수» 미리보기 숨김 — «내 기록» 탭·«나의 4주 보고서» 모두 성취율만 보여주고 자동 점수 수치는 더 이상 노출하지 않는다(최종 점수는 4주가 끝난 뒤 선생님이 계산). «점수 구성»→«성취율 구성»으로 카드 제목도 정리. -->
 <!--   [1.49.0] «나의 4주 보고서» 화면 추가(읽기 전용 — 요약·주차별 실천·성취율·체력측정 변화·성찰+선생님 코멘트. 감상문 입력·사진일기는 아직 없음, 추후 결정되면 추가).
         서버 getMyReport(sid) 사용(관리자 adminGetReport 를 본인 전용으로 재사용). ★관리자 설정(메뉴_운동·체력·성찰·기록·공지·보고서)으로 하단 탭을 켜고 끌 수 있게 —
@@ -1776,13 +1780,13 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.50.0';
+var PWA_VER = '1.51.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
 var FCM_VAPID_KEY = 'BGmB7kEsyxjKRGk6olSRAaw0e-gkGUFE7B7LNPY_IyR5u-wHAay3_mdM-MABq2jHKHfshLQS4TICZT6zrgl5Z7s';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
-var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro|chuseokrun|chuseokhi|chuseok';   // [1.29.3] JH.peace 5종 · [1.43.0] 추석 3종(긴 이름 먼저)
+var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro|chuseokrun|chuseokhi|chuseok|finish|week4';   // [1.29.3] JH.peace 5종 · [1.43.0] 추석 3종(긴 이름 먼저) · [1.51.0] 피니쉬·4주 완주
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
 var PWA_BUILD = '2026.09.21 17:00';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }
