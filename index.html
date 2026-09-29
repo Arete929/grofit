@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.51.1 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.52.0 -->
+<!--   [1.52.0] 주차 완주 도장 3종 더 — st-week1·st-week2·st-week3(1·2·3 WEEK COMPLETE). week4·finish 와 한 벌.
+        STK_KEYS·sw.js 캐시에 추가. 관리자 스티커 판(admin 1.28.7)에서 고른다. 원본은 작업폴더 아이콘\진호아이콘. -->
 <!--   [1.51.1] ★«네» 단추가 안 보이던 버그 — 확인 대화상자(askP)의 .adlg-ok 가 background:var(--p) 였는데 --p 는 앱 어디에도 정의된 적이 없는 변수다.
         배경이 안 칠해져 흰 카드 위에 흰 글씨가 되어, 학생 눈에는 «아니요» 하나만 보였다(문의로 접수). var(--primary)+var(--onp) 로 고침.
         영향: 페이스 경고·기준 미달 경고·지난 주차 제출 경고 등 되묻는 모든 곳. 라이트·다크·애플 스타일 모두 해당. -->
@@ -1783,13 +1785,13 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.51.1';
+var PWA_VER = '1.52.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
 var FCM_VAPID_KEY = 'BGmB7kEsyxjKRGk6olSRAaw0e-gkGUFE7B7LNPY_IyR5u-wHAay3_mdM-MABq2jHKHfshLQS4TICZT6zrgl5Z7s';
 /* [1.14.1] 진호 이모티콘 이름 — 여기 한 곳만 고치면 인사·피드백·공지 글자가 함께 따라온다 */
-var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro|chuseokrun|chuseokhi|chuseok|finish|week4';   // [1.29.3] JH.peace 5종 · [1.43.0] 추석 3종(긴 이름 먼저) · [1.51.0] 피니쉬·4주 완주
+var STK_KEYS = 'verygood|good|nice|peace|regret|frustration|sob|wail|no|workout|watch|cheer|jhwhite|jhblue|jhred|jhpink|jhretro|chuseokrun|chuseokhi|chuseok|finish|week4|week1|week2|week3';   // [1.29.3] JH.peace 5종 · [1.43.0] 추석 3종(긴 이름 먼저) · [1.51.0] 피니쉬·4주 완주
 var STK_ONE = new RegExp('^(' + STK_KEYS + ')$');
 var PWA_BUILD = '2026.09.21 17:00';
 function verLine(){ return 'v'+PWA_VER+' · '+PWA_BUILD+' (KST)'; }

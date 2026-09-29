@@ -6,7 +6,7 @@
    처음 이 판으로 바뀔 때도 옛 캐시에 있던 그림을 옮겨 담으므로 다시 받지 않는다.
    ★그림 파일을 «같은 이름»으로 바꿔 넣었으면 STATIC 숫자를 올릴 것 — 그래야 새 그림을 받는다.
    ★그림 한 장을 못 받아도 설치는 계속된다(예전 addAll 은 한 장만 없어도 설치가 통째로 실패했다). */
-var CACHE = 'grofit-v1.51.1';
+var CACHE = 'grofit-v1.52.0';
 var STATIC = 'grofit-static-1';
 
 /* [1.34.0] 푸시 알림(FCM) — 앱이 닫혀 있어도 알림이 뜨게. FCM_CONFIG 가 비어 있으면(파이어베이스 설정 전) 조용히 건너뛴다.
@@ -29,6 +29,7 @@ var ASSETS = [
   './st-jhwhite.png','./st-jhblue.png','./st-jhred.png','./st-jhpink.png','./st-jhretro.png',   // [1.29.3] JH.peace 5종(새 이름이라 STATIC 그대로)
   './st-chuseok.png','./st-chuseokhi.png','./st-chuseokrun.png',   // [1.43.0] 추석 3종(새 이름이라 STATIC 그대로)
   './st-finish.png','./st-week4.png',   // [1.51.0] 4주차 한정 2종(새 이름이라 STATIC 그대로)
+  './st-week1.png','./st-week2.png','./st-week3.png',   // [1.52.0] 1·2·3주차 완주 도장
   './splash-locke.jpg','./ic-flex.png','./ic-body.png',
   './ex-app-samsung.jpg','./ex-app-nrc.jpg','./ex-app-apple.jpg'];   // [1.25.0] 앱별 실제 상세 화면 예시(새 이름이라 STATIC 은 그대로)
 /* 테마 6종의 manifest·아이콘·로고도 오프라인 캐시 (설치 아이콘이 테마별로 다름) */
