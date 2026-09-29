@@ -1,4 +1,9 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.52.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.53.0 -->
+<!--   [1.53.0] ★유산소 인정 기준의 «페이스»를 앱에 나온 평균 페이스(페이스 칸)로 판정한다.
+        전에는 학생이 적은 거리÷시간을 다시 나눈 값으로만 봤는데, 반올림·경과시간 탓에 실제보다 느리게 나와
+        사진은 기준을 통과하는데 «인정 안 됨» 경고가 뜨고 제출을 못 하는 일이 있었다(학생 문의).
+        페이스 칸을 비워 두면 예전처럼 계산값으로 본다. 두 값이 0.15분 이상 다르면 화면에 둘 다 보여 준다.
+        제출할 때 aiPace 로 함께 보내 서버(GAS 1.37.0)가 «분석페이스» 열에 적고 검토 판정에 쓴다. -->
 <!--   [1.52.0] 주차 완주 도장 3종 더 — st-week1·st-week2·st-week3(1·2·3 WEEK COMPLETE). week4·finish 와 한 벌.
         STK_KEYS·sw.js 캐시에 추가. 관리자 스티커 판(admin 1.28.7)에서 고른다. 원본은 작업폴더 아이콘\진호아이콘. -->
 <!--   [1.51.1] ★«네» 단추가 안 보이던 버그 — 확인 대화상자(askP)의 .adlg-ok 가 background:var(--p) 였는데 --p 는 앱 어디에도 정의된 적이 없는 변수다.
@@ -1365,7 +1370,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
         <div class="field"><label id="c-dur-lab">움직인 시간</label><input id="c-dur" placeholder="2:01:22" oninput="cLive()"></div>
         <div class="field hidden" id="c-total-f"><label id="c-total-lab">전체 시간</label><input id="c-total" placeholder="2:10:00" oninput="cLive()"></div>
         <div class="field hidden" id="c-rest-f"><label>휴식 시간 <span class="cap">(자동)</span></label><input id="c-rest" readonly tabindex="-1" placeholder="두 시간을 적으면 나와요"></div>
-        <div class="field"><label>페이스</label><input id="c-pace" placeholder="8'45&quot;"></div>
+        <div class="field"><label>페이스 <span class="cap">앱에 나온 평균 페이스</span></label><input id="c-pace" placeholder="8'45&quot;" oninput="cLive()"></div>
         <div class="field"><label>칼로리</label><input id="c-kcal" inputmode="numeric"></div>
       </div>
       <p class="cap" style="margin:8px 0 0">시간은 <b>화면에 보이는 그대로</b> 적어도 됩니다 —
@@ -1785,7 +1790,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.52.0';
+var PWA_VER = '1.53.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -3682,7 +3687,8 @@ async function saveCardio(){
     distanceKm:val('c-dist'),durationMin:durMin(),summary:'페이스 '+val('c-pace')+' · '+val('c-kcal')+'kcal',source:'앱',
     app:(cAppOn()&&cAppCur())?cAppCur().k:'', totalMin:(cAppOn()&&isFinite(totMin()))?totMin():'',   // [1.24.0]
     reflect:val('c-reflect'),rpe:PICK.c.rpe,sat:PICK.c.sat,partner:pnValue('c'),
-    aiDistanceKm:(cardioAI?cardioAI.km:''),aiDurationMin:(cardioAI?cardioAI.min:'')}],
+    aiDistanceKm:(cardioAI?cardioAI.km:''),aiDurationMin:(cardioAI?cardioAI.min:''),
+    aiPace:val('c-pace')}],                                     // [1.53.0] 앱에 나온 평균 페이스 — 서버가 이 값으로 판정
     function(r){
       if(!r||r.ok===false){progFail((r&&r.msg)||'저장하지 못했어요');return;}   // [0.92.0] 사진 재사용 등 거절 사유 표시
       ST.myRecords=null;
@@ -5427,6 +5433,18 @@ function parseDur(txt){
 }
 function durMin(){ var m=parseDur(val('c-dur')); return isFinite(m)?Math.round(m*100)/100:NaN; }
 /* 페이스(1km 당 분) → {v, txt} */
+/* [1.53.0] 학생이 «페이스» 칸에 적는 값 = 앱 화면(사진)에 찍힌 평균 페이스.
+   이것이 인정 기준의 잣대다 — 거리·시간을 다시 나눈 값은 반올림·경과시간 탓에 느리게 나온다. */
+function appPace(){
+  var t=String(val('c-pace')||'').trim(); if(!t) return null;
+  var m=t.match(/(\d{1,3})\s*[:'\u2019\u2032]\s*(\d{1,2})/);
+  var v=NaN;
+  if(m) v=Number(m[1])+Number(m[2])/60;
+  else { var n=Number(t.replace(/[^\d.]/g,'')); if(isFinite(n)&&n>0&&n<60) v=n; }
+  if(!isFinite(v)||v<=0) return null;
+  var mm=Math.floor(v), ss=Math.round((v-mm)*60); if(ss===60){mm++;ss=0;}
+  return {v:v, txt:mm+"'"+(ss<10?'0':'')+ss+'"'};
+}
 function paceOf(km,min){
   if(!(km>0)||!(min>0)) return null;
   var v=min/km, mm=Math.floor(v), ss=Math.round((v-mm)*60);
@@ -5520,7 +5538,9 @@ function stdIssues(km,min,p){
   var sd=cardioStd(), out=[];
   if(!sd.on) return out;
   if(isFinite(min)&&min>0&&min<sd.min) out.push('움직인 시간 '+sd.min+'분 이상이어야 인정돼요 (지금 '+(Math.round(min*10)/10)+'분)');
-  if(p&&p.v>=sd.maxPace) out.push('페이스가 '+sd.maxPace+'분보다 빨라야 인정돼요 (지금 '+p.txt+')');
+  /* [1.53.0] 페이스는 «앱에 나온 평균 페이스»(페이스 칸)로 본다. 안 적었을 때만 거리÷시간으로. */
+  var ap=appPace(), use=ap||p;
+  if(use&&use.v>=sd.maxPace) out.push('페이스가 '+sd.maxPace+'분보다 빨라야 인정돼요 (지금 '+use.txt+(ap?'':' — 적은 거리·시간으로 계산한 값')+')');
   var tt=totMin();                                                      // [1.27.0] 휴식 시간
   if(isFinite(min)&&min>0&&tt>0&&tt>=min&&(tt-min)>sd.maxRest) out.push('휴식 시간이 '+sd.maxRest+'분 이하여야 인정돼요 (지금 '+fmtMin(tt-min)+')');
   return out;
@@ -5537,6 +5557,10 @@ function cLive(){
   if(p.v<3) sub='<span class="sub">시간을 너무 짧게 적은 것 같아요. 2:01:22 이면 <b>121</b>분이에요.</span>';
   else if(p.v>25) sub='<span class="sub">걷는 것보다 느려요. 시간은 «움직인 시간»(삼성·애플 운동 시간 / NRC 활성 시간)으로 적었나요?</span>';
   if(iss.length) sub+=iss.map(function(t){return '<span class="sub">⛔ '+esc(t)+'</span>';}).join('');   // [1.15.0]
+  /* [1.53.0] 앱에 나온 평균 페이스와 «거리÷시간»이 다를 때 — 판정은 앱 값으로 한다고 알려 준다 */
+  var ap2=appPace();
+  if(ap2&&p&&Math.abs(ap2.v-p.v)>=0.15)
+    sub+='<span class="sub">📱 앱에 나온 평균 페이스 <b>'+esc(ap2.txt)+'</b> 기준으로 봅니다 (적은 거리·시간으로 계산하면 '+esc(p.txt)+')</span>';
   else if(cardioStd().on) sub+='<span class="sub" style="color:#1E7A46">✔ '+cardioStd().week+'주차 인정 기준을 채웠어요</span>';
   box.className='clive'+(bad?' bad':'');
   box.innerHTML='→ 페이스 <b>'+p.txt+'</b>/km <span class="sub" style="display:inline">('
