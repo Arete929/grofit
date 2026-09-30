@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.53.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.54.0 -->
+<!--   [1.54.0] 마지막 주 — 이번 주 목표(주 4일)를 채우면 홈에 «지금까지 총 몇 주 인정»을 같이 보여 준다.
+        4주 모두면 «완주했습니다», 검토 대기가 섞여 있으면 «확인이 끝나면 N주»로 나눠 알려 준다(주차현황.충족 으로 센다). -->
 <!--   [1.53.0] ★유산소 인정 기준의 «페이스»를 앱에 나온 평균 페이스(페이스 칸)로 판정한다.
         전에는 학생이 적은 거리÷시간을 다시 나눈 값으로만 봤는데, 반올림·경과시간 탓에 실제보다 느리게 나와
         사진은 기준을 통과하는데 «인정 안 됨» 경고가 뜨고 제출을 못 하는 일이 있었다(학생 문의).
@@ -655,6 +657,12 @@ h2{font-size:15px;font-weight:700;margin:0 0 10px}
 .stchip.no{background:#fde2df;color:#b3261e}
 .stchip.go{background:#fff0d1;color:#8a5200}
 .stchip.wait{background:#eceef0;color:#6b7280}
+.wkdone{margin:12px 0 0;padding:13px 15px;border-radius:14px;background:var(--primary-tint);
+  border:1.5px solid var(--primary);color:var(--ink);font-size:14px;line-height:1.6}
+.wkdone b{color:var(--primary-dark)}
+.wkdone .big{display:block;font-size:20px;font-weight:800;margin-bottom:2px}
+.wkdone.wait{background:var(--soft2,#fff6e6);border-color:#E8A33D}
+.wkdone.wait b{color:#B4761E}
 .ruleln{margin:2px 0 10px;padding:9px 12px;border-radius:12px;background:var(--soft,#f3f4f6);font-size:12.5px;line-height:1.55;color:var(--ink2,#3a3a3c)}   /* [1.42.0] 홈 주간 카드 — 4일 규칙 */
 .ruleln b{color:var(--ink,#1d1d1f)}
 .stleft{flex-basis:100%;margin-top:6px;font-size:13px;line-height:1.5;color:var(--ink2,#3a3a3c)}   /* [1.41.0] 진행 중 — 남은 조건 */
@@ -1237,6 +1245,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
         </div>
       </div>
       <p class="ruleln hidden" id="hm-rule" style="margin:12px 0 0">📌 <b>3일 + 하루 몰아서 ≠ 4일.</b> 근력과 유산소를 하루에 몰아 해도 <b>1일</b>로 세요. 몰아 하면 근육통으로 다음 운동량도 줄어요.</p>
+      <div class="wkdone hidden" id="hm-weeks"></div>   <!-- [1.54.0] 이번 주를 채우면 «총 몇 주 인정»을 같이 보여 준다 -->
     </div>
     <button class="rdcard mindcard" id="mind-card" onclick="openMind(0)">
       <span class="rd-tag" id="mind-tag">♥ 이번 주 마음 한 줄</span>
@@ -1790,7 +1799,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.53.0';
+var PWA_VER = '1.54.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -3243,6 +3252,7 @@ function paintHome(h){
     document.getElementById('g-str-c').textContent=근일+'/'+근필;
     var pct=Math.min(100,Math.round(wk.완료일수/wk.목표일수*100));
     document.getElementById('g-week').innerHTML=ring(pct,wk.완료일수+'/'+wk.목표일수,'이번 주');
+    paintWeeksDone(h, wk);                                          // [1.54.0] 이번 주를 채웠으면 «총 몇 주 인정»
     ST.home=h; ST.myRecords=null; ST.calDay=null;
     document.getElementById('cal-detail').classList.remove('open');
     renderCal(h); paintRejTile();                                   // [1.29.0] 운동 탭 반려 타일도 같이
@@ -3250,6 +3260,29 @@ function paintHome(h){
     if(!ST.notices) checkNotices();   // 묶음으로 이미 받았으면 다시 부르지 않는다
     var hv=document.getElementById('home-ver');
     if(hv)hv.textContent=verLine();
+}
+/* [1.54.0] 마지막 주 — 이번 주 목표를 채우면 «지금까지 총 몇 주 인정»을 같이 보여 준다.
+   검토 대기가 섞여 있으면 «선생님 확인이 끝나면 N주»로 나눠서 알려 준다(숫자를 부풀리지 않는다). */
+function paintWeeksDone(h, wk){
+  var box=document.getElementById('hm-weeks'); if(!box) return;
+  var 목표=Number(wk.목표일수)||4, 한일=Number(wk.완료일수)||0, 대기=Number(wk.검토중)||0;
+  if(한일+대기 < 목표){ box.className='wkdone hidden'; box.innerHTML=''; return; }   // 아직 이번 주를 못 채웠으면 안 보인다
+  var 총주=Number((h.config||{})['총_주차수'])||4;
+  var 인정=0; (h['주차현황']||[]).forEach(function(r){ if(r && r.충족) 인정++; });
+  var 예정=인정 + ((!wk.충족 && (한일+대기)>=목표) ? 1 : 0);        // 검토가 끝나면 될 수
+  if(wk.충족 && 인정>=총주){
+    box.className='wkdone';
+    box.innerHTML='<span class="big">🏆 '+총주+'주 모두 인정 — 완주했습니다!</span>'
+      +'마지막 주까지 한 주도 빠뜨리지 않았어요. 정말 잘했습니다.';
+  }else if(wk.충족){
+    box.className='wkdone';
+    box.innerHTML='<span class="big">🎉 이번 주 채웠어요 · 지금까지 <b>'+인정+'주</b> 인정</span>'
+      +총주+'주 중 <b>'+인정+'주</b>가 인정되었습니다.';
+  }else{
+    box.className='wkdone wait';
+    box.innerHTML='<span class="big">⏳ 이번 주 '+목표+'일 채웠어요 (검토 대기 '+대기+'일)</span>'
+      +'지금까지 인정된 것은 <b>'+인정+'주</b>, 선생님 확인이 끝나면 <b>'+예정+'주</b>가 됩니다.';
+  }
 }
 function parseYmd(s){var p=String(s).split('-');return new Date(+p[0],(+p[1]||1)-1,(+p[2]||1));}
 function weekOfDate(ds,start,totalW){
