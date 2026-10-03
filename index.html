@@ -1,4 +1,9 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.55.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.56.0 -->
+<!--   [1.56.0] ★운동처방 감상문 새 구조(디자인 확정본). 제목 «운동처방 감상문», 마감 안내(10/8 목 22:00 이후 제출 불가 → 미제출) · 선생님 한 마디(말풍선 위·진호 아래, 문구는 설정 감상문_한마디) ·
+        문항 4개: ①4주간의 나 ②요소 2(질적·양적)+원리 6(과부하·점진성·개별성·특이성·전면성·반복성) 칸마다 ③읽을거리 ④마음단단(FITT 문항 삭제).
+        디벗(가로 860px↑)은 왼쪽 문항 목록 · 가운데 한 문항 · 오른쪽 «내 기록»(아코디언 6칸 — 요약·주차별·성취율·체력·성찰·사진일기), 휴대폰은 세로 + 아래 시트.
+        저장: 글자를 멈추고 1초 뒤 서버에 «임시저장»(상태 칩), «제출하기»를 눌러야 «제출», 제출할 때마다 서버에 이력(차수·시각·답안 사본). 서버 GAS 1.39.0.
+        사진일기는 펼칠 때 한 장씩 받아 오며 «추억이 많아서…» 안내와 진행 게이지. 감상문도 보고서 스위치(MENU_GATE)를 따른다. -->
 <!--   [1.55.0] ★4주 감상문 — 보고서 화면 맨 아래 «✍️ 감상문 쓰러 가기» 버튼 → 감상문 화면(문항 5개).
         ① 4주간의 나 ② 과학적 원리로 내 기록 평가(원리 2개 이상 고르기) ③ 다시 시작한다면(FITT)
         ④ 가장 도움이 된 읽을거리 고르고 이유 ⑤ 가장 와닿은 마음단단 고르고 이유. 제목을 누르면 그 글을 다시 읽을 수 있다.
@@ -663,31 +668,153 @@ h2{font-size:15px;font-weight:700;margin:0 0 10px}
 .stchip.no{background:#fde2df;color:#b3261e}
 .stchip.go{background:#fff0d1;color:#8a5200}
 .stchip.wait{background:#eceef0;color:#6b7280}
+/* [1.56.0] 운동처방 감상문 — 휴대폰은 세로로 쭉, 디벗(가로 860px↑)은 왼쪽 문항 · 가운데 입력 · 오른쪽 «내 기록» 세 칸 */
+.es-wrap{display:block}
+.es-nav{display:none}
+.es-main{display:block}
+.estopbar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.estopbar .back{width:36px;height:36px;border-radius:12px;border:1.5px solid var(--line2);background:#fff;font-size:17px;flex:0 0 auto;cursor:pointer}
+.estopbar h1{font-size:20px}
+.esrecbtn{margin-left:auto;flex:0 0 auto;height:38px;padding:0 14px;border-radius:19px;border:1.5px solid var(--primary);
+  background:var(--primary-tint);color:var(--primary-dark);font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;white-space:nowrap}
+body.es-recopen .esrecbtn{background:var(--primary);color:#fff}
+.esstatbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:8px;background:var(--bg);padding:6px 0;margin-bottom:4px;flex-wrap:wrap}
+.esstat{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;
+  padding:7px 13px;font-size:12.5px;font-weight:700;color:var(--muted);transition:all .25s}
+.esstat i{width:7px;height:7px;border-radius:50%;background:currentColor;flex:0 0 auto}
+.esstat.saving{border-color:#f2b134;color:#8a6d00;background:#fff8e6}
+.esstat.submitted{border-color:var(--primary);color:var(--primary-dark);background:var(--primary-tint)}
+.esstat.fail{border-color:var(--danger);color:#c23545;background:var(--danger-tint)}
+.esloglink{font-size:12px;color:var(--primary-dark);font-weight:700;text-decoration:underline;cursor:pointer;background:none;border:none;font-family:inherit}
+.eslogpanel{display:none;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 13px;margin-bottom:10px;font-size:12.5px}
+.eslogpanel.show{display:block}
+.eslogpanel .r{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line)}
+.eslogpanel .r:last-child{border-bottom:none}
+.esdue{background:var(--danger-tint);border:1.5px solid var(--danger);border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.6;margin-bottom:10px;color:var(--ink)}
+.esdue b{color:#c23545}
+.esclosed{background:#eceef0;border-radius:14px;padding:12px 14px;font-size:13.5px;line-height:1.6;margin-bottom:10px}
 .esq{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
 .esq h3{margin:0 0 4px;font-size:16px}
 .esq .qsub{font-size:12.5px;color:var(--muted);margin:0 0 10px;line-height:1.6}
 .esq textarea{width:100%;min-height:130px;font-size:16px;line-height:1.7;padding:12px;border:1.5px solid var(--line);
-  border-radius:12px;font-family:inherit;color:var(--ink);background:var(--surface);resize:vertical}
+  border-radius:12px;font-family:inherit;color:var(--ink);background:var(--surface);resize:vertical;box-sizing:border-box}
 .esq textarea:focus{outline:none;border-color:var(--primary)}
+.esq textarea[readonly]{background:var(--bg)}
 .escnt{font-size:12px;color:var(--muted);text-align:right;margin:6px 2px 0}
 .escnt.ok{color:var(--primary-dark);font-weight:700}
-.espick{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-.espick button{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:20px;
-  padding:8px 13px;font-size:13px;font-family:inherit;font-weight:600}
-.espick button.on{background:var(--primary);border-color:var(--primary);color:#fff}
+.essh{font-size:13px;font-weight:800;color:var(--primary-dark);margin:14px 0 8px}
+.essh:first-of-type{margin-top:0}
+.esmini{border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;background:var(--bg)}
+.esmini .lbl{font-size:13.5px;font-weight:700;margin-bottom:2px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.esmini .lbl .cnt{font-size:11px;font-weight:600;color:var(--muted2);flex:0 0 auto}
+.esmini .lbl .cnt.ok{color:var(--primary-dark)}
+.esmini .hint{font-size:11.5px;color:var(--muted2);margin-bottom:6px}
+.esmini textarea{min-height:60px;font-size:15px;padding:8px 10px;border-radius:9px}
+.eschip{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:7px;margin-right:6px}
+.eschip.e{background:#e7f1fe;color:#1a5fa8}
+.eschip.p{background:#fdeee0;color:#b45309}
 .eslist{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
 .eslist .li{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:var(--surface);
-  border-radius:12px;padding:11px 13px;font-size:13.5px;text-align:left;font-family:inherit;color:var(--ink)}
+  border-radius:12px;padding:11px 13px;font-size:13.5px;text-align:left;font-family:inherit;color:var(--ink);cursor:pointer}
 .eslist .li.on{border-color:var(--primary);background:var(--primary-tint)}
 .eslist .li .wk{font-size:11px;color:var(--muted);flex:0 0 auto}
 .eslist .li .tt{flex:1;font-weight:600}
 .eslist .li .rd{font-size:11.5px;color:var(--primary-dark);flex:0 0 auto}
-.esbar{position:sticky;bottom:78px;display:flex;align-items:center;gap:10px;background:var(--surface);
-  border:1.5px solid var(--line);border-radius:16px;padding:10px 12px;box-shadow:0 6px 20px rgba(0,0,0,.08);margin-bottom:10px}
-.esbar .btn{margin:0;flex:0 0 auto;width:auto;padding:12px 22px}
+.esbar{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--line);border-radius:16px;
+  padding:10px 12px;box-shadow:0 6px 20px rgba(0,0,0,.08);margin:6px 0 10px;position:sticky;bottom:78px;z-index:15}
+.esbar .btn{margin:0;flex:0 0 auto;width:auto;padding:0 22px}
+.esbar .btn:disabled{opacity:.4;box-shadow:none}
 .esbar .cap{flex:1}
-.esdone{background:var(--primary-tint);border:1.5px solid var(--primary);border-radius:14px;padding:13px 15px;
-  font-size:14px;line-height:1.6;margin-bottom:12px}
+/* 선생님 한 마디 — 말풍선이 위, 이모지가 아래 */
+.esmsg{display:flex;flex-direction:column;align-items:center;gap:18px}
+.esbub{position:relative;width:100%;max-width:880px;background:#fff;border:1.5px solid var(--primary);border-radius:18px;padding:18px 20px;
+  font-size:14.5px;line-height:1.85;color:var(--ink2)}
+.esbub:before,.esbub:after{content:'';position:absolute;left:50%;margin-left:-9px;border-left:9px solid transparent;border-right:9px solid transparent;border-top:9px solid var(--primary)}
+.esbub:before{bottom:-10px}
+.esbub:after{bottom:-7.5px;border-top-color:#fff}
+.esbub p{margin:0 0 10px}
+.esbub .estag{display:inline-block;background:var(--primary-tint);color:var(--primary-dark);font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;margin-bottom:8px}
+.esbub .who{display:block;margin-top:6px;font-size:12px;font-weight:700;color:var(--primary-dark)}
+.esmsg img{width:130px;height:130px;object-fit:contain}
+/* 내 기록 패널 */
+.es-rec{background:var(--surface);display:flex;flex-direction:column}
+.es-rec-h{display:flex;align-items:center;gap:8px;padding:14px 16px 10px;border-bottom:1px solid var(--line);flex:0 0 auto}
+.es-rec-h b{font-size:15px}
+.es-rec-h .cap{flex:1}
+.es-rec-h .x{width:30px;height:30px;border-radius:9px;border:1.5px solid var(--line2);background:#fff;font-size:14px;cursor:pointer}
+.es-rec-b{overflow-y:auto;padding:10px 14px 24px;flex:1}
+.esacc{border:1.5px solid var(--line);border-radius:14px;margin-bottom:8px;background:var(--surface);overflow:hidden}
+.esacc.open{border-color:var(--primary)}
+.esacc-h{display:flex;align-items:center;gap:8px;width:100%;padding:12px 13px;border:none;background:transparent;font-family:inherit;
+  font-size:14px;font-weight:800;color:var(--ink);text-align:left;cursor:pointer}
+.esacc-h .sum{margin-left:auto;font-size:12px;font-weight:700;color:var(--muted2)}
+.esacc-h .chev{font-size:11px;color:var(--muted2);transition:transform .2s;margin-left:6px}
+.esacc.open .esacc-h .chev{transform:rotate(180deg)}
+.esacc-b{display:none;padding:2px 13px 13px;font-size:13px;line-height:1.7}
+.esacc.open .esacc-b{display:block}
+.estiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.estile{background:var(--bg);border-radius:11px;padding:10px 12px}
+.estile b{display:block;font-size:20px;font-weight:800;letter-spacing:-.02em}
+.estile span{font-size:11.5px;color:var(--muted2)}
+.estab{width:100%;border-collapse:collapse;font-size:12.5px}
+.estab th{font-size:11px;color:var(--muted2);font-weight:700;text-align:center;padding:5px 3px;border-bottom:1px solid var(--line)}
+.estab th:first-child,.estab td:first-child{text-align:left}
+.estab td{padding:7px 3px;text-align:center;border-bottom:1px solid var(--divider)}
+.estab tr:last-child td{border-bottom:none}
+.esok{display:inline-block;background:var(--primary-tint);color:var(--primary-dark);font-size:11px;font-weight:800;padding:2px 9px;border-radius:10px}
+.esno{display:inline-block;background:var(--danger-tint);color:#c23545;font-size:11px;font-weight:800;padding:2px 9px;border-radius:10px}
+.esup{color:var(--primary-dark);font-weight:800}
+.esbl{height:8px;background:var(--line);border-radius:5px;overflow:hidden;margin:4px 0 9px}
+.esbl i{display:block;height:100%;background:var(--primary);border-radius:5px}
+.esrrow{display:flex;justify-content:space-between;font-size:12.5px}
+.esrf{margin-bottom:10px}
+.esrf .wk{font-size:11.5px;font-weight:800;color:var(--primary-dark)}
+.esrf .tx{margin:2px 0 0;font-size:13px;line-height:1.7;white-space:pre-wrap}
+.esrf .tc{margin:5px 0 0;padding:7px 10px;background:var(--primary-tint);border-radius:9px;font-size:12px;color:var(--ink2)}
+.esrechint{font-size:11.5px;color:var(--muted2);margin:2px 2px 10px}
+.esdia{text-align:center;padding:12px 6px 4px}
+.esdia .big{font-size:30px}
+.esdia p{margin:6px 0 0;font-size:13px;line-height:1.65;color:var(--ink2)}
+.esdia p b{color:var(--primary-dark)}
+.esgauge{height:10px;border-radius:999px;background:var(--line2);overflow:hidden;margin:12px 4px 6px}
+.esgauge i{display:block;height:100%;width:0;background:var(--primary);border-radius:999px;transition:width .3s ease}
+.esgnum{font-size:12px;font-weight:800;color:var(--primary-dark)}
+.esdgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.esdgrid .polar{margin-top:0}
+.esdgrid .polar img{cursor:pointer}
+/* 휴대폰: 내 기록은 아래에서 올라오는 시트 */
+.es-rec{position:fixed;left:50%;bottom:0;width:min(100%,480px);max-height:58vh;z-index:1000;border-radius:18px 18px 0 0;
+  border:1.5px solid var(--line);box-shadow:0 -10px 34px rgba(20,40,25,.16);transform:translate(-50%,105%);transition:transform .28s}
+body.es-recopen .es-rec{transform:translate(-50%,0)}
+body.es-recopen #s-essay{padding-bottom:calc(58vh + 20px)}
+#s-essay.on .es-secshow{display:block}
+/* 디벗: 가로 860px 이상 — 앱 폭 제한을 풀고 세 칸으로 */
+body.es-on.es-wide .app{max-width:none}
+body.es-on.es-wide .tabbar,body.es-on.es-wide #install-bar,body.es-on.es-wide #app-ver{display:none!important}
+body.es-on.es-wide #s-essay.on{display:block;padding:0;height:100vh;overflow:hidden}
+body.es-wide .es-wrap{display:flex;height:100vh}
+body.es-wide .es-nav{display:block;flex:0 0 280px;background:var(--surface);border-right:1px solid var(--line);padding:20px 14px;overflow-y:auto}
+body.es-wide .es-nav h1{font-size:18px;margin-bottom:4px}
+body.es-wide .es-nav .esdue{font-size:12px;padding:10px 12px;margin-top:8px}
+body.es-wide .es-navitem{display:flex;align-items:center;gap:8px;padding:12px;border-radius:12px;cursor:pointer;font-size:13.5px;font-weight:600;color:var(--ink2);margin-bottom:4px}
+body.es-wide .es-navitem.active{background:var(--primary-tint);color:var(--primary-dark);font-weight:800}
+body.es-wide .es-navitem .tk{display:inline-flex;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line2);align-items:center;justify-content:center;font-size:11px;flex:0 0 auto;color:var(--muted2)}
+body.es-wide .es-navitem.done .tk{background:var(--primary);border-color:var(--primary);color:#fff}
+body.es-wide .es-main{flex:1 1 auto;min-width:0;overflow-y:auto;padding:20px 40px 40px}
+body.es-wide.es-recopen .es-main{padding-left:28px;padding-right:28px}
+body.es-wide .esq{padding:26px 30px}
+body.es-wide .essec{display:none}
+body.es-wide .essec.active{display:block}
+body.es-wide #essec-q1 textarea{min-height:320px}
+body.es-wide .esmini textarea{min-height:76px}
+body.es-wide .esmsg img{width:160px;height:160px}
+body.es-wide .esbub{font-size:16px;line-height:1.9;padding:24px 28px}
+body.es-wide #essec-msg.active{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 230px)}
+body.es-wide .esbar{bottom:0}
+body.es-wide #es-nonwide{display:none}
+body.es-wide .es-rec{position:static;transform:none;width:0;max-height:none;flex:0 0 0;overflow:hidden;border:0;border-radius:0;box-shadow:none;transition:flex-basis .25s,width .25s}
+body.es-wide.es-recopen .es-rec{flex:0 0 400px;width:400px;border-left:1px solid var(--line)}
+body.es-wide.es-recopen #s-essay{padding-bottom:0}
 .wkdone{margin:12px 0 0;padding:13px 15px;border-radius:14px;background:var(--primary-tint);
   border:1.5px solid var(--primary);color:var(--ink);font-size:14px;line-height:1.6}
 .wkdone b{color:var(--primary-dark)}
@@ -1696,17 +1823,29 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
     <div id="rpt-essay" class="hidden"></div>   <!-- [1.55.0] 감상문 쓰러 가기 -->
   </section>
 
-  <!-- [1.55.0] 4주 감상문 -->
+  <!-- [1.56.0] 운동처방 감상문 -->
   <section id="s-essay" class="scr">
-    <div class="topbar"><button class="back" onclick="go('report')">←</button><h1>4주 감상문</h1></div>
-    <p class="muted" style="font-size:12.5px;margin:0 0 10px" id="es-due"></p>
-    <div class="card" id="es-mine" style="padding:14px 16px"></div>
-    <div id="es-body"><p class="muted" style="text-align:center;padding:26px 0">불러오는 중…</p></div>
-    <div id="es-bar" class="esbar hidden">
-      <span class="cap" id="es-save">…</span>
-      <button class="btn" id="es-submit" onclick="essaySubmit()">제출하기</button>
+    <div class="es-wrap">
+      <aside class="es-nav" id="es-nav"></aside>
+      <main class="es-main" id="es-main">
+        <div class="estopbar"><button class="back" onclick="go('report')">←</button><h1>운동처방 감상문</h1>
+          <button class="esrecbtn" onclick="esToggleRec()">📄 <span id="es-recbtn-tx">내 기록 보기</span></button></div>
+        <div class="esstatbar"><span class="esstat" id="es-stat"><i></i><span id="es-stat-tx">아직 저장 전</span></span>
+          <button class="esloglink" onclick="esToggleLog()">제출 이력 보기</button></div>
+        <div class="eslogpanel" id="es-log"></div>
+        <div class="esdue" id="es-due"></div>
+        <div id="es-body"><p class="muted" style="text-align:center;padding:26px 0">불러오는 중…</p></div>
+        <div id="es-bar" class="esbar hidden">
+          <span class="cap" id="es-left">…</span>
+          <button class="btn" id="es-submit" onclick="esSubmit()">제출하기</button>
+        </div>
+        <p class="savedat" id="saved-essay"></p>
+      </main>
+      <aside class="es-rec" id="es-rec">
+        <div class="es-rec-h"><b>📄 내 기록</b><span class="cap">쓰는 동안 열어 두세요</span><button class="x" onclick="esToggleRec()">✕</button></div>
+        <div class="es-rec-b" id="es-rec-b"></div>
+      </aside>
     </div>
-    <p class="savedat" id="saved-essay"></p>
   </section>
 
 
@@ -1844,7 +1983,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.55.0';
+var PWA_VER = '1.56.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -1934,7 +2073,7 @@ function dismissInstall(){localStorage.setItem('grofit_install_dismissed','1');d
 /* ---------- 화면 전환 ---------- */
 var TABS = {home:1,cert:1,inbody:1,reflect:1,score:1,notice:1};
 /* [1.49.0] 관리자 설정(메뉴_운동 등)으로 막힌 화면은 홈으로 돌려보낸다 — 탭바뿐 아니라 홈의 바로가기 카드로도 못 들어가게 */
-var MENU_GATE={cert:'운동',cardio:'운동',strength:'운동',reject:'운동','inbody':'체력','inbody-graph':'체력',reflect:'성찰',score:'기록',notice:'공지',report:'보고서'};
+var MENU_GATE={cert:'운동',cardio:'운동',strength:'운동',reject:'운동','inbody':'체력','inbody-graph':'체력',reflect:'성찰',score:'기록',notice:'공지',report:'보고서',essay:'보고서'};   // [1.56.0] 감상문도 보고서 스위치를 따른다
 function menuOn(key){
   /* [1.55.0] 보고서는 3277(선생님)에게만 항상 열어 둔다 — 학생에게 켜기 전에 미리 보려고 */
   if(key==='보고서' && String((ST.student||{}).학번||'')==='3277') return true;
@@ -1972,8 +2111,9 @@ function go(name, skipLoad){
   if(name==='notice'){ loadNoticesStudent(); notiPaint(); }   // [1.34.0]
   if(name==='inquiry'){ renderIqType(); renderIqPrev(); loadMyInq(); }
   if(name==='report') loadReport();   // [1.49.0]
-  if(name==='essay') loadEssay();     // [1.55.0]
-  if(name!=='essay'){ try{ if(ES && ES.타이머){ clearInterval(ES.타이머); ES.타이머=null; esSaveServer(); } }catch(e){} }   // [1.55.0] 화면을 벗어나면 임시저장
+  document.body.classList.toggle('es-on', name==='essay'); try{ esApplyWide(); }catch(e){}   // [1.56.0] 디벗이면 감상문 화면만 넓게
+  if(name==='essay') loadEssay();
+  else { try{ document.body.classList.remove('es-recopen'); if(ES && ES.더티 && !ES.닫힘){ esSaveServer(); } }catch(e){} }   // 화면을 벗어나면 바로 임시저장
   if(name==='read') renderReading();
   if(name==='mind') renderMind();
   if(name==='home') ST.readWeek=null;   // [0.67.0] 홈으로 오면 «이번 주 글»로 되돌린다
@@ -4847,83 +4987,293 @@ function loadReport(){
 function rptStat(v,label){ return '<div style="flex:1 1 40%;min-width:120px"><div style="font-size:24px;font-weight:800">'+v+'</div><div class="cap">'+label+'</div></div>'; }
 
 
-/* ===================== [1.55.0] 4주 감상문 =====================
-   보고서 화면 맨 아래 버튼 → 이 화면. 문항 5개.
-   저장은 ① 글자를 칠 때마다 이 기기에 ② 30초마다(그리고 나갈 때) 서버에 «작성중»으로.
-   «제출하기»를 눌러야 «제출»이 된다. 마감이 지나면 읽기 전용. */
-var ES = { 답:{}, 최소:[150,200,120,80,80], 마감:'', 닫힘:false, 상태:'', 시작:'', 붙:0, 타이머:null, 더티:false, 열린글:'' };
-var ES_PRINCIPLES = ['FITT(빈도·강도·시간·종류)','점진적 과부하','가역성','개별성','특이성'];
-var ES_KEY = function(){ return 'grofit_essay_'+((ST.student||{}).학번||''); };
-
-/* 읽을거리(지식)·마음단단 목록 — 실제 앱에 실린 글에서 뽑는다(제목 중복 제거) */
-function esReadList(){
-  var out=[], seen={};
-  [1,2,3,4].forEach(function(w){
-    ((READINGS[w]||{}).지식||[]).forEach(function(a){
-      if(a&&a.제목&&!seen[a.제목]){ seen[a.제목]=1; out.push({주차:w, 제목:a.제목, 부제:a.부제||a.한줄||''}); }
-    });
-  });
-  return out;
-}
-function esMindList(){
-  var out=[], seen={};
-  [1,2,3,4].forEach(function(w){
-    var R=READINGS[w]||{};
-    var arr=[R.마음].concat((w===4&&new4On())?(NEW4_MORE||[]):[]);
-    arr.forEach(function(a){ if(a&&a.제목&&!seen[a.제목]){ seen[a.제목]=1; out.push({주차:w, 제목:a.제목, 부제:a.한줄||a.부제||''}); } });
-  });
-  return out;
-}
-/* 목록에서 제목으로 글을 찾아 그 자리에서 펼쳐 읽게 한다 */
-function esOpenRead(kind, 제목){
-  if(ES.열린글===제목){ ES.열린글=''; renderEssay(); return; }
-  ES.열린글=제목; renderEssay();
-}
-function esArticle(kind, 제목){
-  var found=null;
-  [1,2,3,4].forEach(function(w){
-    var R=READINGS[w]||{};
-    var arr = kind==='read' ? (R.지식||[]) : [R.마음].concat((w===4&&new4On())?(NEW4_MORE||[]):[]);
-    arr.forEach(function(a){ if(a&&a.제목===제목) found=a; });
-  });
-  return found;
-}
-function esArticleHTML(a){
-  if(!a) return '';
-  var body=(a.본문||[]).map(function(sec){
-    return (sec.h?'<b>'+esc(sec.h)+'</b><br>':'')+(sec.p||[]).map(function(t){return '<p style="margin:6px 0">'+t+'</p>';}).join('');
-  }).join('');
-  return '<div style="background:var(--soft,#f6f8f5);border-radius:12px;padding:12px 14px;margin:-4px 0 10px;font-size:13.5px;line-height:1.75">'
-    +(a.한줄?'<p style="margin:0 0 6px;font-weight:700">“'+esc(a.한줄)+'”</p>':'')
-    +(a.부제?'<p class="cap" style="margin:0 0 8px">'+esc(a.부제)+'</p>':'')
-    +(body||'<p class="muted">본문이 없습니다.</p>')+'</div>';
-}
-
+/* ===================== [1.56.0] 운동처방 감상문 =====================
+   저장: 글자를 칠 때마다 이 기기에, 1초 멈추면 서버에 «임시저장», «제출하기»를 눌러야 «제출». 제출할 때마다 서버에 이력이 한 줄 남는다.
+   디벗(가로 860px↑)은 왼쪽 문항 · 가운데 입력 · 오른쪽 «내 기록», 휴대폰은 세로 + 아래 시트. */
+var ES={답:{},최소:[150,40,80,80],마감:'',닫힘:false,상태:'',수정됨:false,제출시각:'',시작:'',붙:0,활동초:0,마지막입력:0,
+  활성:'msg',저장중:false,더티:false,디바운스:null,이력:[],한마디:'',열린글:'',rpt:null,dia:{state:'idle',total:0,done:0,list:[]},stat:'idle',statTime:'',seq:0};
+var ES_SECS=[['msg','선생님 한 마디','💬'],['q1','4주간의 나'],['q2','요소와 원리'],['q3','읽을거리'],['q4','마음단단']];
+var ES_ELEM=[['요소_질적','질적 요소','운동의 강도·형태 등 «어떻게» 운동했는지','예: 유산소 페이스를 14분→12분→10분으로 점점 빠르게…'],
+             ['요소_양적','양적 요소','빈도·시간·거리 등 «얼마나» 운동했는지','예: 주 4일, 유산소 2일·근력 2일을 4주간 유지…']];
+var ES_PRIN=[['원리_과부하','과부하의 원리','평소보다 더 강한 자극을 준 경험'],['원리_점진성','점진성의 원리','조금씩 강도를 늘려 간 과정'],
+             ['원리_개별성','개별성의 원리','나만의 몸 상태에 맞춘 부분'],['원리_특이성','특이성의 원리','목표에 맞는 운동을 골랐던 부분'],
+             ['원리_전면성','전면성의 원리','유산소·근력을 고르게 했는지'],['원리_반복성','반복성의 원리','꾸준히 반복한 경험']];
+var ES_KEY=function(){ return 'grofit_essay2_'+((ST.student||{}).학번||''); };
+function esWide(){ return window.innerWidth>=860; }
+function esApplyWide(){ var on=document.body.classList.contains('es-on'); document.body.classList.toggle('es-wide', on&&esWide()); }
+window.addEventListener('resize',function(){ try{ esApplyWide(); }catch(e){} });
+document.addEventListener('visibilitychange',function(){ if(document.hidden){ try{ if(ES.더티&&!ES.닫힘) esSaveServer(); }catch(e){} } });
 function esCount(v){ return String(v==null?'':v).replace(/\s+/g,'').length; }
-function esSetAns(k,v){ ES.답[k]=v; ES.더티=true; esSaveLocal(); esCountLine(k); esBar(); }
-function esSaveLocal(){ try{ localStorage.setItem(ES_KEY(), JSON.stringify({답:ES.답, 시각:Date.now()})); }catch(e){} }
+function esFmtDue(t){ var m=String(t||'').match(/(\d{4})-(\d{1,2})-(\d{1,2})[ T]?(\d{1,2})?:?(\d{2})?/); if(!m) return String(t||'');
+  var d=new Date(+m[1],+m[2]-1,+m[3]); var w='일월화수목금토'.charAt(d.getDay()); var z=function(n){return ('0'+n).slice(-2)};
+  return (+m[2])+'월 '+(+m[3])+'일('+w+') '+z(m[4]||0)+':'+z(m[5]||0); }
+function esDots(t){ return String(t||'').replace(/-/g,'.'); }
+
+/* 읽을거리·마음단단 목록 — 실제 앱에 실린 글에서 뽑는다 */
+function esReadList(){ var out=[],seen={}; [1,2,3,4].forEach(function(w){ ((READINGS[w]||{}).지식||[]).forEach(function(a){
+  if(a&&a.제목&&!seen[a.제목]){ seen[a.제목]=1; out.push({주차:w,제목:a.제목}); } }); }); return out; }
+function esMindList(){ var out=[],seen={}; [1,2,3,4].forEach(function(w){ var R=READINGS[w]||{};
+  [R.마음].concat((w===4&&new4On())?(NEW4_MORE||[]):[]).forEach(function(a){ if(a&&a.제목&&!seen[a.제목]){ seen[a.제목]=1; out.push({주차:w,제목:a.제목}); } }); }); return out; }
+function esArticle(kind,제목){ var f=null; [1,2,3,4].forEach(function(w){ var R=READINGS[w]||{};
+  var arr=kind==='read'?(R.지식||[]):[R.마음].concat((w===4&&new4On())?(NEW4_MORE||[]):[]);
+  arr.forEach(function(a){ if(a&&a.제목===제목) f=a; }); }); return f; }
+function esArticleHTML(a){ if(!a) return '';
+  var body=(a.본문||[]).map(function(sec){ return (sec.h?'<b>'+esc(sec.h)+'</b><br>':'')+(sec.p||[]).map(function(t){return '<p style="margin:6px 0">'+t+'</p>';}).join(''); }).join('');
+  return '<div style="background:var(--bg);border-radius:12px;padding:12px 14px;margin:-4px 0 10px;font-size:13.5px;line-height:1.75">'
+    +(a.한줄?'<p style="margin:0 0 6px;font-weight:700">“'+esc(a.한줄)+'”</p>':'')+(a.부제?'<p class="cap" style="margin:0 0 8px">'+esc(a.부제)+'</p>':'')
+    +(body||'<p class="muted">본문이 없습니다.</p>')+'</div>'; }
+function esOpenRead(kind,제목){ ES.열린글=(ES.열린글===제목?'':제목); esRender(); }
+
+/* ── 불러오기 ── */
+function loadEssay(){
+  var body=document.getElementById('es-body');
+  body.innerHTML='<p class="muted" style="text-align:center;padding:26px 0">불러오는 중…</p>';
+  call('getMyEssay',[ST.student.학번],function(r){
+    if(!r||!r.ok){ body.innerHTML='<p class="muted" style="text-align:center;padding:26px 0">불러오지 못했어요 · 잠시 뒤 다시 열어 주세요</p>'; return; }
+    ES.최소=r.최소||ES.최소; ES.마감=r.마감||''; ES.닫힘=!!r.마감지남; ES.상태=r.상태||''; ES.수정됨=!!r.제출후수정;
+    ES.제출시각=r.제출시각||''; ES.이력=r.이력||[]; ES.한마디=r.한마디||'';
+    var a=r.답||{}; ES.답={}; ['문항1'].concat(ES_ELEM.map(function(x){return x[0]}),ES_PRIN.map(function(x){return x[0]}),['읽을거리','읽을거리이유','마음단단','마음단단이유']).forEach(function(k){ ES.답[k]=a[k]||''; });
+    ES.시작=a.작성시작||nowStamp(); ES.활동초=(Number(a.작성시간분)||0)*60; ES.붙=Number(a.붙여넣기)||0; ES.마지막입력=0;
+    var loc=esLoadLocal();                       // 창이 닫혀 서버에 못 보낸 글이 이 기기에 더 있으면 살린다
+    if(loc&&loc.답){ Object.keys(loc.답).forEach(function(k){ if((!ES.답[k]) && loc.답[k]){ ES.답[k]=loc.답[k]; ES.더티=true; } }); }
+    ES.활성='msg'; ES.열린글='';
+    if(ES.상태==='제출'&&!ES.수정됨) esStat('submitted',ES.제출시각);
+    else if(ES.상태) esStat('saved',(r.수정시각||''));
+    else esStat('idle');
+    esRender(); if(ES.더티&&!ES.닫힘) esSchedule(1000);
+  });
+}
+function nowStamp(){ var d=new Date(), z=function(n){return ('0'+n).slice(-2)};
+  return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())+' '+z(d.getHours())+':'+z(d.getMinutes())+':'+z(d.getSeconds()); }
+function esSaveLocal(){ try{ localStorage.setItem(ES_KEY(),JSON.stringify({답:ES.답,시각:Date.now()})); }catch(e){} }
 function esLoadLocal(){ try{ var t=localStorage.getItem(ES_KEY()); return t?JSON.parse(t):null; }catch(e){ return null; } }
 
-/* 서버에 임시저장 — 30초마다, 그리고 화면을 벗어날 때 */
+/* ── 상태 칩 ── */
+function esStat(kind,t){
+  ES.stat=kind; if(t) ES.statTime=t;
+  var el=document.getElementById('es-stat'), tx=document.getElementById('es-stat-tx'); if(!el||!tx) return;
+  var cls='esstat', txt='아직 저장 전';
+  if(kind==='saving'){ cls+=' saving'; txt='입력 중…'; }
+  else if(kind==='saved'){ txt='임시저장됨'+(ES.statTime?' · '+String(ES.statTime).slice(11):''); if(ES.수정됨) txt+=' · 제출한 뒤 고친 내용이에요 (다시 제출해야 반영돼요)'; }
+  else if(kind==='submitted'){ cls+=' submitted'; txt='제출됨 · '+esDots(ES.statTime); }
+  else if(kind==='fail'){ cls+=' fail'; txt='저장 실패 · 잠시 뒤 다시 시도해요'; }
+  el.className=cls; tx.textContent=txt;
+}
+
+/* ── 입력 · 자동저장(1초 멈추면) ── */
+function esOnInput(k,el){
+  var now=Date.now(); ES.활동초+= (ES.마지막입력&&now-ES.마지막입력<30000) ? (now-ES.마지막입력)/1000 : 5; ES.마지막입력=now;
+  ES.답[k]=el.value; ES.더티=true; esSaveLocal(); esCountLine(k); esTicks(); esBar();
+  esStat('saving'); esSchedule(1000);
+}
+function esSchedule(ms){ if(ES.디바운스) clearTimeout(ES.디바운스); ES.디바운스=setTimeout(function(){ esSaveServer(); }, ms); }
+function esPayload(제출){ var p=Object.assign({},ES.답); p.제출=!!제출; p.작성시작=ES.시작; p.붙여넣기=ES.붙; p.작성시간분=Math.round(ES.활동초/60); return p; }
 function esSaveServer(done){
-  if(ES.닫힘){ done&&done(); return; }
-  if(!ES.더티){ done&&done(); return; }
-  ES.더티=false;
-  var p=Object.assign({}, ES.답, {제출:false, 작성시작:ES.시작, 붙여넣기:ES.붙, 작성시간분:esMinutes()});
-  call('saveEssay',[ST.student.학번,p],function(r){
-    var el=document.getElementById('es-save');
-    if(r&&r.ok){ if(el) el.textContent='자동 저장됨 · '+(r.시각||'').slice(11,16); }
-    else if(el) el.textContent='저장 실패 — 잠시 뒤 다시 시도해요';
+  if(ES.닫힘||!ES.더티){ done&&done(); return; }
+  if(ES.저장중){ esSchedule(1000); return; }
+  ES.저장중=true; ES.더티=false; var tok=++ES.seq;
+  var guard=setTimeout(function(){ if(ES.저장중&&ES.seq===tok){ ES.저장중=false; ES.더티=true; esStat('fail'); } },30000);   // 서버가 답을 못 줘도 멈추지 않게
+  call('saveEssay',[ST.student.학번,esPayload(false)],function(r){
+    clearTimeout(guard); ES.저장중=false;
+    if(r&&r.ok){ ES.상태=r.상태; if(r.제출후수정) ES.수정됨=true; esStat('saved',r.시각); }
+    else if(r&&r.마감){ ES.닫힘=true; ES.더티=false; esRender(); uiMsg(r.msg); }
+    else { ES.더티=true; esStat('fail'); }
+    if(ES.더티&&!ES.닫힘&&ES.stat!=='fail') esSchedule(1000);
     done&&done();
   });
 }
-function esMinutes(){
-  if(!ES.시작) return 0;
-  var t=new Date(String(ES.시작).replace(/-/g,'/')).getTime();
-  if(!t) return 0;
-  return Math.max(0, Math.round((Date.now()-t)/60000));
+
+/* ── 제출 ── */
+function esDone(key){
+  var A=ES.답, M=ES.최소;
+  if(key==='q1') return esCount(A.문항1)>=M[0];
+  if(key==='q2') return ES_ELEM.concat(ES_PRIN).every(function(x){ return esCount(A[x[0]])>=M[1]; });
+  if(key==='q3') return !!A.읽을거리 && esCount(A.읽을거리이유)>=M[2];
+  if(key==='q4') return !!A.마음단단 && esCount(A.마음단단이유)>=M[3];
+  return false;
 }
-function esTick(){ if(ES.타이머) clearInterval(ES.타이머); ES.타이머=setInterval(function(){ esSaveServer(); }, 30000); }
+function esLeft(){
+  var A=ES.답, M=ES.최소, n=0;
+  if(esCount(A.문항1)<M[0]) n++;
+  ES_ELEM.concat(ES_PRIN).forEach(function(x){ if(esCount(A[x[0]])<M[1]) n++; });
+  if(!A.읽을거리) n++; if(esCount(A.읽을거리이유)<M[2]) n++;
+  if(!A.마음단단) n++; if(esCount(A.마음단단이유)<M[3]) n++;
+  return n;
+}
+function esBar(){
+  var bar=document.getElementById('es-bar'), btn=document.getElementById('es-submit'), lf=document.getElementById('es-left'); if(!bar) return;
+  bar.classList.toggle('hidden',ES.닫힘); if(ES.닫힘) return;
+  var n=esLeft(); lf.textContent = n ? ('아직 남았어요 — '+n+'곳') : '모두 채웠어요 ✓';
+  btn.disabled = n>0; btn.textContent = (ES.상태==='제출') ? '다시 제출하기' : '제출하기';
+}
+function esSubmit(){
+  if(esLeft()>0){ toast('아직 못 채운 곳이 있어요'); return; }
+  if(ES.저장중){ toast('저장하는 중이에요 · 잠깐만요'); setTimeout(esSubmit,1200); return; }
+  askP('감상문을 제출할까요?\n\n마감('+esFmtDue(ES.마감)+') 전까지는 고쳐서 몇 번이든 다시 제출할 수 있어요.\n제출할 때마다 기록이 남아요.').then(function(yes){
+    if(!yes) return;
+    if(ES.디바운스) clearTimeout(ES.디바운스); ES.더티=false;
+    call('saveEssay',[ST.student.학번,esPayload(true)],function(r){
+      if(!r||!r.ok){ ES.더티=true; uiMsg((r&&r.msg)||'제출하지 못했어요 · 잠시 뒤 다시 눌러 주세요'); if(r&&r.마감){ ES.닫힘=true; esRender(); } return; }
+      ES.상태='제출'; ES.수정됨=false; ES.제출시각=r.시각; ES.이력=r.이력||ES.이력;
+      esStat('submitted',r.시각); showSaved('saved-essay',r.savedAt,true); toast('✅ 감상문을 제출했어요!');
+      var lg=document.getElementById('es-log'); if(lg){ lg.classList.add('show'); } esRenderLog(); esBar(); esRenderNav();
+    });
+  });
+}
+function uiMsg(m){ askP(String(m)); }
+function esToggleLog(){ var lg=document.getElementById('es-log'); lg.classList.toggle('show'); esRenderLog(); }
+function esRenderLog(){
+  var box=document.getElementById('es-log'); if(!box) return;
+  if(!ES.이력.length){ box.innerHTML='<div class="muted" style="padding:4px 0">아직 제출한 적이 없어요. 제출하면 이곳에 기록이 남아요.</div>'; return; }
+  box.innerHTML=ES.이력.map(function(h){ return '<div class="r"><span>'+h.차수+'차 제출</span><b>'+esc(esDots(h.시각))+'</b></div>'; }).join('');
+}
+
+/* ── 화면 ── */
+function esParas(txt){
+  return String(txt||'').split(/\n\s*\n/).map(function(p){ return '<p>'+esc(p.trim()).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')+'</p>'; }).join('');
+}
+function esRender(){
+  var box=document.getElementById('es-body'); if(!box) return;
+  var ro=ES.닫힘, A=ES.답, M=ES.최소;
+  var ta=function(k,i,ph,minH){
+    var n=esCount(A[k]), ok=n>=M[i];
+    return '<textarea id="es-'+k+'" data-min="'+M[i]+'" '+(ro?'readonly ':'')+'placeholder="'+esc(ph)+'" oninput="esOnInput(\''+k+'\',this)" onpaste="ES.붙=(ES.붙||0)+1">'+esc(A[k]||'').replace(/<br>/g,'\n')+'</textarea>'
+      +'<p class="escnt'+(ok?' ok':'')+'" id="cnt-'+k+'">'+n+' / '+M[i]+'자'+(ok?' ✓':'')+'</p>';
+  };
+  var mini=function(k,chip,label,hint,ph){
+    var n=esCount(A[k]), ok=n>=M[1];
+    return '<div class="esmini"><div class="lbl"><span><span class="eschip '+(chip==='e'?'e':'p')+'">'+(chip==='e'?'요소':'원리')+'</span>'+label+'</span><span class="cnt'+(ok?' ok':'')+'" id="cnt-'+k+'">'+n+'/'+M[1]+'자'+(ok?' ✓':'')+'</span></div>'
+      +(hint?'<div class="hint">'+hint+'</div>':'')
+      +'<textarea id="es-'+k+'" data-min="'+M[1]+'" '+(ro?'readonly ':'')+'placeholder="'+esc(ph)+'" oninput="esOnInput(\''+k+'\',this)" onpaste="ES.붙=(ES.붙||0)+1">'+esc(A[k]||'').replace(/<br>/g,'\n')+'</textarea></div>';
+  };
+  var pick=function(kind,list,key,ik,mi,title,sub,ph){
+    var h='<div class="esq"><h3>'+title+'</h3><p class="qsub">'+sub+'</p><div class="eslist">'+list.map(function(a){
+      var on=(A[key]===a.제목), q=a.제목.replace(/'/g,"\\'");
+      return '<button type="button" class="li'+(on?' on':'')+'" '+(ro?'disabled ':'')+'onclick="esPick(\''+key+'\',\''+q+'\')">'
+        +'<span class="wk">'+a.주차+'주</span><span class="tt">'+esc(a.제목)+'</span>'
+        +'<span class="rd" onclick="event.stopPropagation();esOpenRead(\''+kind+'\',\''+q+'\')">'+(ES.열린글===a.제목?'접기':'다시 읽기')+'</span></button>'
+        +(ES.열린글===a.제목?esArticleHTML(esArticle(kind,a.제목)):'');
+    }).join('')+'</div>'+ta(ik,mi,ph)+'</div>';
+    return h;
+  };
+  var h='';
+  h+='<div class="essec" id="essec-msg"><div class="esmsg"><div class="esbub"><span class="estag">📋 과제 안내</span>'+esParas(ES.한마디)+'<span class="who">김진호 선생님</span></div><img src="st-jhpink.png" alt=""></div></div>';
+  h+='<div class="essec" id="essec-q1"><div class="esq"><h3>1. 4주간의 나</h3><p class="qsub">가장 힘들었던 순간은 언제였고 그때 어떻게 했나요? 반대로 «해냈다» 싶었던 순간은요? <b>구체적인 날과 상황</b>을 넣어 주세요.</p>'
+    +ta('문항1',0,'예: 9월 둘째 주 비 오는 날…')+'</div></div>';
+  h+='<div class="essec" id="essec-q2"><div class="esq"><h3>2. 운동처방의 요소와 원리로 평가하기</h3><p class="qsub">아래 <b>요소 2가지</b>와 <b>원리 6가지</b>를 각각 어떻게 적용했는지, <b>내 기록의 숫자를 근거</b>로 간단히 써 주세요. (오른쪽 위 «내 기록 보기»를 열어 두면 숫자를 보면서 쓸 수 있어요)</p>'
+    +'<div class="essh">🔵 요소 (2)</div>'+ES_ELEM.map(function(x){ return mini(x[0],'e',x[1],x[2],x[3]); }).join('')
+    +'<div class="essh">🟠 원리 (6)</div>'+ES_PRIN.map(function(x){ return mini(x[0],'p',x[1],'',x[2]); }).join('')+'</div></div>';
+  h+='<div class="essec" id="essec-q3">'+pick('read',esReadList(),'읽을거리','읽을거리이유',2,'3. 가장 도움이 된 읽을거리','4주 동안 읽은 글 중 하나를 고르고 <b>왜 도움이 되었는지</b> 적어 주세요. «다시 읽기»를 누르면 그 글을 다시 볼 수 있어요.','이 글이 도움이 된 이유를 적어 주세요')+'</div>';
+  h+='<div class="essec" id="essec-q4">'+pick('mind',esMindList(),'마음단단','마음단단이유',3,'4. 가장 마음에 와닿은 «마음단단»','마음단단 글 중 하나를 고르고 <b>왜 마음에 남았는지</b> 적어 주세요.','이 글이 마음에 남은 이유를 적어 주세요')+'</div>';
+  box.innerHTML=h;
+  var due=document.getElementById('es-due');
+  if(due){ due.className = ro ? 'esclosed' : 'esdue';
+    due.innerHTML = ro ? ('📄 <b>제출이 마감되었습니다.</b> '+(ES.상태==='제출'?'제출한 감상문이 최종으로 인정돼요.':'제출하지 못해 <b>미제출</b>로 처리돼요.'))
+                       : ('⏰ <b>제출 마감 '+esFmtDue(ES.마감)+'</b><br>이후에는 제출할 수 없으며, <b>자동으로 미제출 처리</b>됩니다.'); }
+  esRenderNav(); esShow(ES.활성); esBar(); esRenderLog();
+}
+function esRenderNav(){
+  var nav=document.getElementById('es-nav'); if(!nav) return;
+  nav.innerHTML='<h1>운동처방<br>감상문</h1><div class="esdue" style="margin-top:8px">⏰ '+esFmtDue(ES.마감)+' 마감</div>'
+    +ES_SECS.map(function(it){ var dn=(it[0]!=='msg')&&esDone(it[0]);
+      return '<div class="es-navitem'+(ES.활성===it[0]?' active':'')+(dn?' done':'')+'" data-k="'+it[0]+'" onclick="esShow(\''+it[0]+'\')"><span class="tk">'+(it[2]||it[0].replace('q',''))+'</span>'+it[1]+'</div>'; }).join('');
+}
+function esTicks(){ document.querySelectorAll('.es-navitem').forEach(function(e){ var k=e.getAttribute('data-k'); if(k!=='msg') e.classList.toggle('done',esDone(k)); }); }
+function esShow(k){
+  ES.활성=k;
+  document.querySelectorAll('#es-body .essec').forEach(function(e){ e.classList.toggle('active', e.id==='essec-'+k); });
+  document.querySelectorAll('.es-navitem').forEach(function(e){ e.classList.toggle('active', e.getAttribute('data-k')===k); });
+  var m=document.getElementById('es-main'); if(m) m.scrollTop=0;
+}
+function esPick(k,v){ ES.답[k]=(ES.답[k]===v?'':v); ES.더티=true; esSaveLocal(); esRender(); esStat('saving'); esSchedule(1000); }
+function esCountLine(k){
+  var el=document.getElementById('es-'+k), c=document.getElementById('cnt-'+k); if(!el||!c) return;
+  var min=Number(el.getAttribute('data-min'))||0, n=esCount(ES.답[k]), ok=n>=min, mini=!!el.closest('.esmini');
+  c.textContent = mini ? (n+'/'+min+'자'+(ok?' ✓':'')) : (n+' / '+min+'자'+(ok?' ✓':''));
+  c.className = (mini?'cnt':'escnt')+(ok?' ok':'');
+}
+
+/* ── 내 기록 패널 ── */
+function esToggleRec(){
+  var on=document.body.classList.toggle('es-recopen');
+  var t=document.getElementById('es-recbtn-tx'); if(t) t.textContent = on?'내 기록 닫기':'내 기록 보기';
+  if(on && !ES.rpt) esLoadRpt();
+}
+function esAccHTML(id,ico,title,sum,body,open){
+  return '<div class="esacc'+(open?' open':'')+'" id="esacc-'+id+'"><button class="esacc-h" onclick="esAccToggle(\''+id+'\')">'
+    +'<span>'+ico+'</span>'+title+'<span class="sum">'+sum+'</span><span class="chev">▼</span></button><div class="esacc-b">'+body+'</div></div>';
+}
+function esAccToggle(id){ var el=document.getElementById('esacc-'+id); el.classList.toggle('open'); if(id==='dia'&&el.classList.contains('open')) esDiaStart(); }
+function esLoadRpt(){
+  var box=document.getElementById('es-rec-b'); box.innerHTML='<p class="muted" style="text-align:center;padding:20px 0">불러오는 중…</p>';
+  call('getMyReport',[ST.student.학번],function(d){
+    if(!d||!d.ok){ box.innerHTML='<p class="muted" style="text-align:center;padding:20px 0">내 기록을 불러오지 못했어요 · 닫았다가 다시 열어 주세요</p>'; ES.rpt=null; return; }
+    ES.rpt=d; esBuildRec();
+  });
+}
+function esBuildRec(){
+  var d=ES.rpt, box=document.getElementById('es-rec-b'), sc=d.점수||{}, h='<p class="esrechint">보고서에 나온 내용이에요. 눌러서 펼쳐 보세요.</p>';
+  h+=esAccHTML('sum','📊','4주 요약',(d.총운동일||0)+'일 · '+(d.달성주차||0)+'/'+(d.총주차||4)+'주',
+    '<div class="estiles"><div class="estile"><b>'+(d.총운동일||0)+'</b><span>총 운동일수</span></div><div class="estile"><b>'+(d.달성주차||0)+'/'+(d.총주차||4)+'</b><span>목표 달성 주차</span></div>'
+    +'<div class="estile"><b>'+(d.총거리||0)+'</b><span>총 달린 거리(km)</span></div><div class="estile"><b>'+(d.총시간||0)+'</b><span>총 운동시간(분)</span></div></div>',true);
+  h+=esAccHTML('wk','🗓','주차별 운동 실천','',
+    '<table class="estab"><tr><th>주차</th><th>운동일수</th><th>유산소</th><th>근력</th><th>결과</th></tr>'
+    +(d.주차||[]).map(function(w){ return '<tr><td>'+w.주차+'주</td><td>'+w.운동일수+'일</td><td>'+w.유산소일수+'일</td><td>'+w.근력일수+'일</td><td>'+(w.달성?'<span class="esok">달성</span>':'<span class="esno">미달</span>')+'</td></tr>'; }).join('')+'</table>',true);
+  var pc=function(v){ return (v==null?'—':v+'%'); }, bw=function(v){ return Math.max(0,Math.min(100,Number(v)||0)); };
+  h+=esAccHTML('rate','🎯','성취율',pc(sc.성취율),
+    '<div class="esrrow"><span>운동 달성률</span><b>'+pc(sc.운동달성률)+'</b></div><div class="esbl"><i style="width:'+bw(sc.운동달성률)+'%"></i></div>'
+    +'<div class="esrrow"><span>제출 정시성</span><b>'+pc(sc.정시성)+'</b></div><div class="esbl"><i style="width:'+bw(sc.정시성)+'%"></i></div>'
+    +'<div class="esrrow"><span>최종 성취율</span><b>'+pc(sc.성취율)+'</b></div><div class="esbl"><i style="width:'+bw(sc.성취율)+'%"></i></div>',false);
+  /* 체력측정 — 처음 잰 회차와 가장 최근 회차를 견준다 */
+  var fits=(d.체력||[]).filter(function(f){return f.있음;});
+  var fbody='<p class="muted" style="margin:0">아직 체력측정 기록이 없어요.</p>', fsum='';
+  if(fits.length){
+    var a=fits[0], b=fits[fits.length-1];
+    fsum=fits.length>1?(esc(a.회차)+' → '+esc(b.회차)):esc(a.회차);
+    fbody='<table class="estab"><tr><th>항목</th><th>'+esc(a.회차)+'</th><th>'+(fits.length>1?esc(b.회차):'')+'</th><th>변화</th></tr>'
+      +FIT_METRICS.map(function(m){ var v1=fitVal(a,m.k), v2=fits.length>1?fitVal(b,m.k):null; if(v1===null&&v2===null) return '';
+        var dv=(v1!==null&&v2!==null)?Math.round((v2-v1)*10)/10:null;
+        return '<tr><td>'+m.n+'</td><td>'+(v1===null?'–':v1)+'</td><td><b>'+(v2===null?'–':v2)+'</b></td><td class="esup">'+(dv===null||dv===0?'':((dv>0?'▲ ':'▼ ')+Math.abs(dv)+(m.u||'')))+'</td></tr>'; }).join('')+'</table>';
+  }
+  h+=esAccHTML('fit','💪','체력측정 변화',fsum,fbody,false);
+  var rf=d.성찰||[];
+  h+=esAccHTML('ref','✍️','내가 쓴 주차별 성찰',rf.length+'편',
+    rf.length?rf.map(function(r){ return '<div class="esrf"><span class="wk">'+r.주차+'주차</span><p class="tx">'+esc(r.내용||'')+'</p>'+(r.교사코멘트?'<p class="tc">💬 선생님: '+esc(r.교사코멘트)+'</p>':'')+'</div>'; }).join('')
+      :'<p class="muted" style="margin:0">작성한 성찰이 없어요.</p>',false);
+  h+=esAccHTML('dia','📷','내 사진일기','<span id="es-diasum">펼치면 불러와요</span>','<div id="es-diabox"><div class="esdia"><p class="muted">눌러서 펼치면 사진을 불러와요</p></div></div>',false);
+  box.innerHTML=h;
+}
+/* 사진일기 — 펼칠 때 처음 한 번, 사진을 한 장씩 받아 오며 진행률을 보여 준다 */
+function esDiaStart(){
+  var D=ES.dia; if(D.state!=='idle') return; D.state='loading'; esDiaRender();
+  call('getMyExercises',[ST.student.학번],function(list){
+    var arr=(list||[]).filter(function(r){return r.일기사진;});
+    D.list=arr.map(function(r){ return {fid:fidOfUrl(r.일기사진),날짜:r.날짜,성찰:r.성찰||'',src:''}; });
+    D.total=D.list.length; D.done=0;
+    var sm=document.getElementById('es-diasum'); if(sm) sm.textContent=D.total+'장';
+    if(!D.total){ D.state='done'; esDiaRender(); return; }
+    esDiaRender();
+    var i=0;
+    (function next(){
+      if(i>=D.list.length){ D.state='done'; esDiaRender(); return; }
+      var it=D.list[i++];
+      myPhoto(it.fid,'w400',function(src){ if(src) it.src=src; D.done++; esDiaRender(); setTimeout(next,40); });
+    })();
+  });
+}
+function esDiaRender(){
+  var box=document.getElementById('es-diabox'); if(!box) return; var D=ES.dia;
+  if(D.state==='loading'){
+    var pct=D.total?Math.round(D.done/D.total*100):0;
+    box.innerHTML='<div class="esdia"><div class="big">📷</div><p><b>추억이 많아서 시간이 조금 걸려요.</b><br>사진을 하나하나 불러오고 있으니 잠시만 기다려 주세요 😊</p>'
+      +(D.total?'<div class="esgauge"><i style="width:'+pct+'%"></i></div><div class="esgnum">'+D.done+' / '+D.total+'장 · '+pct+'%</div>':'<div class="esgnum" style="margin-top:10px">사진일기를 찾는 중…</div>')+'</div>';
+  } else if(D.state==='done'){
+    if(!D.total){ box.innerHTML='<div class="esdia"><p class="muted">아직 사진일기가 없어요.<br>유산소를 올릴 때 사진을 한 장 넣어 볼 수 있어요.</p></div>'; return; }
+    box.innerHTML='<div class="esdgrid">'+D.list.filter(function(it){return it.src;}).map(function(it){
+      return '<div class="polar"><img src="'+it.src+'" alt="사진일기" onclick="openMyPhoto(\''+esc(it.fid)+'\')">'
+        +(it.성찰?'<p class="cap2">'+esc(it.성찰)+'</p>':'')+'<p class="dt">'+esc(it.날짜)+'</p></div>'; }).join('')+'</div>';
+  }
+}
 
 /* 보고서 화면 맨 아래 버튼 */
 function paintEssayBtn(){
@@ -4931,161 +5281,14 @@ function paintEssayBtn(){
   box.classList.remove('hidden');
   call('getMyEssay',[ST.student.학번],function(r){
     if(!r||!r.ok){ box.innerHTML=''; return; }
-    ES.마감=r.마감||''; ES.닫힘=!!r.마감지남; ES.상태=r.상태||'';
-    var 쓴적=!!(r.답 && (r.답.문항1||r.답.문항2||r.답.문항3));
-    var lab = ES.닫힘 ? '📄 내가 쓴 감상문 보기'
-            : (r.상태==='제출' ? '✍️ 감상문 고치기' : (쓴적 ? '✍️ 이어서 쓰기' : '✍️ 감상문 쓰러 가기'));
-    var sub = ES.닫힘 ? '제출이 마감되었습니다'
-            : (r.상태==='제출' ? ('제출 완료 · '+(r.제출시각||'')+' · 마감 전까지 고칠 수 있어요')
-                              : ('마감 '+(r.마감||'')+' 까지'));
-    box.innerHTML='<div class="card" style="text-align:center">'
-      +'<h2 style="margin:0 0 6px">4주 감상문</h2>'
-      +'<p class="muted" style="font-size:13px;margin:0 0 12px">'+esc(sub)+'</p>'
-      +'<button class="btn" onclick="go(\'essay\')">'+lab+'</button></div>';
+    var 쓴적=!!(r.답 && (r.답.문항1||r.답.요소_질적||r.답.읽을거리이유));
+    var lab = r.마감지남 ? '📄 내가 쓴 감상문 보기' : (r.상태==='제출' ? '✍️ 감상문 고치기' : (쓴적 ? '✍️ 이어서 쓰기' : '✍️ 감상문 쓰러 가기'));
+    var sub = r.마감지남 ? (r.상태==='제출' ? '제출이 마감되었습니다 · 제출한 감상문이 최종으로 인정돼요' : '제출이 마감되었습니다 · 제출하지 못해 미제출로 처리돼요')
+            : (r.상태==='제출' ? ('제출 완료 · '+esDots(r.제출시각||'')+' · 마감 전까지 고칠 수 있어요') : ('마감 '+esFmtDue(r.마감)+' 까지'));
+    box.innerHTML='<div class="card" style="text-align:center"><h2 style="margin:0 0 6px">운동처방 감상문</h2>'
+      +'<p class="muted" style="font-size:13px;margin:0 0 12px">'+esc(sub)+'</p><button class="btn" onclick="go(\'essay\')">'+lab+'</button></div>';
   });
 }
-
-function loadEssay(){
-  var body=document.getElementById('es-body');
-  body.innerHTML='<p class="muted" style="text-align:center;padding:26px 0">불러오는 중…</p>';
-  call('getMyEssay',[ST.student.학번],function(r){
-    if(!r||!r.ok){ body.innerHTML='<p class="muted" style="text-align:center;padding:26px 0">불러오지 못했어요</p>'; return; }
-    ES.최소=r.최소||ES.최소; ES.마감=r.마감||''; ES.닫힘=!!r.마감지남; ES.상태=r.상태||'';
-    ES.답 = r.답 ? {문항1:r.답.문항1,문항2:r.답.문항2,문항3:r.답.문항3,고른원리:r.답.고른원리,
-                   읽을거리:r.답.읽을거리,읽을거리이유:r.답.읽을거리이유,마음단단:r.답.마음단단,마음단단이유:r.답.마음단단이유} : {};
-    ES.시작 = (r.답&&r.답.작성시작) || nowStamp();
-    /* 서버 것이 비어 있고 이 기기에 더 쓴 것이 있으면 그것을 쓴다(창이 닫혀 못 보낸 경우) */
-    var loc=esLoadLocal();
-    if(loc&&loc.답){ Object.keys(loc.답).forEach(function(k){ if(!ES.답[k] && loc.답[k]) ES.답[k]=loc.답[k]; }); }
-    document.getElementById('es-due').textContent = ES.닫힘 ? ('마감되었습니다 · '+ES.마감) : ('마감 '+ES.마감+' 까지 · 마감 전에는 몇 번이든 고칠 수 있어요');
-    renderEssayMine(); renderEssay(); esBar(); if(!ES.닫힘) esTick();
-  });
-}
-function nowStamp(){ var d=new Date(), z=function(n){return ('0'+n).slice(-2)};
-  return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())+' '+z(d.getHours())+':'+z(d.getMinutes())+':'+z(d.getSeconds()); }
-
-/* 위쪽 — 내 기록 요약(보면서 쓰라고) */
-function renderEssayMine(){
-  var box=document.getElementById('es-mine'); if(!box) return;
-  var h=ST.home||{}, wk=(h.주차현황||[]), 인정=0; wk.forEach(function(w){ if(w&&w.충족) 인정++; });
-  var 총주=Number((h.config||{})['총_주차수'])||4;
-  box.innerHTML='<b>📄 내 기록</b> <span class="cap">보고서에서 더 자세히 볼 수 있어요</span>'
-    +'<p style="margin:8px 0 0;font-size:14px;line-height:1.8">'
-    +'· 인정된 주차 <b>'+인정+' / '+총주+'주</b><br>'
-    +'· 지금까지 올린 운동 <b>'+((ST.myRecords||[]).length||'—')+'건</b></p>';
-}
-
-function renderEssay(){
-  var box=document.getElementById('es-body'); if(!box) return;
-  var ro=ES.닫힘, A=ES.답, M=ES.최소;
-  var ta=function(k,i,label,sub,ph){
-    var n=esCount(A[k]), ok=n>=M[i];
-    return '<div class="esq"><h3>'+label+'</h3><p class="qsub">'+sub+'</p>'
-      +'<textarea id="es-'+k+'" '+(ro?'readonly':'')+' placeholder="'+ph+'" '
-      +'oninput="esSetAns(\''+k+'\',this.value)" onpaste="ES.붙=(ES.붙||0)+1">'+esc(A[k]||'')+'</textarea>'
-      +'<p class="escnt'+(ok?' ok':'')+'" id="cnt-'+k+'">'+n+' / '+M[i]+'자'+(ok?' ✓':'')+'</p></div>';
-  };
-  var 원리=String(A.고른원리||'').split(/[,·]/).map(function(x){return x.trim()}).filter(Boolean);
-  var h='';
-  h+=ta('문항1',0,'1. 4주간의 나','가장 힘들었던 순간은 언제였고 그때 어떻게 했나요? 반대로 «해냈다» 싶었던 순간은요? <b>구체적인 날과 상황</b>을 넣어 주세요.','예: 9월 둘째 주 비 오는 날…');
-  h+='<div class="esq"><h3>2. 과학적 원리로 내 기록 평가하기</h3>'
-    +'<p class="qsub">아래 원리 중 <b>두 가지 이상</b>을 고르고, <b>내 기록의 숫자</b>를 근거로 4주간의 운동을 평가해 주세요.<br>'
-    +'(페이스 기준이 14분→12분→10분으로 빨라진 것 · 체력측정 전후 · 유산소와 근력의 균형 …)</p>'
-    +'<div class="espick">'+ES_PRINCIPLES.map(function(t){
-        return '<button type="button" class="'+(원리.indexOf(t)>=0?'on':'')+'" '+(ro?'disabled':'')+' onclick="esTogglePrin(\''+t.replace(/'/g,"\\'")+'\')">'+esc(t)+'</button>';
-      }).join('')+'</div>'
-    +'<textarea id="es-문항2" '+(ro?'readonly':'')+' placeholder="예: 점진적 과부하 — 1주차에는 3km를 31분에…" '
-    +'oninput="esSetAns(\'문항2\',this.value)" onpaste="ES.붙=(ES.붙||0)+1">'+esc(A.문항2||'')+'</textarea>'
-    +'<p class="escnt'+(esCount(A.문항2)>=M[1]?' ok':'')+'" id="cnt-문항2">'+esCount(A.문항2)+' / '+M[1]+'자'+(esCount(A.문항2)>=M[1]?' ✓':'')+'</p></div>';
-  h+=ta('문항3',2,'3. 다시 시작한다면','다음 달부터 혼자 운동한다면 어떻게 하겠습니까? <b>일주일에 몇 번 · 어느 정도 강도로 · 몇 분 · 무슨 운동</b>인지 구체적으로 적어 주세요.','예: 주 3회, 조금 숨찰 정도로 30분씩…');
-
-  /* 4번 읽을거리 */
-  var rl=esReadList();
-  h+='<div class="esq"><h3>4. 가장 도움이 된 읽을거리</h3>'
-    +'<p class="qsub">4주 동안 읽은 글 중 하나를 고르고 <b>왜 도움이 되었는지</b> 적어 주세요. 제목을 누르면 다시 읽을 수 있어요.</p>'
-    +'<div class="eslist">'+rl.map(function(a){
-      var on=(A.읽을거리===a.제목);
-      return '<button type="button" class="li'+(on?' on':'')+'" '+(ro?'disabled':'')+' onclick="esPick(\'읽을거리\',\''+a.제목.replace(/'/g,"\\'")+'\')">'
-        +'<span class="wk">'+a.주차+'주</span><span class="tt">'+esc(a.제목)+'</span>'
-        +'<span class="rd" onclick="event.stopPropagation();esOpenRead(\'read\',\''+a.제목.replace(/'/g,"\\'")+'\')">다시 읽기</span></button>'
-        +(ES.열린글===a.제목?esArticleHTML(esArticle('read',a.제목)):'');
-    }).join('')+'</div>'
-    +'<textarea id="es-읽을거리이유" '+(ro?'readonly':'')+' placeholder="이 글이 도움이 된 이유를 적어 주세요" '
-    +'oninput="esSetAns(\'읽을거리이유\',this.value)" onpaste="ES.붙=(ES.붙||0)+1">'+esc(A.읽을거리이유||'')+'</textarea>'
-    +'<p class="escnt'+(esCount(A.읽을거리이유)>=M[3]?' ok':'')+'" id="cnt-읽을거리이유">'+esCount(A.읽을거리이유)+' / '+M[3]+'자'+(esCount(A.읽을거리이유)>=M[3]?' ✓':'')+'</p></div>';
-
-  /* 5번 마음단단 */
-  var ml=esMindList();
-  h+='<div class="esq"><h3>5. 가장 마음에 와닿은 «마음단단»</h3>'
-    +'<p class="qsub">마음단단 글 중 하나를 고르고 <b>왜 마음에 남았는지</b> 적어 주세요.</p>'
-    +'<div class="eslist">'+ml.map(function(a){
-      var on=(A.마음단단===a.제목);
-      return '<button type="button" class="li'+(on?' on':'')+'" '+(ro?'disabled':'')+' onclick="esPick(\'마음단단\',\''+a.제목.replace(/'/g,"\\'")+'\')">'
-        +'<span class="wk">'+a.주차+'주</span><span class="tt">'+esc(a.제목)+'</span>'
-        +'<span class="rd" onclick="event.stopPropagation();esOpenRead(\'mind\',\''+a.제목.replace(/'/g,"\\'")+'\')">다시 읽기</span></button>'
-        +(ES.열린글===a.제목?esArticleHTML(esArticle('mind',a.제목)):'');
-    }).join('')+'</div>'
-    +'<textarea id="es-마음단단이유" '+(ro?'readonly':'')+' placeholder="이 글이 마음에 남은 이유를 적어 주세요" '
-    +'oninput="esSetAns(\'마음단단이유\',this.value)" onpaste="ES.붙=(ES.붙||0)+1">'+esc(A.마음단단이유||'')+'</textarea>'
-    +'<p class="escnt'+(esCount(A.마음단단이유)>=M[4]?' ok':'')+'" id="cnt-마음단단이유">'+esCount(A.마음단단이유)+' / '+M[4]+'자'+(esCount(A.마음단단이유)>=M[4]?' ✓':'')+'</p></div>';
-
-  if(ro) h='<div class="esdone">📄 제출이 마감되어 <b>읽기 전용</b>입니다.</div>'+h;
-  else if(ES.상태==='제출') h='<div class="esdone">✅ <b>제출했습니다.</b> 마감 전까지는 고칠 수 있어요.</div>'+h;
-  box.innerHTML=h;
-}
-function esTogglePrin(t){
-  var arr=String(ES.답.고른원리||'').split(/[,·]/).map(function(x){return x.trim()}).filter(Boolean);
-  var i=arr.indexOf(t); if(i>=0) arr.splice(i,1); else arr.push(t);
-  ES.답.고른원리=arr.join(' · '); ES.더티=true; esSaveLocal(); renderEssay(); esBar();
-}
-function esPick(k,v){ ES.답[k]=(ES.답[k]===v?'':v); ES.더티=true; esSaveLocal(); renderEssay(); esBar(); }
-function esCountLine(k){
-  var i={'문항1':0,'문항2':1,'문항3':2,'읽을거리이유':3,'마음단단이유':4}[k];
-  if(i===undefined) return;
-  var el=document.getElementById('cnt-'+k); if(!el) return;
-  var n=esCount(ES.답[k]), ok=n>=ES.최소[i];
-  el.textContent=n+' / '+ES.최소[i]+'자'+(ok?' ✓':'');
-  el.className='escnt'+(ok?' ok':'');
-}
-function esLeft(){
-  var A=ES.답, M=ES.최소, left=[];
-  if(esCount(A.문항1)<M[0]) left.push('1번');
-  if(esCount(A.문항2)<M[1]) left.push('2번');
-  if(String(A.고른원리||'').split(/[,·]/).filter(function(x){return x.trim()}).length<2) left.push('2번 원리');
-  if(esCount(A.문항3)<M[2]) left.push('3번');
-  if(!String(A.읽을거리||'').trim()) left.push('4번 글 고르기');
-  if(esCount(A.읽을거리이유)<M[3]) left.push('4번');
-  if(!String(A.마음단단||'').trim()) left.push('5번 글 고르기');
-  if(esCount(A.마음단단이유)<M[4]) left.push('5번');
-  return left;
-}
-function esBar(){
-  var bar=document.getElementById('es-bar'), btn=document.getElementById('es-submit'); if(!bar) return;
-  bar.classList.toggle('hidden', ES.닫힘);
-  if(ES.닫힘) return;
-  var left=esLeft();
-  btn.textContent = ES.상태==='제출' ? '고쳐서 다시 제출' : '제출하기';
-  btn.disabled = left.length>0;
-  btn.style.opacity = left.length? .45 : 1;
-  var el=document.getElementById('es-save');
-  if(el && left.length) el.textContent='아직 남았어요 — '+left.join(' · ');
-}
-function essaySubmit(){
-  var left=esLeft();
-  if(left.length){ toast('아직 못 채운 곳이 있어요 — '+left.join(' · ')); return; }
-  askP('감상문을 제출할까요?\n\n마감('+ES.마감+') 전까지는 몇 번이든 고칠 수 있어요.').then(function(yes){
-    if(!yes) return;
-    var p=Object.assign({}, ES.답, {제출:true, 작성시작:ES.시작, 붙여넣기:ES.붙, 작성시간분:esMinutes()});
-    call('saveEssay',[ST.student.학번,p],function(r){
-      if(!r||!r.ok){ uiMsg(r&&r.msg||'제출하지 못했어요'); return; }
-      ES.상태='제출'; ES.더티=false;
-      showSaved('saved-essay', r.savedAt, true);
-      toast('✅ 감상문을 제출했어요!');
-      renderEssay(); esBar();
-    });
-  });
-}
-function uiMsg(m){ askP(String(m)); }
 
 /* ---------- 성찰 ---------- */
 /* ---------- 운동자각도 · 만족도 ---------- */
