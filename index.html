@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.58.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.59.0 -->
+<!--   [1.59.0] 감상문 1번 «4주간의 나» 안내에 «계획대로 못 한 날·실패한 경험도 써요 — 왜 못 했는지, 그때 생각, 다음에는 어떻게»를 추가(4주를 못 채운 학생도 쓰도록). 글자수 기준(150자)은 그대로. -->
 <!--   [1.58.0] 감상문 2번 요소·원리 8칸의 최소 글자수(40자)를 없앴다 — 칸마다 «현재 N자»만 보이고, 비어 있지만 않으면 된다(서버 GAS 1.41.0).
         1번(150자)·3번(80자)·4번(80자)은 그대로. -->
 <!--   [1.57.0] 감상문 3번 «읽을거리»·4번 «마음단단» 목록을 주차별 네 단(1~4주차)으로. 글마다 제목 + «다시 읽기», 고른 글은 ✓ 와 색으로.
@@ -2004,7 +2005,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.58.0';
+var PWA_VER = '1.59.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -5185,7 +5186,8 @@ function esRender(){
   var h='';
   h+='<div class="essec" id="essec-msg"><div class="esmsg"><div class="esbub"><span class="estag">📋 과제 안내</span>'+esParas(ES.한마디)+'<span class="who">김진호 선생님</span></div><img src="st-jhpink-hd.png" alt="김진호 선생님"></div></div>';
   h+='<div class="essec" id="essec-q1"><div class="esq"><h3>1. 4주간의 나</h3><p class="qsub">가장 힘들었던 순간은 언제였고 그때 어떻게 했나요? 반대로 «해냈다» 싶었던 순간은요? <b>구체적인 날과 상황</b>을 넣어 주세요.</p>'
-    +ta('문항1',0,'예: 9월 둘째 주 비 오는 날…')+'</div></div>';
+    +'<p class="qsub" style="margin-top:-4px"><b>계획대로 하지 못한 날이나 실패한 경험도 꼭 써 주세요.</b> 왜 못 했는지(시간·몸 상태·마음·환경 등), 그때 어떤 생각이 들었는지, 다음에는 어떻게 하고 싶은지까지 솔직하게 적으면 돼요. 4주를 다 채우지 못한 사람도 괜찮아요.</p>'
+    +ta('문항1',0,'예: 9월 둘째 주 비 오는 날, 하기 싫어서 미뤘다가 못 한 이유는…')+'</div></div>';
   h+='<div class="essec" id="essec-q2"><div class="esq"><h3>2. 운동처방의 요소와 원리로 평가하기</h3><p class="qsub">아래 <b>요소 2가지</b>와 <b>원리 6가지</b>를 각각 어떻게 적용했는지, <b>내 기록의 숫자를 근거</b>로 간단히 써 주세요. (오른쪽 위 «내 기록 보기»를 열어 두면 숫자를 보면서 쓸 수 있어요)</p>'
     +'<div class="essh">🔵 요소 (2)</div>'+ES_ELEM.map(function(x){ return mini(x[0],'e',x[1],x[2],x[3]); }).join('')
     +'<div class="essh">🟠 원리 (6)</div>'+ES_PRIN.map(function(x){ return mini(x[0],'p',x[1],'',x[2]); }).join('')+'</div></div>';
