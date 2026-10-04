@@ -6,8 +6,10 @@
    처음 이 판으로 바뀔 때도 옛 캐시에 있던 그림을 옮겨 담으므로 다시 받지 않는다.
    ★그림 파일을 «같은 이름»으로 바꿔 넣었으면 STATIC 숫자를 올릴 것 — 그래야 새 그림을 받는다.
    ★그림 한 장을 못 받아도 설치는 계속된다(예전 addAll 은 한 장만 없어도 설치가 통째로 실패했다). */
-var CACHE = 'grofit-v1.60.0';
-var STATIC = 'grofit-static-1';
+var CACHE = 'grofit-v1.60.1';
+var STATIC = 'grofit-static-2';   // [1.60.1] 테마 1·3 아이콘을 같은 이름으로 바꿨다 → STATIC 올림(옛 그림을 새 캐시로 옮겨 담지 않고 새로 받는다)
+/* 같은 이름으로 그림을 바꾼 파일 — 옛 캐시에서 옮기지 않고 항상 새로 받는다(이 STATIC 안에 없을 때만) */
+var FRESH = ['icon1-180.png','icon1-192.png','icon1-512.png','icon1-mask-192.png','icon1-mask-512.png','icon3-180.png','icon3-192.png','icon3-512.png','icon3-mask-192.png','icon3-mask-512.png'];
 
 /* [1.34.0] 푸시 알림(FCM) — 앱이 닫혀 있어도 알림이 뜨게. FCM_CONFIG 가 비어 있으면(파이어베이스 설정 전) 조용히 건너뛴다.
    ★ index.html 위쪽의 FCM_CONFIG 와 반드시 «똑같이» 채운다. */
@@ -42,6 +44,7 @@ for (var i = 1; i <= 6; i++) ASSETS.push('./manifest' + i + '.webmanifest',
 function keepAsset(st, u) {
   return st.match(u).then(function (hit) {
     if (hit) return;
+    if (FRESH.indexOf(u.replace('./', '')) >= 0) return fetch(new Request(u, { cache: 'reload' })).then(function (r) { if (r && r.ok) return st.put(u, r); });   // [1.60.1]
     return caches.match(u).then(function (old) {
       return old ? st.put(u, old) : st.add(u);
     });
