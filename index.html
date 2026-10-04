@@ -1,4 +1,7 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.60.3 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.62.0 -->
+<!--   [1.62.0] ★감상문 3번 «체력 변화 돌아보기» 추가 — 내 체력 측정 그래프(항목별 변화·향상/감소)를 문항 안에서 보며 쓴다(80자 이상). 4주차 마지막 측정은 선택이라 안내 + 교무실 인바디·줄자·악력계 대여 안내 + «4주차 측정값 입력하러 가기».
+        읽을거리·마음단단은 4·5번으로. 서버 GAS 1.49.0(체력변화 칸·최소 글자수 5번째 값). -->
+<!--   [1.61.0] 체력 측정 회차에서 3주차를 뺐다(측정 안 함) — 방학 전·개학 후·1주·2주·4주. 그래프·표도 5회차로(서버 1.48.0). -->
 <!--   [1.60.3] 아이콘 크기를 1.60.1 때로 되돌림(로고 여백 있는 판) — 1.60.2 의 «꽉 찬» 판은 취소. 앱 안 로고도 mask-512 로 복귀. -->
 <!--   [1.60.2] 아이콘의 로고를 더 크게 — 여백을 없애 로고가 칸을 꽉 채우게(any 100%, maskable 88%), 파랑은 3D 테두리가 남던 아래·왼쪽 띠를 지움. 앱 안 로고(테마 1·3)는 여백 없는 icon{n}-512.png 사용. -->
 <!--   [1.60.1] ★새 아이콘이 안 보이던 것 — 서비스워커가 «그림 캐시(grofit-static-1)» 의 옛 아이콘을 계속 내주고 있었다. STATIC 를 static-2 로 올리고, 아이콘 10장은 옛 캐시에서 옮기지 않고 새로 받게(FRESH). -->
@@ -716,6 +719,10 @@ body.es-recopen .esrecbtn{background:var(--primary);color:#fff}
 .escnt.ok{color:var(--primary-dark);font-weight:700}
 .essh{font-size:13px;font-weight:800;color:var(--primary-dark);margin:14px 0 8px}
 .essh:first-of-type{margin-top:0}
+.esfitg{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:10px}
+.esfitc{border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;background:var(--surface)}
+.esfith{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:13px;margin-bottom:2px}
+.esfitnone{border:1.5px dashed var(--line);border-radius:12px;padding:14px;color:var(--muted);font-size:13px;margin-bottom:10px;text-align:center}
 .esmini{border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;background:var(--bg)}
 .esmini .lbl{font-size:13.5px;font-weight:700;margin-bottom:2px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .esmini .lbl .cnt{font-size:11px;font-weight:600;color:var(--muted2);flex:0 0 auto}
@@ -2009,7 +2016,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.60.3';
+var PWA_VER = '1.62.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -4698,7 +4705,7 @@ function saveStrength(){
 /* ---------- 체력측정 (PAPS 자동 판정) ----------
    ※ 기준값은 서버 Code.gs 의 FIT_STD / FIT_DIAG / MUSCLE_STD 와 동일하게 유지할 것.
       여기 것은 "입력 즉시 등급 표시"용 사본이고, 저장 시 서버가 다시 판정합니다. */
-var FIT_ROUNDS=['방학 전','개학 후','1주차','2주차','3주차','4주차'];
+var FIT_ROUNDS=['방학 전','개학 후','1주차','2주차','4주차'];   // [1.61.0] 3주차는 측정하지 않아 뺐다 · 4주차는 선택
 var FIT_STD={
   악력:[[36.0,999,1],[27.5,35.9,2],[19.5,27.4,3],[16.0,19.4,4],[-999,15.9,5]],
   팔굽혀펴기:[[40,999,1],[24,39,2],[14,23,3],[6,13,4],[-999,5,5]],
@@ -5018,7 +5025,7 @@ function rptStat(v,label){ return '<div style="flex:1 1 40%;min-width:120px"><di
    디벗(가로 860px↑)은 왼쪽 문항 · 가운데 입력 · 오른쪽 «내 기록», 휴대폰은 세로 + 아래 시트. */
 var ES={답:{},최소:[150,40,80,80],마감:'',닫힘:false,상태:'',수정됨:false,제출시각:'',시작:'',붙:0,활동초:0,마지막입력:0,
   활성:'msg',저장중:false,더티:false,디바운스:null,이력:[],한마디:'',열린글:'',rpt:null,dia:{state:'idle',total:0,done:0,list:[]},stat:'idle',statTime:'',seq:0};
-var ES_SECS=[['msg','선생님 한 마디','💬'],['q1','4주간의 나'],['q2','요소와 원리'],['q3','읽을거리'],['q4','마음단단']];
+var ES_SECS=[['msg','선생님 한 마디','💬'],['q1','4주간의 나'],['q2','요소와 원리'],['qf','체력 변화','3'],['q3','읽을거리','4'],['q4','마음단단','5']];   // [1.62.0] 3번 체력 변화 추가
 var ES_ELEM=[['요소_질적','질적 요소','운동의 강도·형태 등 «어떻게» 운동했는지','예: 유산소 페이스를 14분→12분→10분으로 점점 빠르게…'],
              ['요소_양적','양적 요소','빈도·시간·거리 등 «얼마나» 운동했는지','예: 주 4일, 유산소 2일·근력 2일을 4주간 유지…']];
 var ES_PRIN=[['원리_과부하','과부하의 원리','평소보다 더 강한 자극을 준 경험'],['원리_점진성','점진성의 원리','조금씩 강도를 늘려 간 과정'],
@@ -5058,7 +5065,8 @@ function loadEssay(){
     if(!r||!r.ok){ body.innerHTML='<p class="muted" style="text-align:center;padding:26px 0">불러오지 못했어요 · 잠시 뒤 다시 열어 주세요</p>'; return; }
     ES.최소=r.최소||ES.최소; ES.마감=r.마감||''; ES.닫힘=!!r.마감지남; ES.상태=r.상태||''; ES.수정됨=!!r.제출후수정;
     ES.제출시각=r.제출시각||''; ES.이력=r.이력||[]; ES.한마디=r.한마디||'';
-    var a=r.답||{}; ES.답={}; ['문항1'].concat(ES_ELEM.map(function(x){return x[0]}),ES_PRIN.map(function(x){return x[0]}),['읽을거리','읽을거리이유','마음단단','마음단단이유']).forEach(function(k){ ES.답[k]=a[k]||''; });
+    var a=r.답||{}; ES.답={}; ['문항1'].concat(ES_ELEM.map(function(x){return x[0]}),ES_PRIN.map(function(x){return x[0]}),['읽을거리','읽을거리이유','마음단단','마음단단이유','체력변화']).forEach(function(k){ ES.답[k]=a[k]||''; });
+    ES.최소=(ES.최소||[]).slice(); while(ES.최소.length<5) ES.최소.push(80);   // [1.62.0] 5번째 = 체력 변화
     ES.시작=a.작성시작||nowStamp(); ES.활동초=(Number(a.작성시간분)||0)*60; ES.붙=Number(a.붙여넣기)||0; ES.마지막입력=0;
     var loc=esLoadLocal();                       // 창이 닫혀 서버에 못 보낸 글이 이 기기에 더 있으면 살린다
     if(loc&&loc.답){ Object.keys(loc.답).forEach(function(k){ if((!ES.답[k]) && loc.답[k]){ ES.답[k]=loc.답[k]; ES.더티=true; } }); }
@@ -5114,6 +5122,7 @@ function esDone(key){
   var A=ES.답, M=ES.최소;
   if(key==='q1') return esCount(A.문항1)>=M[0];
   if(key==='q2') return ES_ELEM.concat(ES_PRIN).every(function(x){ return esCount(A[x[0]])>=1; });   // [1.58.0] 글자 수 제한 없이 비어 있지만 않으면
+  if(key==='qf') return esCount(A.체력변화)>=(M[4]||80);
   if(key==='q3') return !!A.읽을거리 && esCount(A.읽을거리이유)>=M[2];
   if(key==='q4') return !!A.마음단단 && esCount(A.마음단단이유)>=M[3];
   return false;
@@ -5124,6 +5133,7 @@ function esLeft(){
   ES_ELEM.concat(ES_PRIN).forEach(function(x){ if(esCount(A[x[0]])<1) n++; });
   if(!A.읽을거리) n++; if(esCount(A.읽을거리이유)<M[2]) n++;
   if(!A.마음단단) n++; if(esCount(A.마음단단이유)<M[3]) n++;
+  if(esCount(A.체력변화)<(M[4]||80)) n++;
   return n;
 }
 function esBar(){
@@ -5157,6 +5167,17 @@ function esRenderLog(){
 /* ── 화면 ── */
 function esParas(txt){
   return String(txt||'').split(/\n\s*\n/).map(function(p){ return '<p>'+esc(p.trim()).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')+'</p>'; }).join('');
+}
+/* [1.62.0] 감상문 3번에 넣는 체력 변화 그래프 — 체력 화면의 chartCard 조각을 작게 모은다 */
+function esFitHTML(){
+  if(!ST.fitness){ if(!ES.핏요청){ ES.핏요청=true; callCached('getFitness',[ST.student.학번],function(r){ ST.fitness=(r&&r.기록)||[]; var b=document.getElementById('es-fitbox'); if(b) b.innerHTML=esFitHTML(); }); }
+    return '<p class="muted" style="text-align:center;padding:14px 0">체력 측정 기록을 불러오는 중…</p>'; }
+  var recs=ST.fitness||[], any=recs.some(function(r){return r.있음;});
+  if(!any) return '<div class="esfitnone">아직 체력 측정 기록이 없어요. 체력 탭에서 측정값을 입력하면 여기에 그래프가 보여요.</div>';
+  var done=FIT_ROUNDS.filter(function(rd){ return recs.some(function(x){return x.회차===rd&&x.있음;}); });
+  var cards=FIT_METRICS.map(function(m){ var d=chartCard(m,recs,true,300,130); if(!d) return '';
+    return '<div class="esfitc"><div class="esfith"><b>'+d.title+'</b>'+d.badge+'</div>'+d.svg+'<div class="cap">'+d.cap+'</div></div>'; }).join('');
+  return '<div class="cap" style="margin:0 0 6px">측정한 회차: <b>'+done.join(' · ')+'</b>'+(done.indexOf('4주차')<0?' <span class="muted">(4주차 미측정 — 선택)</span>':'')+'</div><div class="esfitg">'+cards+'</div>';
 }
 function esRender(){
   var box=document.getElementById('es-body'); if(!box) return;
@@ -5195,8 +5216,15 @@ function esRender(){
   h+='<div class="essec" id="essec-q2"><div class="esq"><h3>2. 운동처방의 요소와 원리로 평가하기</h3><p class="qsub">아래 <b>요소 2가지</b>와 <b>원리 6가지</b>를 각각 어떻게 적용했는지, <b>내 기록의 숫자를 근거</b>로 간단히 써 주세요. (오른쪽 위 «내 기록 보기»를 열어 두면 숫자를 보면서 쓸 수 있어요)</p>'
     +'<div class="essh">🔵 요소 (2)</div>'+ES_ELEM.map(function(x){ return mini(x[0],'e',x[1],x[2],x[3]); }).join('')
     +'<div class="essh">🟠 원리 (6)</div>'+ES_PRIN.map(function(x){ return mini(x[0],'p',x[1],'',x[2]); }).join('')+'</div></div>';
-  h+='<div class="essec" id="essec-q3">'+pick('read',esReadList(),'읽을거리','읽을거리이유',2,'3. 가장 도움이 된 읽을거리','4주 동안 읽은 글 중 하나를 고르고 <b>왜 도움이 되었는지</b> 적어 주세요. «다시 읽기»를 누르면 그 글을 다시 볼 수 있어요.','이 글이 도움이 된 이유를 적어 주세요')+'</div>';
-  h+='<div class="essec" id="essec-q4">'+pick('mind',esMindList(),'마음단단','마음단단이유',3,'4. 가장 마음에 와닿은 «마음단단»','마음단단 글 중 하나를 고르고 <b>왜 마음에 남았는지</b> 적어 주세요.','이 글이 마음에 남은 이유를 적어 주세요')+'</div>';
+  /* [1.62.0] 3. 체력 변화 — 내 측정 기록 그래프를 보며 쓴다(4주차 마지막 측정은 선택) */
+  h+='<div class="essec" id="essec-qf"><div class="esq"><h3>3. 체력 변화 돌아보기</h3>'
+    +'<p class="qsub">아래 <b>내 체력 측정 그래프</b>를 보고, <b>어떤 항목이 좋아졌고 어떤 항목은 그대로이거나 떨어졌는지</b> 숫자로 적어 주세요. 그리고 <b>4주간의 운동이 그 변화에 어떤 영향을 주었는지</b>, 앞으로 어떻게 관리하고 싶은지까지 써 주세요.</p>'
+    +'<p class="qsub" style="margin-top:-4px">🏋️ <b>4주차(마지막) 측정은 선택이에요.</b> 측정했다면 처음과 비교하고, 하지 않았다면 지금까지의 변화와 느낀 점을 쓰면 돼요. 교무실에서 <b>인바디·줄자·악력계</b>를 빌릴 수 있어요.</p>'
+    +'<div id="es-fitbox">'+esFitHTML()+'</div>'
+    +(ro?'':'<button type="button" class="btn ghost" style="margin:4px 0 10px;width:auto;padding:8px 14px;font-size:13px" onclick="go(\'inbody\')">🏋️ 4주차 측정값 입력하러 가기</button>')
+    +ta('체력변화',4,'예: 악력이 24kg → 27kg으로 늘었다. 근력 운동을 주 2번 꾸준히 한 덕분인 것 같다. 반대로 앞으로굽히기는 그대로였는데…')+'</div></div>';
+  h+='<div class="essec" id="essec-q3">'+pick('read',esReadList(),'읽을거리','읽을거리이유',2,'4. 가장 도움이 된 읽을거리','4주 동안 읽은 글 중 하나를 고르고 <b>왜 도움이 되었는지</b> 적어 주세요. «다시 읽기»를 누르면 그 글을 다시 볼 수 있어요.','이 글이 도움이 된 이유를 적어 주세요')+'</div>';
+  h+='<div class="essec" id="essec-q4">'+pick('mind',esMindList(),'마음단단','마음단단이유',3,'5. 가장 마음에 와닿은 «마음단단»','마음단단 글 중 하나를 고르고 <b>왜 마음에 남았는지</b> 적어 주세요.','이 글이 마음에 남은 이유를 적어 주세요')+'</div>';
   box.innerHTML=h;
   var due=document.getElementById('es-due');
   if(due){ due.className = ro ? 'esclosed' : 'esdue';
@@ -6239,8 +6267,8 @@ function mock(fn,args){
     현재주차:2,이번주:{완료일수:2,목표일수:3,유산소일수:1,유산소필수:2,충족:false},주차현황:[],최근기록:[],
     운동일자:{'2026-07-07':{c:true},'2026-07-09':{c:true,s:true},'2026-07-14':{c:true,s:true}}};
   if(fn==='analyzeCardio')return{ok:true,data:{distanceKm:3.2,durationMin:28,paceMinPerKm:"8'45\"",kcal:248}};
-  if(fn==='getFitness')return{회차목록:['방학 전','개학 후','1주차','2주차','3주차','4주차'],savedAt:'',
-    기록:['방학 전','개학 후','1주차','2주차','3주차','4주차'].map(function(r){return {회차:r,있음:false};})};
+  if(fn==='getFitness')return{회차목록:['방학 전','개학 후','1주차','2주차','4주차'],savedAt:'',
+    기록:['방학 전','개학 후','1주차','2주차','4주차'].map(function(r){return {회차:r,있음:false};})};
   if(fn==='submitFitness')return{ok:true,savedAt:'2026.08.13 01:20:00'};
   if(fn==='getWeekSummary')return{주차:1,시작일:'2026-08-10',종료일:'2026-08-16',운동일수:0,유산소일수:0,근력일수:0,목표일수:3,유산소필수:2,달성:false,총거리:0,총시간:0,기록:[]};
   if(fn==='verifyStrengthPhoto')return{ok:true,pass:true,stamp:true,sign:true,date:'2026-08-13',time:'19:45',code:'X4HNRDCHEG4PYP',exercise:true,what:'플랭크 자세'};
