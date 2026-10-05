@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.63.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.64.0 -->
+<!--   [1.64.0] ★하단 탭 «보고서»를 «감상문»으로(헷갈림 방지, 아이콘 ✍️) · 마스터코드로 들어온 둘러보기 계정은 메뉴_보고서 설정·오픈 시각과 무관하게 항상 «감상문» 탭·보고서·감상문 화면을 볼 수 있다(저장은 여전히 서버가 막음, 안전).
+        «나의 4주 보고서»를 디벗 가로(860px↑)에서 2단 레이아웃으로(왼쪽 요약·주차별 실천·성취율, 오른쪽 체력 변화 그래프+수치표·주차별 성찰) + 체력 탭과 같은 변화 그래프 추가. GAS 1.51.0(teacherGetMasterCode·teacherSetMasterCode). -->
 <!--   [1.63.0] ★자동 전환 — 운동 탭은 «자동_운동끄기»(10/5 22:00)부터 숨김, 보고서 탭은 «자동_보고서표시»부터 보이되 «자동_보고서열기»(10/6 09:00) 전에는 «보고서는 10월 6일(화) 09:00에 열려요» 안내(감상문도 막음). 앱을 켜 둔 채 시각이 지나도 30초마다 다시 확인해 바뀐다(서버 GAS 1.50.0). -->
 <!--   [1.62.1] 설치 앱이 세로로만 열리던 것 — manifest 7개의 orientation 을 portrait → any(디벗 가로 화면에서 로그인·감상문 쓰기). -->
 <!--   [1.62.0] ★감상문 3번 «체력 변화 돌아보기» 추가 — 내 체력 측정 그래프(항목별 변화·향상/감소)를 문항 안에서 보며 쓴다(80자 이상). 4주차 마지막 측정은 선택이라 안내 + 교무실 인바디·줄자·악력계 대여 안내 + «4주차 측정값 입력하러 가기».
@@ -721,6 +723,10 @@ body.es-recopen .esrecbtn{background:var(--primary);color:#fff}
 .escnt.ok{color:var(--primary-dark);font-weight:700}
 .essh{font-size:13px;font-weight:800;color:var(--primary-dark);margin:14px 0 8px}
 .essh:first-of-type{margin-top:0}
+.rpt-grid .rpt-col{display:flex;flex-direction:column;gap:14px}
+.rpt-grid .rpt-col .card{margin-bottom:0}
+body.rpt-wide .app{max-width:960px}   /* [1.64.0] 나의 4주 보고서 — 디벗 가로(860px↑)에서 폭을 넓히고 2단으로 */
+body.rpt-wide .rpt-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
 .rpsoon{text-align:center;padding:28px 18px}
 .rpsoon-ic{font-size:44px;margin-bottom:6px}
 .rpsoon h2{font-size:19px;margin:0 0 10px}
@@ -2003,7 +2009,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
     <button data-t="reflect" onclick="go('reflect')"><img class="ic" src="tab-reflect.png" alt="">성찰</button>
     <button data-t="score" onclick="go('score')"><img class="ic" src="tab-score.png" alt="">기록</button>
     <button data-t="notice" onclick="go('notice')"><img class="ic" src="tab-notice.png" alt="">공지</button>
-    <button data-t="report" onclick="go('report')"><span class="ic">📄</span>보고서</button>
+    <button data-t="report" onclick="go('report')"><span class="ic">✍️</span>감상문</button>
   </nav>
 </div>
 <div class="peekbar hidden" id="peekbar">🔑 <b>마스터코드로 보는 중</b> · 읽음 표시가 남지 않아요</div>
@@ -2023,7 +2029,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.63.0';
+var PWA_VER = '1.64.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -2118,12 +2124,13 @@ var MENU_GATE={cert:'운동',cardio:'운동',strength:'운동',reject:'운동','
 function schedPast(t){ var m=String(t||'').match(/(\d{4})-(\d{1,2})-(\d{1,2})[ T](\d{1,2}):(\d{2})/); if(!m) return false;
   return Date.now()>=new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]).getTime(); }
 function reportOpen(){
-  if(String((ST.student||{}).학번||'')==='3277') return true;
+  if(String((ST.student||{}).학번||'')==='3277' || isPeek()) return true;   // [1.64.0] 마스터코드 둘러보기도 미리보기 허용
   var c=ST.config||{}; return c.메뉴_보고서==='on' || schedPast(c.자동_보고서열기);
 }
 function menuOn(key){
-  /* [1.55.0] 보고서는 3277(선생님)에게만 항상 열어 둔다 — 학생에게 켜기 전에 미리 보려고 */
-  if(key==='보고서' && String((ST.student||{}).학번||'')==='3277') return true;
+  /* [1.55.0][1.64.0] 보고서(감상문)는 3277(선생님) 또는 마스터코드로 들어온 둘러보기 계정에 항상 열어 둔다
+     — 아직 전체 오픈 전이라도 실제 학생 데이터로 화면을 미리 확인할 수 있게. 서버 저장(saveEssay)은 그대로 막혀 있다(안전). */
+  if(key==='보고서' && (String((ST.student||{}).학번||'')==='3277' || isPeek())) return true;
   var c=ST.config||{}, v=c['메뉴_'+key];
   if(key==='운동' && schedPast(c.자동_운동끄기)) return false;                       // [1.63.0]
   if(key==='보고서') return v==='on' || v==='soon' || schedPast(c.자동_보고서표시) || schedPast(c.자동_보고서열기);
@@ -2142,7 +2149,7 @@ function applyMenuSwitches(){
 }
 function go(name, skipLoad){
   var gate=MENU_GATE[name];
-  if(gate && !menuOn(gate)){ toast(gate+' 메뉴는 지금 닫혀 있어요'); name='home'; }
+  if(gate && !menuOn(gate)){ toast((gate==='보고서'?'감상문':gate)+' 메뉴는 지금 닫혀 있어요'); name='home'; }
   if(name==='essay' && !reportOpen()){ toast('감상문은 '+rpOpenLabel()+'에 열려요'); name='report'; }   // [1.63.0]
   document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on')});
   var el = document.getElementById('s-'+name); if(el) el.classList.add('on');
@@ -2164,6 +2171,7 @@ function go(name, skipLoad){
   if(name==='notice'){ loadNoticesStudent(); notiPaint(); }   // [1.34.0]
   if(name==='inquiry'){ renderIqType(); renderIqPrev(); loadMyInq(); }
   if(name==='report') loadReport();   // [1.49.0]
+  try{ rptApplyWide(); }catch(e){}   // [1.64.0]
   document.body.classList.toggle('es-on', name==='essay'); try{ esApplyWide(); }catch(e){}   // [1.56.0] 디벗이면 감상문 화면만 넓게
   if(name==='essay') loadEssay();
   else { try{ document.body.classList.remove('es-recopen'); if(ES && ES.더티 && !ES.닫힘){ esSaveServer(); } }catch(e){} }   // 화면을 벗어나면 바로 임시저장
@@ -5013,11 +5021,12 @@ function loadReport(){
   call('getMyReport',[ST.student.학번],function(d){
     if(!d||!d.ok){ box.innerHTML='<p class="muted" style="text-align:center;padding:26px 0">'+esc((d&&d.msg)||'불러오지 못했어요')+'</p>'; return; }
     document.getElementById('rpt-sub').textContent=(d.평가명||'')+' · '+(d.기간||'');
-    var h='';
-    h+='<div class="card"><div style="display:flex;flex-wrap:wrap;gap:10px 18px">'
+    ST.fitness=d.체력||[];                              // [1.64.0] 체력 탭·확대 보기와 같은 데이터를 쓴다
+    var left='', right='';
+    left+='<div class="card"><div style="display:flex;flex-wrap:wrap;gap:10px 18px">'
       +rptStat(d.총운동일,'총 운동일수')+rptStat((d.달성주차||0)+'/'+(d.총주차||0),'목표 달성 주차')
       +rptStat(d.총거리,'총 달린 거리(km)')+rptStat(d.총시간,'총 운동시간(분)')+'</div></div>';
-    h+='<div class="card"><h2 style="margin:0 0 10px">주차별 운동 실천</h2><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:380px">'
+    left+='<div class="card"><h2 style="margin:0 0 10px">주차별 운동 실천</h2><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:380px">'
       +'<thead><tr><th style="text-align:left;padding:6px 4px;color:#8a978c">주차</th><th style="padding:6px 4px;color:#8a978c">운동일수</th>'
       +'<th style="padding:6px 4px;color:#8a978c">유산소</th><th style="padding:6px 4px;color:#8a978c">근력</th><th style="padding:6px 4px;color:#8a978c">목표</th></tr></thead><tbody>'
       +(d.주차||[]).map(function(w){ return '<tr><td style="padding:6px 4px;border-top:1px solid var(--divider)">'+w.주차+'주</td>'
@@ -5027,11 +5036,16 @@ function loadReport(){
         +'<td style="text-align:center;padding:6px 4px;border-top:1px solid var(--divider)"><span class="chip '+(w.달성?'ok':'bad')+'">'+(w.달성?'달성':'미달')+'</span></td></tr>'; }).join('')
       +'</tbody></table></div></div>';
     var sc=d.점수||{};
-    h+='<div class="card"><h2 style="margin:0 0 10px">성취율</h2><div style="display:flex;flex-wrap:wrap;gap:10px 18px">'
+    left+='<div class="card"><h2 style="margin:0 0 10px">성취율</h2><div style="display:flex;flex-wrap:wrap;gap:10px 18px">'
       +rptStat((sc.운동달성률!=null?sc.운동달성률+'%':'—'),'운동 달성률')+rptStat((sc.정시성!=null?sc.정시성+'%':'—'),'제출 정시성')
       +rptStat((sc.성취율!=null?sc.성취율+'%':'—'),'최종 성취율')+'</div></div>';
-    if((d.체력||[]).some(function(f){return f.있음;})){
-      h+='<div class="card"><h2 style="margin:0 0 10px">체력측정 변화</h2><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11.5px;min-width:430px">'
+    var hasFit=(d.체력||[]).some(function(f){return f.있음;});
+    if(hasFit){
+      right+='<div class="card"><h2 style="margin:0 0 10px">체력 변화 그래프</h2>'
+        +'<div class="esfitg">'+FIT_METRICS.map(function(m){ var c=chartCard(m,d.체력,true,280,130); if(!c) return '';
+          return '<div class="esfitc fitcard" onclick="zoomChart(&quot;'+m.k+'&quot;)"><div class="esfith"><b>'+c.title+'</b>'+c.badge+'</div>'+c.svg+'<div class="cap">'+c.cap+'</div></div>'; }).join('')
+        +'</div>'
+        +'<div style="overflow-x:auto;margin-top:4px"><table style="width:100%;border-collapse:collapse;font-size:11px;min-width:380px">'
         +'<thead><tr><th style="text-align:left;padding:6px 4px;color:#8a978c">항목</th>'
         +(d.체력||[]).map(function(f){return '<th style="padding:6px 3px;color:#8a978c;font-size:10px">'+esc(f.회차).replace('주차','주')+'</th>';}).join('')+'</tr></thead><tbody>'
         +FIT_METRICS.map(function(m){ return '<tr><td style="padding:6px 4px;border-top:1px solid var(--divider)">'+m.n+'</td>'
@@ -5039,11 +5053,12 @@ function loadReport(){
           +'</tr>'; }).join('')
         +'</tbody></table></div></div>';
     }
-    h+='<div class="card"><h2 style="margin:0 0 10px">주차별 성찰</h2>'
+    right+='<div class="card"><h2 style="margin:0 0 10px">주차별 성찰</h2>'
       +((d.성찰&&d.성찰.length)?d.성찰.map(function(r){ return '<div style="margin-bottom:12px"><b>'+r.주차+'주차</b> <span class="cap">'+esc(r.작성일||'')+'</span>'
           +'<p style="margin:4px 0 0">'+esc(r.내용||'')+'</p>'+(r.교사코멘트?comicHTML(r.교사코멘트,r.스티커||''):'')+'</div>'; }).join('')
         :'<p class="muted">작성한 성찰이 없어요.</p>')+'</div>';
-    box.innerHTML=h;
+    box.innerHTML='<div class="rpt-grid"><div class="rpt-col">'+left+'</div><div class="rpt-col">'+(right||'<div></div>')+'</div></div>';
+    rptApplyWide();                                    // [1.64.0]
     paintEssayBtn();                                  // [1.55.0] 맨 아래 «감상문 쓰러 가기»
   });
 }
@@ -5064,7 +5079,8 @@ var ES_PRIN=[['원리_과부하','과부하의 원리','평소보다 더 강한 
 var ES_KEY=function(){ return 'grofit_essay2_'+((ST.student||{}).학번||''); };
 function esWide(){ return window.innerWidth>=860; }
 function esApplyWide(){ var on=document.body.classList.contains('es-on'); document.body.classList.toggle('es-wide', on&&esWide()); }
-window.addEventListener('resize',function(){ try{ esApplyWide(); }catch(e){} });
+function rptApplyWide(){ var on=document.getElementById('s-report').classList.contains('on'); document.body.classList.toggle('rpt-wide', on&&esWide()); }   // [1.64.0] 나의 4주 보고서 — 디벗 가로 다단
+window.addEventListener('resize',function(){ try{ esApplyWide(); }catch(e){} try{ rptApplyWide(); }catch(e){} });
 document.addEventListener('visibilitychange',function(){ if(document.hidden){ try{ if(ES.더티&&!ES.닫힘) esSaveServer(); }catch(e){} } });
 function esCount(v){ return String(v==null?'':v).replace(/\s+/g,'').length; }
 function esFmtDue(t){ var m=String(t||'').match(/(\d{4})-(\d{1,2})-(\d{1,2})[ T]?(\d{1,2})?:?(\d{2})?/); if(!m) return String(t||'');
