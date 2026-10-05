@@ -1,4 +1,5 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.62.1 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.63.0 -->
+<!--   [1.63.0] ★자동 전환 — 운동 탭은 «자동_운동끄기»(10/5 22:00)부터 숨김, 보고서 탭은 «자동_보고서표시»부터 보이되 «자동_보고서열기»(10/6 09:00) 전에는 «보고서는 10월 6일(화) 09:00에 열려요» 안내(감상문도 막음). 앱을 켜 둔 채 시각이 지나도 30초마다 다시 확인해 바뀐다(서버 GAS 1.50.0). -->
 <!--   [1.62.1] 설치 앱이 세로로만 열리던 것 — manifest 7개의 orientation 을 portrait → any(디벗 가로 화면에서 로그인·감상문 쓰기). -->
 <!--   [1.62.0] ★감상문 3번 «체력 변화 돌아보기» 추가 — 내 체력 측정 그래프(항목별 변화·향상/감소)를 문항 안에서 보며 쓴다(80자 이상). 4주차 마지막 측정은 선택이라 안내 + 교무실 인바디·줄자·악력계 대여 안내 + «4주차 측정값 입력하러 가기».
         읽을거리·마음단단은 4·5번으로. 서버 GAS 1.49.0(체력변화 칸·최소 글자수 5번째 값). -->
@@ -720,6 +721,11 @@ body.es-recopen .esrecbtn{background:var(--primary);color:#fff}
 .escnt.ok{color:var(--primary-dark);font-weight:700}
 .essh{font-size:13px;font-weight:800;color:var(--primary-dark);margin:14px 0 8px}
 .essh:first-of-type{margin-top:0}
+.rpsoon{text-align:center;padding:28px 18px}
+.rpsoon-ic{font-size:44px;margin-bottom:6px}
+.rpsoon h2{font-size:19px;margin:0 0 10px}
+.rpsoon h2 b{color:var(--primary-dark)}
+.rpsoon p{font-size:14px;line-height:1.7;margin:0 0 8px}
 .esfitg{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:10px}
 .esfitc{border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;background:var(--surface)}
 .esfith{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:13px;margin-bottom:2px}
@@ -2017,7 +2023,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.62.1';
+var PWA_VER = '1.63.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -2108,11 +2114,23 @@ function dismissInstall(){localStorage.setItem('grofit_install_dismissed','1');d
 var TABS = {home:1,cert:1,inbody:1,reflect:1,score:1,notice:1};
 /* [1.49.0] 관리자 설정(메뉴_운동 등)으로 막힌 화면은 홈으로 돌려보낸다 — 탭바뿐 아니라 홈의 바로가기 카드로도 못 들어가게 */
 var MENU_GATE={cert:'운동',cardio:'운동',strength:'운동',reject:'운동','inbody':'체력','inbody-graph':'체력',reflect:'성찰',score:'기록',notice:'공지',report:'보고서',essay:'보고서'};   // [1.56.0] 감상문도 보고서 스위치를 따른다
+/* [1.63.0] 자동 전환 예약 — 서버가 준 값에 더해, 앱을 켜 둔 채 시각이 지나도 바로 바뀌게 기기 시계로도 본다 */
+function schedPast(t){ var m=String(t||'').match(/(\d{4})-(\d{1,2})-(\d{1,2})[ T](\d{1,2}):(\d{2})/); if(!m) return false;
+  return Date.now()>=new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]).getTime(); }
+function reportOpen(){
+  if(String((ST.student||{}).학번||'')==='3277') return true;
+  var c=ST.config||{}; return c.메뉴_보고서==='on' || schedPast(c.자동_보고서열기);
+}
 function menuOn(key){
   /* [1.55.0] 보고서는 3277(선생님)에게만 항상 열어 둔다 — 학생에게 켜기 전에 미리 보려고 */
   if(key==='보고서' && String((ST.student||{}).학번||'')==='3277') return true;
-  var c=ST.config||{}, v=c['메뉴_'+key]; if(v===undefined) return key!=='보고서'; return String(v)!=='off';
+  var c=ST.config||{}, v=c['메뉴_'+key];
+  if(key==='운동' && schedPast(c.자동_운동끄기)) return false;                       // [1.63.0]
+  if(key==='보고서') return v==='on' || v==='soon' || schedPast(c.자동_보고서표시) || schedPast(c.자동_보고서열기);
+  if(v===undefined) return true; return String(v)!=='off';
 }
+setInterval(function(){ try{ if(!ST.student) return; var was=ST._rpOpen; applyMenuSwitches(); var now=reportOpen(); ST._rpOpen=now;
+  if(was===false && now && document.getElementById('s-report').classList.contains('on')) loadReport(); }catch(e){} },30000);
 function applyMenuSwitches(){
   document.querySelectorAll('#tabbar button[data-t]').forEach(function(b){
     var g=MENU_GATE[b.dataset.t]; if(!g) return;   // 홈은 늘 켜짐
@@ -2125,6 +2143,7 @@ function applyMenuSwitches(){
 function go(name, skipLoad){
   var gate=MENU_GATE[name];
   if(gate && !menuOn(gate)){ toast(gate+' 메뉴는 지금 닫혀 있어요'); name='home'; }
+  if(name==='essay' && !reportOpen()){ toast('감상문은 '+rpOpenLabel()+'에 열려요'); name='report'; }   // [1.63.0]
   document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on')});
   var el = document.getElementById('s-'+name); if(el) el.classList.add('on');
   var tb = document.getElementById('tabbar');
@@ -4979,8 +4998,18 @@ function renderFitTable(){
 }
 
 /* [1.49.0] 나의 4주 보고서 — 읽기 전용(감상문 입력·사진일기는 아직 없음) */
+function rpOpenLabel(){ var t=(ST.config||{}).자동_보고서열기||''; var m=String(t).match(/(\d{4})-(\d{1,2})-(\d{1,2})[ T](\d{1,2}):(\d{2})/);
+  if(!m) return '선생님이 열어 줄 때'; var d=new Date(+m[1],+m[2]-1,+m[3]); return (+m[2])+'월 '+(+m[3])+'일('+'일월화수목금토'.charAt(d.getDay())+') '+m[4].padStart(2,'0')+':'+m[5]; }
 function loadReport(){
   var box=document.getElementById('rpt-body');
+  ST._rpOpen=reportOpen();
+  if(!ST._rpOpen){                                                          // [1.63.0] 열리기 전 — 오픈 예정 안내
+    document.getElementById('rpt-sub').textContent='4주 운동처방일지 보고서 · 운동처방 감상문';
+    box.innerHTML='<div class="card rpsoon"><div class="rpsoon-ic">📄</div><h2>보고서는 <b>'+rpOpenLabel()+'</b>에 열려요</h2>'
+      +'<p>4주 동안 정말 수고 많았어요! 운동 기록은 이제 마감되었어요.<br>열리면 나의 4주 보고서를 보고 <b>운동처방 감상문</b>을 쓸 수 있어요.</p>'
+      +'<p class="cap">감상문 작성 기간 · '+rpOpenLabel()+' ~ '+esFmtDue((ST.config||{}).감상문_마감||'')+'</p></div>';
+    return;
+  }
   call('getMyReport',[ST.student.학번],function(d){
     if(!d||!d.ok){ box.innerHTML='<p class="muted" style="text-align:center;padding:26px 0">'+esc((d&&d.msg)||'불러오지 못했어요')+'</p>'; return; }
     document.getElementById('rpt-sub').textContent=(d.평가명||'')+' · '+(d.기간||'');
