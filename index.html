@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.65.0 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.66.0 -->
+<!--   [1.66.0] «나의 4주 보고서»를 «나의 혜원핏 보고서»로. 2단(왼쪽/오른쪽) 고정 레이아웃을 걷어내고, 주차마다 운동 실천·근력 1일차→2일차 세트·횟수 변화·사진일기 썸네일·그 주 성찰을 한 카드에 묶어 «주차별 기록» 그리드로(좁으면 1단, 디벗 가로면 자동 2~4단).
+        근력 변화는 서버 parseStrSummary_(GAS 1.54.0, adminGetReport 의 주차.근력기록)로 종목별 합계를 비교해 ±회/초로 보여준다. 사진일기는 주차.일기(fileId)를 기존 hydratePhotos()/openMyPhoto() 로 지연 로딩·확대. -->
 <!--   [1.65.0] 주간 성찰도 «자동_운동끄기» 시각이 지나면 쓰기 칸이 닫히고 «⏰ 주간 성찰 작성 기간이 끝났어요» 안내로 바뀐다(지난 성찰은 그대로 보임). 서버 GAS 1.52.0도 같은 시각으로 거절. -->
 <!--   [1.64.0] ★하단 탭 «보고서»를 «감상문»으로(헷갈림 방지, 아이콘 ✍️) · 마스터코드로 들어온 둘러보기 계정은 메뉴_보고서 설정·오픈 시각과 무관하게 항상 «감상문» 탭·보고서·감상문 화면을 볼 수 있다(저장은 여전히 서버가 막음, 안전).
         «나의 4주 보고서»를 디벗 가로(860px↑)에서 2단 레이아웃으로(왼쪽 요약·주차별 실천·성취율, 오른쪽 체력 변화 그래프+수치표·주차별 성찰) + 체력 탭과 같은 변화 그래프 추가. GAS 1.51.0(teacherGetMasterCode·teacherSetMasterCode). -->
@@ -724,10 +726,27 @@ body.es-recopen .esrecbtn{background:var(--primary);color:#fff}
 .escnt.ok{color:var(--primary-dark);font-weight:700}
 .essh{font-size:13px;font-weight:800;color:var(--primary-dark);margin:14px 0 8px}
 .essh:first-of-type{margin-top:0}
-.rpt-grid .rpt-col{display:flex;flex-direction:column;gap:14px}
-.rpt-grid .rpt-col .card{margin-bottom:0}
-body.rpt-wide .app{max-width:960px}   /* [1.64.0] 나의 4주 보고서 — 디벗 가로(860px↑)에서 폭을 넓히고 2단으로 */
-body.rpt-wide .rpt-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+body.rpt-wide .app{max-width:1100px}   /* [1.66.0] 나의 혜원핏 보고서 — 디벗 가로(860px↑)에서 폭을 넓힌다(주차 카드·체력 그래프가 자동으로 여러 칸으로 배치됨) */
+/* [1.66.0] 주차 카드 — 좁으면 1단, 넓으면 자동으로 2~4단(auto-fit) */
+.rptwks{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px;margin-top:2px}
+.rptwk{border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--bg);display:flex;flex-direction:column;gap:9px}
+.rptwk.ok{border-color:var(--primary)}
+.rptwkh{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.rptwkh b{font-size:15.5px}
+.rptwkline{font-size:12px;color:var(--muted);margin-top:-5px}
+.rptwkstr{font-size:12.5px;line-height:1.6;border-top:1px dashed var(--divider);padding-top:8px}
+.rptwkstr b{display:block;margin-bottom:4px;color:var(--ink);font-size:12.5px}
+.rptwkstr table{width:100%;border-collapse:collapse;font-size:11.5px}
+.rptwkstr td{padding:3px 4px;border-top:1px dashed var(--divider)}
+.rptwkstr td.up,.rptwkstr .up{color:var(--primary-dark);font-weight:800}
+.rptwkstr .dn{color:#c0392b;font-weight:800}
+.rptwkdia{display:flex;gap:6px;flex-wrap:wrap}
+.rptwkdia img{width:54px;height:54px;object-fit:cover;border-radius:8px;cursor:pointer;background:#eef1ec;flex:none}
+.rptwkdia img.phwait{background:linear-gradient(90deg,#eef1ec,#f6f8f5,#eef1ec);background-size:200% 100%;animation:phsh 1.2s linear infinite}
+.rptwkrf{font-size:12.5px;line-height:1.6;border-top:1px dashed var(--divider);padding-top:8px}
+.rptwkrf b{display:block;margin-bottom:3px;color:var(--ink);font-size:12.5px}
+.rptwkrf p{margin:0}
+.rptwkrf.muted p{color:var(--muted)}
 .rpsoon{text-align:center;padding:28px 18px}
 .rpsoon-ic{font-size:44px;margin-bottom:6px}
 .rpsoon h2{font-size:19px;margin:0 0 10px}
@@ -1606,7 +1625,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
       <button type="button" class="howbtn shotbtn" onclick="toggleDiaryHelp(this)">📸 사진일기가 뭔가요? · 도움말</button>
       <div class="howbox hidden" id="diary-help"></div>
       <div class="drop diary" id="diary-drop" onclick="pick('diary-file')">📸 오늘의 사진 한 장 넣기 <span class="chip">선택</span><br><span class="cap">그날을 기억할 사진 · 안 넣어도 저장됩니다</span></div>
-      <p class="diarynote">📘 사진일기는 4주가 끝나면 <b>나의 4주 보고서</b>에 그날 운동 기록·성찰과 함께 실려요. 감상문 쓸 때 가장 좋은 재료예요!</p>   <!-- [1.32.0] -->
+      <p class="diarynote">📘 사진일기는 4주가 끝나면 <b>나의 혜원핏 보고서</b>에 그날 운동 기록·성찰과 함께 실려요. 감상문 쓸 때 가장 좋은 재료예요!</p>   <!-- [1.32.0] -->
       <input type="file" id="diary-file" accept="image/*" class="hidden" onchange="onDiaryImg(this)">
       <div id="diary-box" class="hidden">
         <img id="diary-prev" class="diaryimg">
@@ -1868,7 +1887,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 
   <!-- [1.49.0] 나의 4주 보고서 -->
   <section id="s-report" class="scr">
-    <h1 style="margin-bottom:4px">나의 4주 보고서</h1>
+    <h1 style="margin-bottom:4px">나의 혜원핏 보고서</h1>
     <p class="muted" style="font-size:12.5px;margin:0 0 14px" id="rpt-sub"></p>
     <div id="rpt-body"><p class="muted" style="text-align:center;padding:26px 0">불러오는 중…</p></div>
     <div id="rpt-essay" class="hidden"></div>   <!-- [1.55.0] 감상문 쓰러 가기 -->
@@ -2034,7 +2053,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.65.0';
+var PWA_VER = '1.66.0';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -3953,7 +3972,7 @@ function diaryHelpHTML(){
     + pic('운동 끝, 물 한 잔','#F3EEE4','<rect x="38" y="26" width="24" height="40" rx="4" fill="#9CC7E8"/><rect x="38" y="40" width="24" height="26" rx="3" fill="#5FA8DC"/><rect x="44" y="18" width="12" height="8" rx="2" fill="#7FB6DE"/>')
     +'</div>'
     +'<ul style="margin:10px 0 0;padding-left:16px;font-size:13px;line-height:1.7">'
-    +'<li>📘 4주가 끝나면 <b>나의 4주 보고서</b>에 그날 기록·성찰과 함께 실려요. <b>감상문</b> 쓸 때 돌아보는 재료가 됩니다.</li>'   // [1.32.0]
+    +'<li>📘 4주가 끝나면 <b>나의 혜원핏 보고서</b>에 그날 기록·성찰과 함께 실려요. <b>감상문</b> 쓸 때 돌아보는 재료가 됩니다.</li>'   // [1.32.0]
     +'<li>📸 <b>운동할 때마다 한 장씩</b> 남기면 4주의 변화가 사진으로 이어져요.</li>'
     +'<li><b>얼굴은 안 나와도 됩니다.</b> 집 주소·아파트 동 번호·학교 이름이 보이는 사진은 피해요.</li>'
     +'<li>운동 앱 캡처(기록 사진)와는 <b>다른 사진</b>이에요.</li>'
@@ -5020,7 +5039,7 @@ function loadReport(){
   if(!ST._rpOpen){                                                          // [1.63.0] 열리기 전 — 오픈 예정 안내
     document.getElementById('rpt-sub').textContent='4주 운동처방일지 보고서 · 운동처방 감상문';
     box.innerHTML='<div class="card rpsoon"><div class="rpsoon-ic">📄</div><h2>보고서는 <b>'+rpOpenLabel()+'</b>에 열려요</h2>'
-      +'<p>4주 동안 정말 수고 많았어요! 운동 기록은 이제 마감되었어요.<br>열리면 나의 4주 보고서를 보고 <b>운동처방 감상문</b>을 쓸 수 있어요.</p>'
+      +'<p>4주 동안 정말 수고 많았어요! 운동 기록은 이제 마감되었어요.<br>열리면 나의 혜원핏 보고서를 보고 <b>운동처방 감상문</b>을 쓸 수 있어요.</p>'
       +'<p class="cap">감상문 작성 기간 · '+rpOpenLabel()+' ~ '+esFmtDue((ST.config||{}).감상문_마감||'')+'</p></div>';
     return;
   }
@@ -5028,26 +5047,22 @@ function loadReport(){
     if(!d||!d.ok){ box.innerHTML='<p class="muted" style="text-align:center;padding:26px 0">'+esc((d&&d.msg)||'불러오지 못했어요')+'</p>'; return; }
     document.getElementById('rpt-sub').textContent=(d.평가명||'')+' · '+(d.기간||'');
     ST.fitness=d.체력||[];                              // [1.64.0] 체력 탭·확대 보기와 같은 데이터를 쓴다
-    var left='', right='';
-    left+='<div class="card"><div style="display:flex;flex-wrap:wrap;gap:10px 18px">'
+    var sc=d.점수||{}, h='';
+    /* [1.66.0] 요약 — 운동·성취율을 한 카드에 두 줄로(카드 수를 줄여 가로 화면에서 스크롤을 덜 하게) */
+    h+='<div class="card"><div style="display:flex;flex-wrap:wrap;gap:10px 18px">'
       +rptStat(d.총운동일,'총 운동일수')+rptStat((d.달성주차||0)+'/'+(d.총주차||0),'목표 달성 주차')
-      +rptStat(d.총거리,'총 달린 거리(km)')+rptStat(d.총시간,'총 운동시간(분)')+'</div></div>';
-    left+='<div class="card"><h2 style="margin:0 0 10px">주차별 운동 실천</h2><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:380px">'
-      +'<thead><tr><th style="text-align:left;padding:6px 4px;color:#8a978c">주차</th><th style="padding:6px 4px;color:#8a978c">운동일수</th>'
-      +'<th style="padding:6px 4px;color:#8a978c">유산소</th><th style="padding:6px 4px;color:#8a978c">근력</th><th style="padding:6px 4px;color:#8a978c">목표</th></tr></thead><tbody>'
-      +(d.주차||[]).map(function(w){ return '<tr><td style="padding:6px 4px;border-top:1px solid var(--divider)">'+w.주차+'주</td>'
-        +'<td style="text-align:center;padding:6px 4px;border-top:1px solid var(--divider)">'+w.운동일수+'일</td>'
-        +'<td style="text-align:center;padding:6px 4px;border-top:1px solid var(--divider)">'+w.유산소일수+'일</td>'
-        +'<td style="text-align:center;padding:6px 4px;border-top:1px solid var(--divider)">'+w.근력일수+'일</td>'
-        +'<td style="text-align:center;padding:6px 4px;border-top:1px solid var(--divider)"><span class="chip '+(w.달성?'ok':'bad')+'">'+(w.달성?'달성':'미달')+'</span></td></tr>'; }).join('')
-      +'</tbody></table></div></div>';
-    var sc=d.점수||{};
-    left+='<div class="card"><h2 style="margin:0 0 10px">성취율</h2><div style="display:flex;flex-wrap:wrap;gap:10px 18px">'
+      +rptStat(d.총거리,'총 달린 거리(km)')+rptStat(d.총시간,'총 운동시간(분)')+'</div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--divider)">'
       +rptStat((sc.운동달성률!=null?sc.운동달성률+'%':'—'),'운동 달성률')+rptStat((sc.정시성!=null?sc.정시성+'%':'—'),'제출 정시성')
       +rptStat((sc.성취율!=null?sc.성취율+'%':'—'),'최종 성취율')+'</div></div>';
+    /* [1.66.0] 주차별 — 운동 실천 + 근력 1일차·2일차 변화 + 사진일기 + 그 주 성찰을 한 카드씩, 가로가 넓으면 여러 칸으로 자동 배치 */
+    var rfBy={}; (d.성찰||[]).forEach(function(r){ rfBy[Number(r.주차)]=r; });
+    h+='<div class="card"><h2 style="margin:0 0 10px">주차별 기록</h2><div class="rptwks">'
+      +(d.주차||[]).map(function(w){ return rptWeekCardHTML(w,rfBy[w.주차]); }).join('')
+      +'</div></div>';
     var hasFit=(d.체력||[]).some(function(f){return f.있음;});
     if(hasFit){
-      right+='<div class="card"><h2 style="margin:0 0 10px">체력 변화 그래프</h2>'
+      h+='<div class="card"><h2 style="margin:0 0 10px">체력 변화 그래프</h2>'
         +'<div class="esfitg">'+FIT_METRICS.map(function(m){ var c=chartCard(m,d.체력,true,280,130); if(!c) return '';
           return '<div class="esfitc fitcard" onclick="zoomChart(&quot;'+m.k+'&quot;)"><div class="esfith"><b>'+c.title+'</b>'+c.badge+'</div>'+c.svg+'<div class="cap">'+c.cap+'</div></div>'; }).join('')
         +'</div>'
@@ -5059,16 +5074,51 @@ function loadReport(){
           +'</tr>'; }).join('')
         +'</tbody></table></div></div>';
     }
-    right+='<div class="card"><h2 style="margin:0 0 10px">주차별 성찰</h2>'
-      +((d.성찰&&d.성찰.length)?d.성찰.map(function(r){ return '<div style="margin-bottom:12px"><b>'+r.주차+'주차</b> <span class="cap">'+esc(r.작성일||'')+'</span>'
-          +'<p style="margin:4px 0 0">'+esc(r.내용||'')+'</p>'+(r.교사코멘트?comicHTML(r.교사코멘트,r.스티커||''):'')+'</div>'; }).join('')
-        :'<p class="muted">작성한 성찰이 없어요.</p>')+'</div>';
-    box.innerHTML='<div class="rpt-grid"><div class="rpt-col">'+left+'</div><div class="rpt-col">'+(right||'<div></div>')+'</div></div>';
+    box.innerHTML=h;
     rptApplyWide();                                    // [1.64.0]
+    hydratePhotos();                                    // [1.66.0] 사진일기 썸네일을 한 장씩 불러온다
     paintEssayBtn();                                  // [1.55.0] 맨 아래 «감상문 쓰러 가기»
   });
 }
 function rptStat(v,label){ return '<div style="flex:1 1 40%;min-width:120px"><div style="font-size:24px;font-weight:800">'+v+'</div><div class="cap">'+label+'</div></div>'; }
+/* [1.66.0] 주차 카드 한 장 — 운동 실천 요약 + 근력 1일차·2일차 변화 + 사진일기 + 그 주 성찰 */
+function rptWeekCardHTML(w,rf){
+  var h='<div class="rptwk'+(w.달성?' ok':'')+'"><div class="rptwkh"><b>'+w.주차+'주차</b><span class="chip '+(w.달성?'ok':'bad')+'">'+(w.달성?'✓ 달성':'미달')+'</span></div>'
+    +'<div class="rptwkline">운동 '+w.운동일수+'일 · 유산소 '+w.유산소일수+'일 · 근력 '+w.근력일수+'일</div>';
+  var str=rptStrCompareHTML(w.근력기록||[]);
+  if(str) h+=str;
+  if((w.일기||[]).length){
+    h+='<div class="rptwkdia">'+w.일기.map(function(ph){
+      return '<img class="phwait" data-fid="'+esc(ph.fileId)+'" title="'+esc(ph.날짜)+' · 사진일기" alt="사진일기" onclick="openMyPhoto(&quot;'+esc(ph.fileId)+'&quot;)">'; }).join('')+'</div>';
+  }
+  h+='<div class="rptwkrf'+(rf?'':' muted')+'"><b>📝 '+w.주차+'주차 성찰</b>'
+    +(rf?('<p>'+esc(rf.내용||'')+'</p>'+(rf.교사코멘트?comicHTML(rf.교사코멘트,rf.스티커||''):'')):'<p>작성한 성찰이 없어요.</p>')+'</div>';
+  return h+'</div>';
+}
+/* [1.66.0] 근력 1일차·2일차 종목별 세트·횟수(또는 초) 비교 — 서버가 준 parseStrSummary_ 결과(w.근력기록[i].종목)를 쓴다 */
+function rptStrValTxt(x){ return x.sets+'세트×'+(x.secs?x.secs+'초':(Math.round(x.reps*10)/10+'회')); }
+function rptStrCompareHTML(recs){
+  if(!recs.length) return '';
+  if(recs.length===1){
+    var only=recs[0], rows1=(only.종목||[]).map(function(x){ return '<tr><td>'+esc(x.name)+'</td><td>'+rptStrValTxt(x)+'</td></tr>'; }).join('');
+    if(!rows1) return '';
+    return '<div class="rptwkstr"><b>근력 기록 · '+only.날짜.slice(5).replace('-','/')+'(1일차)</b><table>'+rows1+'</table>'
+      +'<div class="cap" style="margin-top:3px">필수 근력은 주 2회예요 · 아직 1회만 기록했어요</div></div>';
+  }
+  var a=recs[0], b=recs[1], names=[]; var seen={};
+  (a.종목||[]).concat(b.종목||[]).forEach(function(x){ if(!seen[x.name]){ seen[x.name]=1; names.push(x.name); } });
+  if(!names.length) return '';
+  var rows=names.map(function(nm){
+    var A=(a.종목||[]).filter(function(x){return x.name===nm;})[0], B=(b.종목||[]).filter(function(x){return x.name===nm;})[0];
+    var av=A?(A.secs?A.totSecs:A.totReps):null, bv=B?(B.secs?B.totSecs:B.totReps):null;
+    var d=(av!=null&&bv!=null)?(bv-av):null, unit=((A&&A.secs)||(B&&B.secs))?'초':'회';
+    var dHtml=d==null?'<span class="muted">—</span>':(d===0?'<span class="muted">0'+unit+'</span>':('<span class="'+(d>0?'up':'dn')+'">'+(d>0?'+':'')+d+unit+'</span>'));
+    return '<tr><td>'+esc(nm)+'</td><td>'+(A?rptStrValTxt(A):'<span class="muted">—</span>')+'</td><td>'+(B?rptStrValTxt(B):'<span class="muted">—</span>')+'</td><td>'+dHtml+'</td></tr>';
+  }).join('');
+  return '<div class="rptwkstr"><b>근력 변화 · '+a.날짜.slice(5).replace('-','/')+' → '+b.날짜.slice(5).replace('-','/')+'</b>'
+    +'<table><tr><td></td><td>1일차</td><td>2일차</td><td>변화</td></tr>'+rows+'</table>'
+    +(recs.length>2?('<div class="cap" style="margin-top:3px">그 주에 '+(recs.length-2)+'번 더 기록했어요</div>'):'')+'</div>';
+}
 
 
 /* ===================== [1.56.0] 운동처방 감상문 =====================
