@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.70.4 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.70.5 -->
+<!--   [1.70.5] 제출하기 눌렀을 때 "아직 못 채운 곳이 있어요"로만 뜨던 걸 — esLeftDetail() 로 몇 번 문항에 몇 글자가 모자란지(또는 글을 안 골랐는지) 콕 짚어 보여주고,
+        첫 번째 미달 문항으로 화면도 바로 이동(esShow). esLeft() 는 esLeftDetail().length 를 쓰도록 통합(두 로직이 따로 놀며 어긋나지 않게). -->
 <!--   [1.70.4] ★버그 수정 — 보고서 화면의 «감상문 쓰러 가기» 버튼(paintEssayBtn)이 getMyEssay 응답을 기다렸다가 그려지는 구조라, 오늘 밤처럼 서버가 느려 그 호출이 실패하면 버튼 자리가 통째로 비어 학생이 감상문으로 못 들어갔다(유지우 학생 실제 신고).
         기본 버튼을 먼저 그려 두고, 응답이 오면 더 정확한 문구(이어서 쓰기 등)로 바꾸는 식으로 — 실패해도 버튼은 항상 있게. -->
 <!--   [1.70.3] 감상문 탭 상단에 저장 지연 안내 배너(.esinfo) 고정 — 어느 문항을 펼쳐도 늘 보이게 #es-due 바로 아래. 같은 문구로 공지도 함께 보냄. -->
@@ -2072,7 +2074,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.70.4';
+var PWA_VER = '1.70.5';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -5249,14 +5251,19 @@ function esDone(key){
   if(key==='qt') return esCount(A.선생님께)>=1;   // [1.67.0] 선택 항목 — 쓰면 체크만 켜진다(제출 조건 아님)
   return false;
 }
-function esLeft(){
-  var A=ES.답, M=ES.최소, n=0;
-  if(esCount(A.문항1)<M[0]) n++;
-  ES_ELEM.concat(ES_PRIN).forEach(function(x){ if(esCount(A[x[0]])<1) n++; });
-  if(!A.읽을거리) n++; if(esCount(A.읽을거리이유)<M[2]) n++;
-  if(!A.마음단단) n++; if(esCount(A.마음단단이유)<M[3]) n++;
-  if(esCount(A.체력변화)<(M[4]||80)) n++;
-  return n;
+function esLeft(){ return esLeftDetail().length; }
+/* [1.70.5] 제출 막힌 곳을 문항·부족 글자수까지 짚어 준다 */
+function esLeftDetail(){
+  var A=ES.답, M=ES.최소, out=[];
+  var c1=esCount(A.문항1); if(c1<M[0]) out.push({k:'q1',t:'1번 4주간의 나 — '+c1+' / '+M[0]+'자 ('+(M[0]-c1)+'자 더 필요)'});
+  var miss2=[]; ES_ELEM.concat(ES_PRIN).forEach(function(x){ if(esCount(A[x[0]])<1) miss2.push(x[1]); });
+  if(miss2.length) out.push({k:'q2',t:'2번 요소와 원리 — '+miss2.join('·')+' 비어 있음'});
+  var mf=(M[4]||80), cf=esCount(A.체력변화); if(cf<mf) out.push({k:'qf',t:'3번 체력 변화 — '+cf+' / '+mf+'자 ('+(mf-cf)+'자 더 필요)'});
+  if(!A.읽을거리) out.push({k:'q3',t:'4번 읽을거리 — 글을 아직 안 골랐어요'});
+  else { var c3=esCount(A.읽을거리이유); if(c3<M[2]) out.push({k:'q3',t:'4번 이유 — '+c3+' / '+M[2]+'자 ('+(M[2]-c3)+'자 더 필요)'}); }
+  if(!A.마음단단) out.push({k:'q4',t:'5번 마음단단 — 글을 아직 안 골랐어요'});
+  else { var c4=esCount(A.마음단단이유); if(c4<M[3]) out.push({k:'q4',t:'5번 이유 — '+c4+' / '+M[3]+'자 ('+(M[3]-c4)+'자 더 필요)'}); }
+  return out;
 }
 function esBar(){
   var bar=document.getElementById('es-bar'), btn=document.getElementById('es-submit'), lf=document.getElementById('es-left'); if(!bar) return;
@@ -5265,7 +5272,8 @@ function esBar(){
   btn.disabled = n>0; btn.textContent = (ES.상태==='제출') ? '다시 제출하기' : '제출하기';
 }
 function esSubmit(){
-  if(esLeft()>0){ toast('아직 못 채운 곳이 있어요'); return; }
+  var left=esLeftDetail();
+  if(left.length){ esShow(left[0].k); uiMsg('아직 못 채운 곳이 '+left.length+'곳 있어요:\n\n'+left.map(function(x){ return '· '+x.t; }).join('\n')); return; }
   if(ES.저장중){ toast('저장하는 중이에요 · 잠깐만요'); setTimeout(esSubmit,1200); return; }
   askP('감상문을 제출할까요?\n\n마감('+esFmtDue(ES.마감)+') 전까지는 고쳐서 몇 번이든 다시 제출할 수 있어요.\n제출할 때마다 기록이 남아요.').then(function(yes){
     if(!yes) return;
