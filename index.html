@@ -1,4 +1,6 @@
-<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.70.3 -->
+<!-- 코드명: 혜원핏 PWA 학생앱 | index.html | @version 1.70.4 -->
+<!--   [1.70.4] ★버그 수정 — 보고서 화면의 «감상문 쓰러 가기» 버튼(paintEssayBtn)이 getMyEssay 응답을 기다렸다가 그려지는 구조라, 오늘 밤처럼 서버가 느려 그 호출이 실패하면 버튼 자리가 통째로 비어 학생이 감상문으로 못 들어갔다(유지우 학생 실제 신고).
+        기본 버튼을 먼저 그려 두고, 응답이 오면 더 정확한 문구(이어서 쓰기 등)로 바꾸는 식으로 — 실패해도 버튼은 항상 있게. -->
 <!--   [1.70.3] 감상문 탭 상단에 저장 지연 안내 배너(.esinfo) 고정 — 어느 문항을 펼쳐도 늘 보이게 #es-due 바로 아래. 같은 문구로 공지도 함께 보냄. -->
 <!--   [1.70.2] ★긴급(이어서, 마지막 조정) — 오늘이 혜원핏 마지막 사용일이라 구조를 바꾸는 대신 수치만 더 조정.
         자동저장 1초→8초(앞서 4초였던 것 더 늘림), 실패 판정 기준 30초→75초(call() 자체가 18초×3번 재시도하므로 그 전엔 섣불리 «실패» 안 띄우게), 실패 뒤 재시도 간격도 8초로. -->
@@ -2070,7 +2072,7 @@ body.apt::before{content:'🍎 애플 스타일 시범 · 3277';position:fixed;l
 <script>
 var API_BASE = 'https://script.google.com/macros/s/AKfycbzkiRulWoZvZs2q6NzDJM1I0aG43xnLjwuE-oY3PJ5R8kHbcSMRDfadG69kUIKzq-FN5A/exec';
 /* 학생앱(PWA) 버전·배포시각(KST) — 배포 때마다 갱신 */
-var PWA_VER = '1.70.3';
+var PWA_VER = '1.70.4';
 /* [1.34.0] 푸시 알림(FCM) — 파이어베이스 콘솔 «프로젝트 설정 → 일반 → 내 앱(웹)» 값. 비어 있으면 «🔔 알림 받기»가 «준비 중»으로 뜬다.
    sw.js 맨 위 FCM_CONFIG 에도 «똑같이» 채워야 한다(백그라운드 수신은 서비스워커가 처리). */
 var FCM_CONFIG = { apiKey:'AIzaSyC_InfCEKRIFqmFLus7npS4b-GejpDBJAE', authDomain:'heywonfit.firebaseapp.com', projectId:'heywonfit', storageBucket:'heywonfit.firebasestorage.app', messagingSenderId:'541314853089', appId:'1:541314853089:web:38220f47a5cb68ac696fa0' };
@@ -5467,8 +5469,10 @@ function esDiaRender(){
 function paintEssayBtn(){
   var box=document.getElementById('rpt-essay'); if(!box) return;
   box.classList.remove('hidden');
+  /* [1.70.4] 서버가 느려 아래 getMyEssay 가 실패해도 버튼 자리가 통째로 비지 않게 — 기본 버튼을 먼저 그려 두고, 응답이 오면 더 정확한 문구로 바꾼다 */
+  box.innerHTML='<div class="card" style="text-align:center"><h2 style="margin:0 0 6px">운동처방 감상문</h2><button class="btn" onclick="go(\'essay\')">✍️ 감상문 쓰러 가기</button></div>';
   call('getMyEssay',[ST.student.학번],function(r){
-    if(!r||!r.ok){ box.innerHTML=''; return; }
+    if(!r||!r.ok){ return; }   // 실패해도 위 기본 버튼은 그대로 둔다(지우지 않음)
     var 쓴적=!!(r.답 && (r.답.문항1||r.답.요소_질적||r.답.읽을거리이유));
     var lab = r.마감지남 ? '📄 내가 쓴 감상문 보기' : (r.상태==='제출' ? '✍️ 감상문 고치기' : (쓴적 ? '✍️ 이어서 쓰기' : '✍️ 감상문 쓰러 가기'));
     var sub = r.마감지남 ? (r.상태==='제출' ? '제출이 마감되었습니다 · 제출한 감상문이 최종으로 인정돼요' : '제출이 마감되었습니다 · 제출하지 못해 미제출로 처리돼요')
